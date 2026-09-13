@@ -33,6 +33,21 @@ class Settings(BaseSettings):
     groq_api_key: str = ""
     gemini_api_key: str = ""
 
+    # --- LLM provider models ----------------------------------------------------
+    # llama-3.3-70b-versatile moved to Groq's Enterprise-only tier - the free/
+    # developer tier's current recommended replacements are the openai/gpt-oss
+    # models. gpt-oss-20b is used here since it's the faster of the two
+    # (~1000 tok/sec vs ~500), which matters for the low-latency interviewer
+    # role; swap to openai/gpt-oss-120b if you want more capability over speed.
+    groq_model: str = "openai/gpt-oss-20b"
+    # gemini-1.5-flash has likewise been superseded. Groq and Google both
+    # deprecate/rename models fairly often on the free tier - if you hit a
+    # 404 "model not found" again, check https://console.groq.com/docs/models
+    # or https://ai.google.dev/gemini-api/docs/models for the current list
+    # and update these two defaults (or override via .env instead of editing
+    # code, using GROQ_MODEL= / GEMINI_MODEL=).
+    gemini_model: str = "gemini-2.5-flash"
+
     # --- CORS -----------------------------------------------------------------
     # The Vite dev server's default origin, so the React frontend (Phase 1
     # onward) is allowed to call this API from the browser during local dev.
