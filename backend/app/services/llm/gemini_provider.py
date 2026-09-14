@@ -31,6 +31,17 @@ from google.genai import types
 from google.genai.errors import APIError
 
 from app.services.llm.base import LLMProvider, LLMProviderError, LLMResponse, Message, Role
+from app.services.llm.retry import retry_transient
+
+# HTTP statuses worth retrying: 429 (rate limited) and the common 5xx
+# "temporarily unavailable" family. Anything else (401 bad key, 404 unknown
+# model, 400 malformed request) is permanent - retrying just delays the
+# same error, so those are left alone and raised immediately.
+_TRANSIENT_CODES = {429, 500, 502, 503, 504}
+
+
+def _is_transient(exc: Exception) -> bool:
+    return isinstance(exc, APIError) and exc.code in _TRANSIENT_CODES
 
 
 class GeminiProvider(LLMProvider):
@@ -67,10 +78,13 @@ class GeminiProvider(LLMProvider):
         )
 
         try:
-            response = await self._client.aio.models.generate_content(
-                model=self._model,
-                contents=contents,
-                config=config,
+            response = await retry_transient(
+                lambda: self._client.aio.models.generate_content(
+                    model=self._model,
+                    contents=contents,
+                    config=config,
+                ),
+                is_transient=_is_transient,
             )
         except APIError as exc:
             raise LLMProviderError(f"Gemini API call failed: {exc}", provider="gemini", original=exc) from exc

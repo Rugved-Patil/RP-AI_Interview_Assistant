@@ -28,6 +28,19 @@ from __future__ import annotations
 from groq import AsyncGroq, GroqError
 
 from app.services.llm.base import LLMProvider, LLMProviderError, LLMResponse, Message
+from app.services.llm.retry import retry_transient
+
+# Same transient/permanent split as the Gemini provider (see retry.py and
+# gemini_provider.py) - 429/5xx are worth a couple of retries, anything
+# else (401 bad key, 404 unknown model) is not. groq-python's error classes
+# (APIStatusError and its subclasses like RateLimitError) all expose
+# `.status_code`; getattr handles the case where some other exception type
+# (e.g. a connection-level error with no status code at all) reaches here.
+_TRANSIENT_STATUS_CODES = {429, 500, 502, 503, 504}
+
+
+def _is_transient(exc: Exception) -> bool:
+    return getattr(exc, "status_code", None) in _TRANSIENT_STATUS_CODES
 
 
 class GroqProvider(LLMProvider):
@@ -57,7 +70,10 @@ class GroqProvider(LLMProvider):
             kwargs["reasoning_effort"] = self._reasoning_effort
 
         try:
-            completion = await self._client.chat.completions.create(**kwargs)
+            completion = await retry_transient(
+                lambda: self._client.chat.completions.create(**kwargs),
+                is_transient=_is_transient,
+            )
         except GroqError as exc:
             raise LLMProviderError(f"Groq API call failed: {exc}", provider="groq", original=exc) from exc
 
