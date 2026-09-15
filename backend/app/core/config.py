@@ -49,6 +49,12 @@ class Settings(BaseSettings):
     # onward) is allowed to call this API from the browser during local dev.
     frontend_origin: str = "http://localhost:5173"
 
+    # --- Persistence -----------------------------------------------------------
+    # SQLite file lives inside backend/ by default. Per scope doc Section 3.6,
+    # nothing is written here automatically - this only gets touched when the
+    # user explicitly hits "Save this report".
+    database_url: str = "sqlite:///./interview_reports.db"
+
 
 @lru_cache
 def get_settings() -> Settings:

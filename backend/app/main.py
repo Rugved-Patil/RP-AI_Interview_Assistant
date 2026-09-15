@@ -13,10 +13,12 @@ Then check:
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api.routes import grading, health, sessions
+from app.api.routes import grading, health, reports, sessions
 from app.core.config import get_settings
+from app.db.base import init_db
 
 settings = get_settings()
+init_db()
 
 app = FastAPI(
     title=settings.app_name,
@@ -38,6 +40,7 @@ app.add_middleware(
 app.include_router(health.router)
 app.include_router(sessions.router)
 app.include_router(grading.router)
+app.include_router(reports.router)
 
 
 @app.get("/")
