@@ -2,7 +2,7 @@
 
 **Status:** Phase 1 (MVP) complete — situational practice + opt-in save, working end-to-end
 **Owner:** AI & Data Science student (personal practice/passion project)
-**Last updated:** 2026-09-15 — Phase 1 complete; persistence library resolved (SQLAlchemy); v1 scope confirmed as Phase 1 only — see Section 7
+**Last updated:** 2026-09-15 — Phase 1 complete; persistence library resolved (SQLAlchemy); v1 scope confirmed as Phase 1 only; `.env` safety audit complete; LLM model-name drift documented as an ongoing operational practice — see Section 7
 
 **Purpose:** A self-directed learning project to improve skills in (a) using AI coding tools effectively (Claude Code) and (b) AI prompt engineering — built by designing and implementing a voice/text-based mock interview practice app. This is not intended as a commercial product; similar products exist, and that's fine — the goal is the learning process, with a working, polished result as a CV portfolio piece.
 
@@ -127,13 +127,19 @@ GitHub Milestones map to the three Development Phases (Section 6); Issues under 
 - **Persistence library:** SQLAlchemy (over SQLModel) — chosen for broader recognizability across the Python ecosystem on a CV, and because it reinforces separating the DB-row class from the API-schema class.
 - **Primary LLM provider(s):** Both, split by role — Groq for the live interviewer conversation (latency-sensitive), Gemini Flash-tier for grading (benefits from large context window over a full transcript).
 - **Rate-limit / transient-failure handling:** Retry-with-backoff added to both LLM providers for real transient status codes (429/5xx), verified against actual `groq`/`google-genai` SDK exception shapes.
+- **`.env` safety audit:** Confirmed `.gitignore` covers `.env`; confirmed `.env` is untracked and was never committed at any point in history (checked via `git log --all --full-history -- "**/.env"`, not just the current working tree); confirmed `.env.example` contains only placeholder values, no real keys.
 - **Repo structure / milestones:** Single monorepo (`/backend`, `/frontend`, `/docs`); GitHub Milestones = the three Development Phases, Issues broken down from each phase's feature bullets.
 - **v1 scope:** Confirmed "v1" = Phase 1 MVP only (situational practice + opt-in save). Full mock interview mode is not pulled forward into v1 — it stays Phase 2, to be picked up deliberately rather than by drift.
 
 ### 7.2 Deferred (intentionally)
 
 - **Exact prompt design** for the "interviewer persona" vs. "grading persona" — not finalized in the abstract; to be iterated on empirically now that there are real graded examples to look back on.
-- **`.env` safety practices audit** — confirming `.gitignore` coverage and a `.env.example` review — flagged, not yet done.
+
+### 7.3 Ongoing Operational Practices
+
+Unlike 7.1, these aren't one-time decisions with an end state — they're recurring risks that come with depending on free-tier third-party LLM APIs, to be managed for as long as the project does.
+
+- **LLM free-tier model name drift:** `groq_model` and `gemini_model` (in `backend/app/core/config.py`) should be treated as values to periodically re-verify against provider docs, not stable constants. Groq and Google both deprecate, rename, or move models off their free tier, sometimes with little notice — this project has already hit multiple 404s from exactly that during development, requiring both defaults to be updated mid-project. This isn't fixable the way a code bug is: a 404 ("model not found") is a *permanent* failure, not a transient one like a rate limit, so no amount of retry logic (see the resolved item above) helps here — the actual fix is always a human checking the current model list and updating the default, either directly in `config.py` or by overriding via `.env` (`GROQ_MODEL=...` / `GEMINI_MODEL=...`) without touching code. Current docs to check when a 404 appears: https://console.groq.com/docs/models and https://ai.google.dev/gemini-api/docs/models.
 
 ## 8. Constraints Recap
 

@@ -70,6 +70,13 @@ pytest tests/ -v
 
 These are mocked unit tests for the LLM wrapper — no API calls, no cost. `backend/scripts/smoke_test_llm.py` is a separate, manually-run script that hits the real Groq/Gemini APIs, kept out of the automated test suite deliberately.
 
+## Troubleshooting
+
+**Getting a `404 model not found` from Groq or Gemini?** This is expected to happen occasionally, not a bug — free-tier providers deprecate, rename, or move models off the free tier over time, and this project has already hit it more than once during development. It's a quick fix:
+
+1. Check the current model lists: [Groq](https://console.groq.com/docs/models) / [Gemini](https://ai.google.dev/gemini-api/docs/models).
+2. Update `groq_model` / `gemini_model` in `backend/app/core/config.py`, or override either without touching code by adding `GROQ_MODEL=...` / `GEMINI_MODEL=...` to your `.env`.
+
 ## Roadmap
 
 - **Phase 2:** full mock interview mode (multi-turn, HR/Technical branching), voice input/output via the Web Speech API, holistic end-of-interview grading.
