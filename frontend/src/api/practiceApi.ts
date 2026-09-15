@@ -22,6 +22,31 @@ export interface GradeResponse {
   score: number
   feedback: string
 }
+export interface SaveReportResponse {
+  id: number
+  session_id: string
+  saved: boolean
+}
+
+export interface ReportSummary {
+  id: number
+  session_id: string
+  question: string
+  answer: string
+  score: number
+  feedback: string
+  created_at: string
+}
+
+export function saveReport(sessionId: string): Promise<SaveReportResponse> {
+  return fetch(`${API_BASE_URL}/sessions/${sessionId}/save`, { method: 'POST' }).then(
+    parseOrThrow<SaveReportResponse>,
+  )
+}
+
+export function listReports(): Promise<ReportSummary[]> {
+  return fetch(`${API_BASE_URL}/reports`).then(parseOrThrow<ReportSummary[]>)
+}
 
 async function parseOrThrow<T>(response: Response): Promise<T> {
   if (!response.ok) {

@@ -1,23 +1,38 @@
 import { useState } from 'react'
-import { API_BASE_URL, gradeSession, startSituationalSession, submitAnswer } from '../api/practiceApi'
+import {
+  API_BASE_URL,
+  gradeSession,
+  saveReport,
+  startSituationalSession,
+  submitAnswer,
+} from '../api/practiceApi'
 import './PracticeCard.css'
 
 /**
  * A discriminated union models the four stages of one practice attempt.
- * Using one Stage variable (instead of several loose useState calls for
- * sessionId/question/answer/score/etc. separately) means it's impossible
- * to end up in an inconsistent combination - e.g. "submitting" true while
- * there's no session yet. TypeScript narrows `stage` inside each branch
- * below based on `stage.name`, so e.g. `stage.question` is only valid to
- * read where TS already knows `stage.name === 'question'`.
+ * `graded` now also carries `sessionId` (needed to call the save endpoint)
+ * and `saveState` - the opt-in save action is a sub-state of being graded,
+ * not a separate stage, since you're still looking at the same panel.
  */
 type Stage =
   | { name: 'idle' }
   | { name: 'question'; sessionId: string; question: string; answer: string; submitting: boolean }
-  | { name: 'graded'; score: number; feedback: string }
+  | {
+      name: 'graded'
+      sessionId: string
+      score: number
+      feedback: string
+      saveState: 'unsaved' | 'saving' | 'saved' | 'error'
+    }
   | { name: 'error'; message: string }
 
-export function PracticeCard() {
+interface PracticeCardProps {
+  /** Fires after a report is successfully saved, so a sibling component
+   * (the saved-reports list) knows to refetch. */
+  onReportSaved?: () => void
+}
+
+export function PracticeCard({ onReportSaved }: PracticeCardProps) {
   const [stage, setStage] = useState<Stage>({ name: 'idle' })
 
   async function handleStart() {
@@ -36,9 +51,28 @@ export function PracticeCard() {
     try {
       await submitAnswer(sessionId, answer)
       const grade = await gradeSession(sessionId)
-      setStage({ name: 'graded', score: grade.score, feedback: grade.feedback })
+      setStage({
+        name: 'graded',
+        sessionId,
+        score: grade.score,
+        feedback: grade.feedback,
+        saveState: 'unsaved',
+      })
     } catch (err) {
       setStage({ name: 'error', message: toMessage(err) })
+    }
+  }
+
+  async function handleSave() {
+    if (stage.name !== 'graded') return
+    const { sessionId } = stage
+    setStage({ ...stage, saveState: 'saving' })
+    try {
+      await saveReport(sessionId)
+      setStage((current) => (current.name === 'graded' ? { ...current, saveState: 'saved' } : current))
+      onReportSaved?.()
+    } catch {
+      setStage((current) => (current.name === 'graded' ? { ...current, saveState: 'error' } : current))
     }
   }
 
@@ -86,9 +120,19 @@ export function PracticeCard() {
         <div className="practice-card__panel">
           <ScoreMark score={stage.score} />
           <p className="practice-card__feedback">{stage.feedback}</p>
-          <button className="practice-card__button practice-card__button--ghost" onClick={handleStart}>
-            Start another question
-          </button>
+
+          <div className="practice-card__actions">
+            <button
+              className="practice-card__button practice-card__button--ghost"
+              onClick={handleSave}
+              disabled={stage.saveState === 'saving' || stage.saveState === 'saved'}
+            >
+              {saveButtonLabel(stage.saveState)}
+            </button>
+            <button className="practice-card__button" onClick={handleStart}>
+              Start another question
+            </button>
+          </div>
         </div>
       )}
 
@@ -104,12 +148,19 @@ export function PracticeCard() {
   )
 }
 
-/**
- * The score, ringed by a stroke that draws itself in once on mount - a red-
- * pen circle marking the answer, tied to the grading action that just
- * completed rather than a decorative loop. Respects reduced-motion (see
- * PracticeCard.css) by skipping straight to the finished state.
- */
+function saveButtonLabel(saveState: 'unsaved' | 'saving' | 'saved' | 'error'): string {
+  switch (saveState) {
+    case 'saving':
+      return 'Saving…'
+    case 'saved':
+      return 'Saved ✓'
+    case 'error':
+      return 'Save failed — retry'
+    default:
+      return 'Save this report'
+  }
+}
+
 function ScoreMark({ score }: { score: number }) {
   return (
     <div className="score-mark">
@@ -126,16 +177,9 @@ function ScoreMark({ score }: { score: number }) {
 
 function toMessage(err: unknown): string {
   if (err instanceof TypeError) {
-    // fetch() itself throws a TypeError when it can't reach the server at
-    // all - connection refused, DNS failure, CORS block, etc. This is the
-    // one case where "the backend isn't running" is actually the right guess.
     return `Could not reach the backend at ${API_BASE_URL} — check that it's running.`
   }
   if (err instanceof Error) {
-    // Otherwise a real HTTP response came back with an error status (see
-    // parseOrThrow in practiceApi.ts) - the backend IS up, something failed
-    // server-side instead (a provider outage, an unexpected grader reply,
-    // etc.). Show what it actually said rather than a generic guess.
     return err.message
   }
   return 'Something went wrong talking to the backend.'
