@@ -2,3 +2,7 @@ fastapi
 uvicorn[standard]
 pydantic-settings
 sqlalchemy
+groq
+google-genai
+pytest
+pytest-asyncio
