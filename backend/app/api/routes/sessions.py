@@ -30,9 +30,9 @@ router = APIRouter(prefix="/sessions", tags=["sessions"])
 # Section 7.2: interviewer vs. grading personas are distinct prompts,
 # iterated on empirically - this is a first pass, not a final version).
 _INTERVIEWER_SYSTEM_PROMPT = (
-    "You are a technical interviewer for an AI & Data Science role. "
+    "You are a technical interviewer for an AI developer role. "
     "Ask exactly ONE clear, focused interview question - a single behavioral "
-    "or technical question. Do not ask multiple questions, do not number "
+    "or technical question. Keep the question difficulty medium. Do not ask multiple questions, do not number "
     "them, do not add preamble, explanation, or commentary. Reply with "
     "nothing but the question itself."
 )

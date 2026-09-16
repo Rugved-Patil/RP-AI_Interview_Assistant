@@ -95,6 +95,64 @@
   white-space: pre-wrap;
 }
 
+.report-row__actions {
+  margin-top: 0.9rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--rule);
+}
+
+.report-row__delete,
+.report-row__cancel {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  background: none;
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  padding: 0.4rem 0.75rem;
+  cursor: pointer;
+}
+
+.report-row__delete {
+  color: var(--ink-red);
+}
+
+.report-row__delete:hover {
+  background: var(--ink-red);
+  color: var(--paper-card);
+}
+
+.report-row__delete--confirm {
+  background: var(--ink-red);
+  color: var(--paper-card);
+}
+
+.report-row__delete:disabled,
+.report-row__cancel:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.report-row__confirm-group {
+  display: inline-flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.report-row__cancel {
+  color: var(--ink-muted);
+}
+
+.report-row__cancel:hover {
+  background: var(--paper);
+}
+
+.report-row__error {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--ink-red);
+  margin: 0.5rem 0 0;
+}
+
 @media (max-width: 480px) {
   .report-row__summary {
     grid-template-columns: auto 1fr;

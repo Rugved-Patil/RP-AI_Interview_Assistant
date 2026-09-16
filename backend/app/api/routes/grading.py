@@ -22,7 +22,8 @@ from app.services.session_store import get_session
 router = APIRouter(prefix="/sessions", tags=["grading"])
 
 _GRADER_SYSTEM_PROMPT = (
-    "You are grading a candidate's answer to a single interview question. "
+    "You are grading a candidate's answer to a single interview question."
+    "Keep the grading harsh but realistic"
     "Reply with EXACTLY this format and nothing else:\n"
     "SCORE: <an integer from 0 to 10>\n"
     "FEEDBACK: <two or three sentences of specific, constructive feedback>"

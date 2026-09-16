@@ -17,7 +17,7 @@ from sqlalchemy.orm import Session
 
 from app.db.base import get_db
 from app.db.models import SavedReport
-from app.schemas.report import ReportSummary, SaveReportResponse
+from app.schemas.report import DeleteReportResponse, ReportSummary, SaveReportResponse
 from app.services.session_store import get_session
 
 router = APIRouter(tags=["reports"])
@@ -57,3 +57,20 @@ def save_report(session_id: str, db: Session = Depends(get_db)) -> SaveReportRes
 def list_reports(db: Session = Depends(get_db)) -> list[SavedReport]:
     """Most recent first - the natural order for "what have I practiced"."""
     return list(db.scalars(select(SavedReport).order_by(SavedReport.created_at.desc())))
+
+
+@router.delete("/reports/{report_id}", response_model=DeleteReportResponse)
+def delete_report(report_id: int, db: Session = Depends(get_db)) -> DeleteReportResponse:
+    """
+    Deletes by the report's own primary key, not session_id - the frontend
+    already has `id` on every ReportSummary it's rendering, so there's no
+    reason to route this through the session layer at all. Confirmation
+    (if any) is a frontend concern; this endpoint just does the delete.
+    """
+    report = db.get(SavedReport, report_id)
+    if report is None:
+        raise HTTPException(status_code=404, detail="Report not found")
+
+    db.delete(report)
+    db.commit()
+    return DeleteReportResponse(id=report_id)

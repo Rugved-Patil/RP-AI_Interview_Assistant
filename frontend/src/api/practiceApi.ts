@@ -48,6 +48,17 @@ export function listReports(): Promise<ReportSummary[]> {
   return fetch(`${API_BASE_URL}/reports`).then(parseOrThrow<ReportSummary[]>)
 }
 
+export interface DeleteReportResponse {
+  id: number
+  deleted: boolean
+}
+
+export function deleteReport(id: number): Promise<DeleteReportResponse> {
+  return fetch(`${API_BASE_URL}/reports/${id}`, { method: 'DELETE' }).then(
+    parseOrThrow<DeleteReportResponse>,
+  )
+}
+
 async function parseOrThrow<T>(response: Response): Promise<T> {
   if (!response.ok) {
     const body = await response.text()

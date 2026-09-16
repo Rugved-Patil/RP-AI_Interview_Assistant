@@ -14,6 +14,11 @@ class SaveReportResponse(BaseModel):
     saved: bool = True
 
 
+class DeleteReportResponse(BaseModel):
+    id: int
+    deleted: bool = True
+
+
 class ReportSummary(BaseModel):
     # from_attributes lets a SQLAlchemy model instance populate this directly
     # (ReportSummary.model_validate(report)) instead of unpacking fields by hand.
