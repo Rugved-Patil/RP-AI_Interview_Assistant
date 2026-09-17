@@ -13,6 +13,12 @@ import './PracticeCard.css'
  * `graded` now also carries `sessionId` (needed to call the save endpoint)
  * and `saveState` - the opt-in save action is a sub-state of being graded,
  * not a separate stage, since you're still looking at the same panel.
+ *
+ * role/company/location are NOT part of Stage - they're the setup form's
+ * own state (below), independent of which stage the attempt is in. Per
+ * the "no memory" decision, they get reset to blank whenever the user
+ * starts a fresh attempt (see handleStartAnother), rather than persisting
+ * across attempts or page visits.
  */
 type Stage =
   | { name: 'idle' }
@@ -28,10 +34,20 @@ type Stage =
 
 export function PracticeCard() {
   const [stage, setStage] = useState<Stage>({ name: 'idle' })
+  const [role, setRole] = useState('')
+  const [company, setCompany] = useState('')
+  const [location, setLocation] = useState('')
+
+  const canStart = role.trim().length > 0
 
   async function handleStart() {
+    if (!canStart) return
     try {
-      const { session_id, question } = await startSituationalSession()
+      const { session_id, question } = await startSituationalSession({
+        role: role.trim(),
+        company: company.trim() || undefined,
+        location: location.trim() || undefined,
+      })
       setStage({ name: 'question', sessionId: session_id, question, answer: '', submitting: false })
     } catch (err) {
       setStage({ name: 'error', message: toMessage(err) })
@@ -69,14 +85,72 @@ export function PracticeCard() {
     }
   }
 
+  /**
+   * Returns to the setup form with blank fields for a new attempt. Used
+   * from the `graded` panel's "Start another question" - deliberately
+   * distinct from `handleStart`, which reuses whatever role/company/
+   * location are currently in the form (e.g. for the `error` panel's
+   * "Try again", where retrying the same attempt with the same context
+   * makes more sense than forcing a re-type).
+   */
+  function handleStartAnother() {
+    setRole('')
+    setCompany('')
+    setLocation('')
+    setStage({ name: 'idle' })
+  }
+
   return (
     <div className="practice-card">
       <p className="practice-card__eyebrow">Situational practice</p>
 
       {stage.name === 'idle' && (
         <div className="practice-card__panel practice-card__panel--idle">
-          <p className="practice-card__lede">Ready when you are.</p>
-          <button className="practice-card__button" onClick={handleStart}>
+          <p className="practice-card__lede">Set up your question.</p>
+
+          <div className="practice-card__field">
+            <label className="practice-card__field-label" htmlFor="role">
+              Role
+            </label>
+            <input
+              id="role"
+              className="practice-card__input"
+              type="text"
+              value={role}
+              onChange={(event) => setRole(event.target.value)}
+              placeholder="e.g. Backend Engineer"
+            />
+          </div>
+
+          <div className="practice-card__field">
+            <label className="practice-card__field-label" htmlFor="company">
+              Company <span className="practice-card__field-optional">(optional)</span>
+            </label>
+            <input
+              id="company"
+              className="practice-card__input"
+              type="text"
+              value={company}
+              onChange={(event) => setCompany(event.target.value)}
+              placeholder="e.g. Acme Corp"
+            />
+          </div>
+
+          <div className="practice-card__field">
+            <label className="practice-card__field-label" htmlFor="location">
+              Location <span className="practice-card__field-optional">(optional)</span>
+            </label>
+            <input
+              id="location"
+              className="practice-card__input"
+              type="text"
+              value={location}
+              onChange={(event) => setLocation(event.target.value)}
+              placeholder="e.g. Bengaluru, India"
+            />
+          </div>
+
+          <button className="practice-card__button" onClick={handleStart} disabled={!canStart}>
             Start a practice question
           </button>
         </div>
@@ -122,7 +196,7 @@ export function PracticeCard() {
             >
               {saveButtonLabel(stage.saveState)}
             </button>
-            <button className="practice-card__button" onClick={handleStart}>
+            <button className="practice-card__button" onClick={handleStartAnother}>
               Start another question
             </button>
           </div>

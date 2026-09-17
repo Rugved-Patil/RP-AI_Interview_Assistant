@@ -29,10 +29,21 @@ from dataclasses import dataclass
 
 @dataclass
 class PracticeSession:
-    """One situational-practice attempt: one question, one answer, one grade."""
+    """
+    One situational-practice attempt: one question, one answer, one grade.
+
+    role/company/location are the personalization context the question was
+    generated for (scope doc Section 3.4). They're captured on the session
+    - not just used transiently in the prompt at creation time - because
+    grading later needs the same context to judge the answer against the
+    right bar (see grading.py's _build_grader_prompt).
+    """
 
     id: str
     question: str
+    role: str
+    company: str | None = None
+    location: str | None = None
     answer: str | None = None
     score: int | None = None
     feedback: str | None = None
@@ -44,8 +55,19 @@ class PracticeSession:
 _sessions: dict[str, PracticeSession] = {}
 
 
-def create_session(question: str) -> PracticeSession:
-    session = PracticeSession(id=str(uuid.uuid4()), question=question)
+def create_session(
+    question: str,
+    role: str,
+    company: str | None = None,
+    location: str | None = None,
+) -> PracticeSession:
+    session = PracticeSession(
+        id=str(uuid.uuid4()),
+        question=question,
+        role=role,
+        company=company,
+        location=location,
+    )
     _sessions[session.id] = session
     return session
 

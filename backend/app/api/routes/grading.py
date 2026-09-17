@@ -21,13 +21,30 @@ from app.services.session_store import get_session
 
 router = APIRouter(prefix="/sessions", tags=["grading"])
 
-_GRADER_SYSTEM_PROMPT = (
-    "You are grading a candidate's answer to a single interview question."
-    "Keep the grading harsh but realistic"
-    "Reply with EXACTLY this format and nothing else:\n"
-    "SCORE: <an integer from 0 to 10>\n"
-    "FEEDBACK: <two or three sentences of specific, constructive feedback>"
-)
+
+def _build_grader_prompt(role: str, company: str | None, location: str | None) -> str:
+    """
+    Builds the grading persona prompt using the same role/company/location
+    context the question was generated with (stored on the session - see
+    session_store.PracticeSession), so the bar for "good answer" reflects
+    what this specific role/company/location context would need rather
+    than a role-agnostic average.
+    """
+    context = f"a {role} role"
+    if company:
+        context += f" at {company}"
+    if location:
+        context += f" (location: {location})"
+
+    return (
+        f"You are grading a candidate's answer to a single interview question for {context}. "
+        "Keep the grading harsh but realistic, and calibrate your expectations to what would "
+        "actually be expected for this role (and this company/location, if given) rather than "
+        "grading in the abstract. "
+        "Reply with EXACTLY this format and nothing else:\n"
+        "SCORE: <an integer from 0 to 10>\n"
+        "FEEDBACK: <two or three sentences of specific, constructive feedback>"
+    )
 
 
 @router.post("/{session_id}/grade", response_model=GradeResponse)
@@ -39,11 +56,12 @@ async def grade_session(session_id: str) -> GradeResponse:
         raise HTTPException(status_code=400, detail="No answer submitted for this session yet")
 
     provider = get_provider(LLMRole.GRADER)
+    system_prompt = _build_grader_prompt(session.role, session.company, session.location)
 
     try:
         response = await provider.generate(
             [
-                Message(role=Role.SYSTEM, content=_GRADER_SYSTEM_PROMPT),
+                Message(role=Role.SYSTEM, content=system_prompt),
                 Message(
                     role=Role.USER,
                     content=f"Question: {session.question}\n\nCandidate's answer: {session.answer}",

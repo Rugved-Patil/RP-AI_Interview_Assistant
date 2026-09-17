@@ -29,6 +29,49 @@
   color: var(--ink);
 }
 
+.practice-card__field {
+  margin-bottom: 1.1rem;
+}
+
+.practice-card__field-label {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+  margin-bottom: 0.4rem;
+}
+
+.practice-card__field-optional {
+  text-transform: none;
+  font-size: 0.68rem;
+}
+
+.practice-card__input {
+  width: 100%;
+  font-family: var(--font-serif);
+  font-size: 1rem;
+  color: var(--ink);
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--rule);
+  padding: 0.4rem 0;
+}
+
+.practice-card__input:focus {
+  outline: none;
+  border-bottom-color: var(--ink-red);
+}
+
+.practice-card__input::placeholder {
+  color: var(--ink-muted);
+}
+
+.practice-card__panel--idle .practice-card__button {
+  margin-top: 0.5rem;
+}
+
 .practice-card__question {
   font-family: var(--font-mono);
   font-size: 1.02rem;

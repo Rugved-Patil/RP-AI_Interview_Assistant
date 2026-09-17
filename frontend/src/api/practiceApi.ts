@@ -12,6 +12,12 @@
 
 export const API_BASE_URL = 'http://localhost:8000'
 
+export interface StartSessionRequest {
+  role: string
+  company?: string
+  location?: string
+}
+
 export interface StartSessionResponse {
   session_id: string
   question: string
@@ -67,10 +73,12 @@ async function parseOrThrow<T>(response: Response): Promise<T> {
   return response.json() as Promise<T>
 }
 
-export function startSituationalSession(): Promise<StartSessionResponse> {
-  return fetch(`${API_BASE_URL}/sessions/situational`, { method: 'POST' }).then(
-    parseOrThrow<StartSessionResponse>,
-  )
+export function startSituationalSession(body: StartSessionRequest): Promise<StartSessionResponse> {
+  return fetch(`${API_BASE_URL}/sessions/situational`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  }).then(parseOrThrow<StartSessionResponse>)
 }
 
 export async function submitAnswer(sessionId: string, answer: string): Promise<void> {
