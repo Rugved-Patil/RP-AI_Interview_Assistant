@@ -84,20 +84,20 @@ GitHub Milestones map to the three Development Phases (Section 6); Issues under 
 
 ## 5. Architecture Overview
 
-┌───────────────────────────┐ ┌────────────────────────────┐ ┌────────────────────────┐
-│ Frontend (React) │◄──────►│ Backend (Python/FastAPI) │◄──────►│ LLM Provider │
-│ - Mic capture │ HTTP/ │ - Session/transcript mgmt │ API │ (Gemini / Groq free) │
-│ (Web Speech API STT) │ WS │ - Prompt construction │ calls │ - Interviewer persona │
-│ - TTS playback │ │ - Grading logic │ │ - Grading persona │
-│ - Mode selection UI │ │ - SQLite persistence │ └────────────────────────┘
-└───────────────────────────┘ │ - (v2) RAG retrieval layer │
-└────────────────────────────┘
-│
-▼
-┌───────────────┐
-│ SQLite │
-│ (local file) │
-└───────────────┘
+┌───────────────────────────┐         ┌────────────────────────────┐          ┌────────────────────────┐
+│ Frontend (React)          │ ◄──────►│ Backend (Python/FastAPI)   │ ◄──────► │ LLM Provider           │
+│ - Mic capture             │   HTTP/ │ - Session/transcript mgmt. │    API   │ (Gemini / Groq free)   │
+│ (Web Speech API STT)      │    WS   │ - Prompt construction      │   calls  │ - Interviewer persona  │
+│ - TTS playback            │         │ - Grading logic            │          │ - Grading persona      │
+│ - Mode selection UI       │         │ - SQLite persistence       │          └────────────────────────┘
+└───────────────────────────┘         │ - (v2) RAG retrieval layer │
+                                      └────────────────────────────┘
+             │
+             ▼
+     ┌───────────────┐
+     │    SQLite     │
+     │  (local file) │
+     └───────────────┘
 
 
 ## 6. Development Phases
