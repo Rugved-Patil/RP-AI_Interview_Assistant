@@ -26,13 +26,7 @@ type Stage =
     }
   | { name: 'error'; message: string }
 
-interface PracticeCardProps {
-  /** Fires after a report is successfully saved, so a sibling component
-   * (the saved-reports list) knows to refetch. */
-  onReportSaved?: () => void
-}
-
-export function PracticeCard({ onReportSaved }: PracticeCardProps) {
+export function PracticeCard() {
   const [stage, setStage] = useState<Stage>({ name: 'idle' })
 
   async function handleStart() {
@@ -70,7 +64,6 @@ export function PracticeCard({ onReportSaved }: PracticeCardProps) {
     try {
       await saveReport(sessionId)
       setStage((current) => (current.name === 'graded' ? { ...current, saveState: 'saved' } : current))
-      onReportSaved?.()
     } catch {
       setStage((current) => (current.name === 'graded' ? { ...current, saveState: 'error' } : current))
     }

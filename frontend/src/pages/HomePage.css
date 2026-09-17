@@ -1,0 +1,86 @@
+.home {
+  width: min(920px, 100%);
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+}
+
+.home__lede {
+  font-family: var(--font-serif);
+  font-size: 1.4rem;
+  font-weight: 400;
+  color: var(--ink);
+  margin: 0;
+  text-align: center;
+}
+
+.home__modes {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+.mode-tile {
+  display: block;
+  min-height: 220px;
+  border: 1px solid var(--rule);
+  border-radius: 10px;
+  padding: clamp(1.75rem, 4vw, 2.5rem);
+  text-decoration: none;
+  transition: border-color 0.15s ease;
+}
+
+/* The two tiles are deliberately not identical - one is a working feature,
+   the other isn't, and the treatment should say so before you even read
+   the copy. */
+.mode-tile--live {
+  background: var(--paper-card);
+  box-shadow: 0 10px 24px -18px rgba(35, 38, 43, 0.45);
+}
+
+.mode-tile--live:hover {
+  border-color: var(--ink);
+}
+
+.mode-tile--placeholder {
+  background: transparent;
+  border-style: dashed;
+}
+
+.mode-tile--placeholder:hover {
+  border-color: var(--ink-muted);
+}
+
+.mode-tile__eyebrow {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--ink-muted);
+  margin: 0 0 0.85rem;
+}
+
+.mode-tile--live .mode-tile__eyebrow {
+  color: var(--ink-red);
+}
+
+.mode-tile__title {
+  font-family: var(--font-serif);
+  font-weight: 500;
+  font-size: 1.5rem;
+  color: var(--ink);
+  margin: 0 0 0.75rem;
+}
+
+.mode-tile__body {
+  font-family: var(--font-serif);
+  font-size: 1rem;
+  line-height: 1.55;
+  color: var(--ink-muted);
+  margin: 0;
+}
+
+@media (max-width: 640px) {
+  .home__modes {
+    grid-template-columns: 1fr;
+  }
+}

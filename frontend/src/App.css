@@ -5,6 +5,9 @@
 }
 
 .page__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   padding: 1.75rem clamp(1.25rem, 4vw, 3rem);
 }
 
@@ -13,6 +16,23 @@
   font-weight: 500;
   font-size: 1.05rem;
   letter-spacing: 0.01em;
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.page__reports-link {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--ink-muted);
+  text-decoration: none;
+  border: 1px solid var(--rule);
+  border-radius: 999px;
+  padding: 0.4rem 0.9rem;
+  transition: border-color 0.15s ease, color 0.15s ease;
+}
+
+.page__reports-link:hover {
+  border-color: var(--ink);
   color: var(--ink);
 }
 
@@ -23,4 +43,27 @@
   align-items: center;
   gap: 2.5rem;
   padding: 2.5rem clamp(1.25rem, 4vw, 3rem) 4rem;
+}
+
+/* Shared by the sub-pages (practice / mock interview / reports): a
+   consistent-width column holding a back link plus that page's content,
+   so the back link lines up with the content below it instead of hugging
+   the far edge of the centered .page__main flex container. */
+.page-section {
+  width: min(560px, 100%);
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.page-back {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--ink-muted);
+  text-decoration: none;
+  align-self: flex-start;
+}
+
+.page-back:hover {
+  color: var(--ink);
 }

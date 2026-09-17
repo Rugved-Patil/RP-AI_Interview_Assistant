@@ -1,0 +1,45 @@
+.mock-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.1rem;
+  text-align: center;
+  padding: 2.5rem 0;
+}
+
+.mock-placeholder__eyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--ink-muted);
+  margin: 0;
+}
+
+.mock-placeholder__title {
+  font-family: var(--font-serif);
+  font-weight: 500;
+  font-size: 1.5rem;
+  color: var(--ink);
+  margin: 0;
+}
+
+.mock-placeholder__body {
+  font-family: var(--font-serif);
+  font-size: 1.02rem;
+  line-height: 1.6;
+  color: var(--ink-muted);
+  margin: 0;
+}
+
+.mock-placeholder__cta {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--ink-red);
+  text-decoration: none;
+  border-bottom: 1px solid var(--ink-red);
+  padding-bottom: 2px;
+  margin-top: 0.5rem;
+}
+
+.mock-placeholder__cta:hover {
+  opacity: 0.75;
+}
