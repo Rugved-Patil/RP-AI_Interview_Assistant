@@ -20,7 +20,12 @@
   text-decoration: none;
 }
 
-.page__reports-link {
+.page__nav {
+  display: flex;
+  gap: 0.6rem;
+}
+
+.page__nav-link {
   font-family: var(--font-mono);
   font-size: 0.78rem;
   color: var(--ink-muted);
@@ -31,7 +36,7 @@
   transition: border-color 0.15s ease, color 0.15s ease;
 }
 
-.page__reports-link:hover {
+.page__nav-link:hover {
   border-color: var(--ink);
   color: var(--ink);
 }

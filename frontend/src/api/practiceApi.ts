@@ -44,6 +44,55 @@ export interface ReportSummary {
   created_at: string
 }
 
+export interface PresetIn {
+  role: string
+  company?: string
+  location?: string
+}
+
+export interface PresetSummary {
+  id: number
+  role: string
+  company: string | null
+  location: string | null
+  created_at: string
+}
+
+export interface DeletePresetResponse {
+  id: number
+  deleted: boolean
+}
+
+export function createPreset(body: PresetIn): Promise<PresetSummary> {
+  return fetch(`${API_BASE_URL}/presets`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  }).then(parseOrThrow<PresetSummary>)
+}
+
+export function listPresets(): Promise<PresetSummary[]> {
+  return fetch(`${API_BASE_URL}/presets`).then(parseOrThrow<PresetSummary[]>)
+}
+
+export function getPreset(id: number): Promise<PresetSummary> {
+  return fetch(`${API_BASE_URL}/presets/${id}`).then(parseOrThrow<PresetSummary>)
+}
+
+export function updatePreset(id: number, body: PresetIn): Promise<PresetSummary> {
+  return fetch(`${API_BASE_URL}/presets/${id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  }).then(parseOrThrow<PresetSummary>)
+}
+
+export function deletePreset(id: number): Promise<DeletePresetResponse> {
+  return fetch(`${API_BASE_URL}/presets/${id}`, { method: 'DELETE' }).then(
+    parseOrThrow<DeletePresetResponse>,
+  )
+}
+
 export function saveReport(sessionId: string): Promise<SaveReportResponse> {
   return fetch(`${API_BASE_URL}/sessions/${sessionId}/save`, { method: 'POST' }).then(
     parseOrThrow<SaveReportResponse>,

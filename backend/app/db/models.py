@@ -34,3 +34,27 @@ class SavedReport(Base):
     created_at: Mapped[datetime] = mapped_column(
         DateTime, default=lambda: datetime.now(timezone.utc)
     )
+
+
+class InterviewPreset(Base):
+    """
+    A saved role/company/location combo the user can select and reuse on
+    the situational practice page, instead of retyping it per attempt.
+
+    Deliberately its own table rather than reusing SavedReport's shape -
+    a preset isn't a graded attempt at all, it's personalization *input*
+    to future attempts. "Which preset is currently active" is NOT stored
+    here: that's a browser-local concern (see frontend's activePreset.ts)
+    rather than something worth persisting server-side, since it's a
+    per-browser convenience, not data - see learnings-and-decisions.md.
+    """
+
+    __tablename__ = "interview_presets"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    role: Mapped[str] = mapped_column(String)
+    company: Mapped[str | None] = mapped_column(String, nullable=True)
+    location: Mapped[str | None] = mapped_column(String, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime, default=lambda: datetime.now(timezone.utc)
+    )

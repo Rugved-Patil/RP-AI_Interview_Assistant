@@ -1,0 +1,240 @@
+.interview-presets {
+  width: min(560px, 100%);
+}
+
+.interview-presets__eyebrow {
+  margin: 0 0 0.85rem 0.25rem;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--ink-muted);
+}
+
+.interview-presets__lede {
+  font-family: var(--font-serif);
+  font-size: 1.05rem;
+  line-height: 1.55;
+  color: var(--ink);
+  margin: 0 0 1.5rem;
+}
+
+.interview-presets__meta {
+  font-family: var(--font-serif);
+  color: var(--ink-muted);
+  margin: 0 0 0 0.25rem;
+}
+
+.preset-form {
+  background: var(--paper-card);
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+  padding: 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.preset-form__label {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--ink-muted);
+  margin: 0 0 0.9rem;
+}
+
+.preset-form__fields {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.preset-form__input {
+  width: 100%;
+  font-family: var(--font-serif);
+  font-size: 1rem;
+  color: var(--ink);
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--rule);
+  padding: 0.4rem 0;
+}
+
+.preset-form__input:focus {
+  outline: none;
+  border-bottom-color: var(--ink-red);
+}
+
+.preset-form__input::placeholder {
+  color: var(--ink-muted);
+}
+
+.preset-form__button {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  background: var(--ink);
+  color: var(--paper-card);
+  border: none;
+  border-radius: 4px;
+  padding: 0.65rem 1.2rem;
+  cursor: pointer;
+  transition: background 150ms ease;
+}
+
+.preset-form__button:hover:not(:disabled) {
+  background: var(--ink-red);
+}
+
+.preset-form__button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.interview-presets__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  background: var(--paper-card);
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.preset-row {
+  border-bottom: 1px solid var(--rule);
+  padding: 0.9rem 1.1rem;
+}
+
+.preset-row:last-child {
+  border-bottom: none;
+}
+
+.preset-row--active {
+  background: var(--paper);
+}
+
+.preset-row--editing {
+  padding-top: 1.1rem;
+}
+
+.preset-row__summary {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.6rem;
+}
+
+.preset-row__text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
+.preset-row__role {
+  font-family: var(--font-serif);
+  font-size: 1rem;
+  color: var(--ink);
+}
+
+.preset-row__meta {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--ink-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.preset-row__badge {
+  flex-shrink: 0;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--ink-red);
+  border: 1px solid var(--ink-red);
+  border-radius: 999px;
+  padding: 0.2rem 0.6rem;
+}
+
+.preset-row__actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.preset-row__select,
+.preset-row__edit,
+.preset-row__delete,
+.preset-row__cancel,
+.preset-row__save {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  background: none;
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  padding: 0.4rem 0.75rem;
+  cursor: pointer;
+}
+
+.preset-row__select:hover,
+.preset-row__edit:hover,
+.preset-row__cancel:hover {
+  background: var(--paper);
+}
+
+.preset-row__save {
+  background: var(--ink);
+  color: var(--paper-card);
+  border-color: var(--ink);
+}
+
+.preset-row__save:hover:not(:disabled) {
+  background: var(--ink-red);
+  border-color: var(--ink-red);
+}
+
+.preset-row__save:disabled,
+.preset-row__cancel:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.preset-row__delete {
+  color: var(--ink-red);
+}
+
+.preset-row__delete:hover {
+  background: var(--ink-red);
+  color: var(--paper-card);
+}
+
+.preset-row__delete--confirm {
+  background: var(--ink-red);
+  color: var(--paper-card);
+}
+
+.preset-row__confirm-group {
+  display: inline-flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.preset-row__cancel {
+  color: var(--ink-muted);
+}
+
+.preset-row__error {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--ink-red);
+  margin: 0.6rem 0 0;
+}
+
+@media (max-width: 480px) {
+  .preset-row__summary {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.4rem;
+  }
+}

@@ -13,7 +13,7 @@ Then check:
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api.routes import grading, health, reports, sessions
+from app.api.routes import grading, health, presets, reports, sessions
 from app.core.config import get_settings
 from app.db.base import init_db
 
@@ -41,6 +41,7 @@ app.include_router(health.router)
 app.include_router(sessions.router)
 app.include_router(grading.router)
 app.include_router(reports.router)
+app.include_router(presets.router)
 
 
 @app.get("/")

@@ -11,6 +11,8 @@ not just a nice-to-have.
 
 from pydantic import BaseModel, field_validator
 
+from app.schemas.personalization import blank_optional_becomes_none, require_role
+
 
 class CreateSessionRequest(BaseModel):
     """
@@ -21,7 +23,10 @@ class CreateSessionRequest(BaseModel):
 
     `role` is required - a question generated with no target role at all
     isn't meaningfully personalized. `company`/`location` are optional
-    extras layered on top.
+    extras layered on top. In practice these three values now usually
+    come from a saved InterviewPreset (schemas/preset.py) rather than
+    being typed fresh each time - this schema doesn't care which, it
+    just validates whatever it's handed.
     """
 
     role: str
@@ -30,23 +35,13 @@ class CreateSessionRequest(BaseModel):
 
     @field_validator("role")
     @classmethod
-    def role_must_not_be_blank(cls, value: str) -> str:
-        stripped = value.strip()
-        if not stripped:
-            raise ValueError("role is required")
-        return stripped
+    def _role_not_blank(cls, value: str) -> str:
+        return require_role(value)
 
     @field_validator("company", "location")
     @classmethod
-    def blank_optional_becomes_none(cls, value: str | None) -> str | None:
-        # An empty string from an untouched optional frontend field should
-        # behave the same as never sending the field at all - otherwise the
-        # prompt builder would have to treat "" and None as two different
-        # "not provided" cases.
-        if value is None:
-            return None
-        stripped = value.strip()
-        return stripped or None
+    def _optional_blank_to_none(cls, value: str | None) -> str | None:
+        return blank_optional_becomes_none(value)
 
 
 class CreateSessionResponse(BaseModel):

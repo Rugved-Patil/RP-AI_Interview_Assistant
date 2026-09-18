@@ -1,24 +1,23 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 import {
   API_BASE_URL,
+  getPreset,
   gradeSession,
   saveReport,
   startSituationalSession,
   submitAnswer,
 } from '../api/practiceApi'
+import type { PresetSummary } from '../api/practiceApi'
+import { getActivePresetId, setActivePresetId } from '../activePreset'
 import './PracticeCard.css'
 
 /**
  * A discriminated union models the four stages of one practice attempt.
- * `graded` now also carries `sessionId` (needed to call the save endpoint)
- * and `saveState` - the opt-in save action is a sub-state of being graded,
- * not a separate stage, since you're still looking at the same panel.
- *
- * role/company/location are NOT part of Stage - they're the setup form's
- * own state (below), independent of which stage the attempt is in. Per
- * the "no memory" decision, they get reset to blank whenever the user
- * starts a fresh attempt (see handleStartAnother), rather than persisting
- * across attempts or page visits.
+ * `graded` also carries `sessionId` (needed to call the save endpoint)
+ * and `saveState` - the opt-in save action is a sub-state of being
+ * graded, not a separate stage, since you're still looking at the same
+ * panel.
  */
 type Stage =
   | { name: 'idle' }
@@ -32,21 +31,58 @@ type Stage =
     }
   | { name: 'error'; message: string }
 
+/**
+ * Which interview preset the situational practice question gets built
+ * from. Resolved from activePreset.ts's localStorage pointer, fetched
+ * fresh on every mount (i.e. every time this page is navigated to) so a
+ * change made on the Presets page is always picked up.
+ */
+type ActivePresetState =
+  | { status: 'loading' }
+  | { status: 'none' }
+  | { status: 'loaded'; preset: PresetSummary }
+  | { status: 'error'; message: string }
+
 export function PracticeCard() {
   const [stage, setStage] = useState<Stage>({ name: 'idle' })
-  const [role, setRole] = useState('')
-  const [company, setCompany] = useState('')
-  const [location, setLocation] = useState('')
+  const [activePreset, setActivePreset] = useState<ActivePresetState>({ status: 'loading' })
 
-  const canStart = role.trim().length > 0
+  useEffect(() => {
+    let cancelled = false
+    const id = getActivePresetId()
+    if (id === null) {
+      setActivePreset({ status: 'none' })
+      return
+    }
+    getPreset(id)
+      .then((preset) => {
+        if (!cancelled) setActivePreset({ status: 'loaded', preset })
+      })
+      .catch((err) => {
+        if (cancelled) return
+        // A 404 here means the active preset was deleted from another
+        // page/tab since this pointer was saved - clear the stale
+        // pointer instead of showing a permanent error for it.
+        if (err instanceof Error && err.message.includes('(404)')) {
+          setActivePresetId(null)
+          setActivePreset({ status: 'none' })
+        } else {
+          setActivePreset({ status: 'error', message: 'Could not load your interview preset.' })
+        }
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [])
 
   async function handleStart() {
-    if (!canStart) return
+    if (activePreset.status !== 'loaded') return
+    const { role, company, location } = activePreset.preset
     try {
       const { session_id, question } = await startSituationalSession({
-        role: role.trim(),
-        company: company.trim() || undefined,
-        location: location.trim() || undefined,
+        role,
+        company: company ?? undefined,
+        location: location ?? undefined,
       })
       setStage({ name: 'question', sessionId: session_id, question, answer: '', submitting: false })
     } catch (err) {
@@ -85,72 +121,18 @@ export function PracticeCard() {
     }
   }
 
-  /**
-   * Returns to the setup form with blank fields for a new attempt. Used
-   * from the `graded` panel's "Start another question" - deliberately
-   * distinct from `handleStart`, which reuses whatever role/company/
-   * location are currently in the form (e.g. for the `error` panel's
-   * "Try again", where retrying the same attempt with the same context
-   * makes more sense than forcing a re-type).
-   */
-  function handleStartAnother() {
-    setRole('')
-    setCompany('')
-    setLocation('')
-    setStage({ name: 'idle' })
-  }
-
   return (
     <div className="practice-card">
       <p className="practice-card__eyebrow">Situational practice</p>
 
       {stage.name === 'idle' && (
         <div className="practice-card__panel practice-card__panel--idle">
-          <p className="practice-card__lede">Set up your question.</p>
-
-          <div className="practice-card__field">
-            <label className="practice-card__field-label" htmlFor="role">
-              Role
-            </label>
-            <input
-              id="role"
-              className="practice-card__input"
-              type="text"
-              value={role}
-              onChange={(event) => setRole(event.target.value)}
-              placeholder="e.g. Backend Engineer"
-            />
-          </div>
-
-          <div className="practice-card__field">
-            <label className="practice-card__field-label" htmlFor="company">
-              Company <span className="practice-card__field-optional">(optional)</span>
-            </label>
-            <input
-              id="company"
-              className="practice-card__input"
-              type="text"
-              value={company}
-              onChange={(event) => setCompany(event.target.value)}
-              placeholder="e.g. Acme Corp"
-            />
-          </div>
-
-          <div className="practice-card__field">
-            <label className="practice-card__field-label" htmlFor="location">
-              Location <span className="practice-card__field-optional">(optional)</span>
-            </label>
-            <input
-              id="location"
-              className="practice-card__input"
-              type="text"
-              value={location}
-              onChange={(event) => setLocation(event.target.value)}
-              placeholder="e.g. Bengaluru, India"
-            />
-          </div>
-
-          <button className="practice-card__button" onClick={handleStart} disabled={!canStart}>
+          <ActivePresetBanner state={activePreset} />
+          <button
+            className="practice-card__button"
+            onClick={handleStart}
+            disabled={activePreset.status !== 'loaded'}
+          >
             Start a practice question
           </button>
         </div>
@@ -196,7 +178,7 @@ export function PracticeCard() {
             >
               {saveButtonLabel(stage.saveState)}
             </button>
-            <button className="practice-card__button" onClick={handleStartAnother}>
+            <button className="practice-card__button" onClick={() => setStage({ name: 'idle' })}>
               Start another question
             </button>
           </div>
@@ -212,6 +194,42 @@ export function PracticeCard() {
         </div>
       )}
     </div>
+  )
+}
+
+function ActivePresetBanner({ state }: { state: ActivePresetState }) {
+  if (state.status === 'loading') {
+    return <p className="practice-card__preset-banner">Loading your interview preset…</p>
+  }
+
+  if (state.status === 'error') {
+    return <p className="practice-card__preset-banner">{state.message}</p>
+  }
+
+  if (state.status === 'none') {
+    return (
+      <p className="practice-card__preset-banner">
+        <span>No interview preset selected.</span>
+        <Link to="/presets" className="practice-card__preset-change">
+          Choose one →
+        </Link>
+      </p>
+    )
+  }
+
+  const { role, company, location } = state.preset
+  const context = [company, location].filter(Boolean).join(' · ')
+
+  return (
+    <p className="practice-card__preset-banner">
+      <span>
+        Practicing as <strong>{role}</strong>
+        {context ? ` — ${context}` : ''}
+      </span>
+      <Link to="/presets" className="practice-card__preset-change">
+        Change
+      </Link>
+    </p>
   )
 }
 
