@@ -21,9 +21,60 @@ This is a self-directed learning project (AI coding tools + prompt engineering),
 | Persistence | SQLite via SQLAlchemy |
 
 ## Project Structure
-├── backend/ # FastAPI app, LLM wrapper, session/grading logic, SQLite<br>
-├── frontend/ # React app (Vite)<br>
-└── RP-AI_Interview_Assistant_Project_Scope.md<br>
+
+```text
+rp-ai-interview-assistant/
+├── backend/
+│   ├── app/
+│   │   ├── api/routes/
+│   │   │   ├── health.py             # GET /health
+│   │   │   ├── sessions.py           # POST /sessions/situational, POST /sessions/{id}/answer
+│   │   │   ├── grading.py            # POST /sessions/{id}/grade
+│   │   │   └── reports.py            # POST /sessions/{id}/save, GET /reports, DELETE /reports/{id}
+│   │   ├── core/
+│   │   │   └── config.py             # env-driven settings (API keys, model names, CORS origin)
+│   │   ├── db/
+│   │   │   ├── base.py               # SQLAlchemy engine/session, Base, init_db()
+│   │   │   └── models.py             # SavedReport ORM model
+│   │   ├── schemas/
+│   │   │   ├── session.py            # request/response models for sessions
+│   │   │   └── report.py             # request/response models for saved reports
+│   │   ├── services/
+│   │   │   ├── llm/
+│   │   │   │   ├── base.py           # LLMProvider interface, Message/Role types
+│   │   │   │   ├── factory.py        # get_provider(LLMRole) -> the right provider
+│   │   │   │   ├── groq_provider.py  # interviewer provider (Groq free tier)
+│   │   │   │   ├── gemini_provider.py# grader provider (Gemini free tier)
+│   │   │   │   └── retry.py          # shared retry-with-backoff for transient errors
+│   │   │   └── session_store.py      # in-memory store for in-progress PracticeSessions
+│   │   └── main.py                   # FastAPI app, CORS, router registration
+│   ├── scripts/
+│   │   └── smoke_test_llm.py         # manual script - hits the real Groq/Gemini APIs
+│   ├── tests/
+│   │   └── test_llm_wrapper.py       # mocked unit tests for the LLM wrapper
+│   ├── .env.example
+│   └── requirements.txt
+│
+└── frontend/
+    ├── public/
+    │   └── favicon.svg
+    └── src/
+        ├── api/
+        │   └── practiceApi.ts             # fetch wrapper for every backend endpoint
+        ├── components/
+        │   ├── PracticeCard.tsx/.css      # situational-practice flow (start → answer → grade)
+        │   └── SavedReports.tsx/.css      # list + two-step-confirm delete of saved reports
+        ├── pages/
+        │   ├── HomePage.tsx/.css          # mode-selection landing page
+        │   ├── SituationalPracticePage.tsx
+        │   ├── MockInterviewPage.tsx/.css # Phase 2 placeholder - not built yet
+        │   └── SavedReportsPage.tsx
+        ├── App.tsx/.css                   # BrowserRouter + persistent header/nav layout
+        ├── main.tsx
+        └── index.css
+```
+
+(Standard boilerplate — `tsconfig*.json`, `eslint.config.js`, lockfiles, empty `__init__.py` package markers — is omitted above for readability.)
 
 ## Getting Started
 
