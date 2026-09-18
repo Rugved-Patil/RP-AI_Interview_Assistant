@@ -21,9 +21,9 @@ This is a self-directed learning project (AI coding tools + prompt engineering),
 | Persistence | SQLite via SQLAlchemy |
 
 ## Project Structure
-├── backend/ # FastAPI app, LLM wrapper, session/grading logic, SQLite
-├── frontend/ # React app (Vite)
-└── RP-AI_Interview_Assistant_Project_Scope.md
+├── backend/ # FastAPI app, LLM wrapper, session/grading logic, SQLite<br>
+├── frontend/ # React app (Vite)<br>
+└── RP-AI_Interview_Assistant_Project_Scope.md<br>
 
 ## Getting Started
 
