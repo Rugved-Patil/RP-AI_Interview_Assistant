@@ -52,8 +52,8 @@ export function InterviewPresets() {
       prev.name === 'loaded' ? { name: 'loaded', presets: prev.presets.filter((p) => p.id !== id) } : prev,
     )
     // Deleting the active preset clears the pointer too - otherwise the
-    // situational practice page would keep pointing at an id that no
-    // longer resolves to anything.
+    // practice page would keep pointing at an id that no longer resolves
+    // to anything.
     if (activeId === id) {
       setActivePresetId(null)
       setActiveId(null)
@@ -70,7 +70,7 @@ export function InterviewPresets() {
       <p className="interview-presets__eyebrow">Interview presets</p>
       <p className="interview-presets__lede">
         Save the role, company, and location you're practicing for. Whichever preset is marked{' '}
-        <strong>Active</strong> is what situational practice uses, until you change it here.
+        <strong>Active</strong> is used to build your practice questions, until you change it here.
       </p>
 
       <NewPresetForm onCreated={handleCreated} />

@@ -16,7 +16,7 @@ export function MockInterviewPage() {
           say, and grades the whole conversation at the end instead of one answer at a time.
         </p>
         <Link to="/practice" className="mock-placeholder__cta">
-          Try situational practice instead
+          Try technical questions instead
         </Link>
       </div>
     </div>

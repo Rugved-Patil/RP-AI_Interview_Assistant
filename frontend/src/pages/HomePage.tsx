@@ -9,10 +9,9 @@ export function HomePage() {
       <div className="home__modes">
         <Link to="/practice" className="mode-tile mode-tile--live">
           <span className="mode-tile__eyebrow">Ready now</span>
-          <h2 className="mode-tile__title">Situational practice</h2>
+          <h2 className="mode-tile__title">Technical questions</h2>
           <p className="mode-tile__body">
-            Answer one question at a time — a self-introduction, a single behavioral prompt, a single technical
-            one — and get graded right after.
+            Answer one technical question at a time, tailored to your role, and get graded right after.
           </p>
         </Link>
 

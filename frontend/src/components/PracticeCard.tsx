@@ -42,10 +42,10 @@ type Stage =
   | { name: 'error'; message: string }
 
 /**
- * Which interview preset the situational practice question gets built
- * from. Resolved from activePreset.ts's localStorage pointer, fetched
- * fresh on every mount (i.e. every time this page is navigated to) so a
- * change made on the Presets page is always picked up.
+ * Which interview preset the technical question gets built from. Resolved
+ * from activePreset.ts's localStorage pointer, fetched fresh on every mount
+ * (i.e. every time this page is navigated to) so a change made on the
+ * Presets page is always picked up.
  */
 type ActivePresetState =
   | { status: 'loading' }
@@ -149,7 +149,7 @@ export function PracticeCard() {
 
   return (
     <div className="practice-card">
-      <p className="practice-card__eyebrow">Situational practice</p>
+      <p className="practice-card__eyebrow">Technical questions</p>
 
       {stage.name === 'idle' && (
         <div className="practice-card__panel">

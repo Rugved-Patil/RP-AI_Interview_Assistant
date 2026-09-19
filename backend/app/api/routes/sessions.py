@@ -1,5 +1,11 @@
 """
-Situational practice session endpoints (scope doc Section 3.1).
+Technical-question practice session endpoints (scope doc Section 3.1).
+
+Naming note: the UI calls this mode "Technical questions", but the route
+(`/sessions/situational`) and module keep the original "situational" name on
+purpose. Once a second mode exists (e.g. Behavioral) we can decide whether
+that means separate endpoints or one endpoint with a `category` field and a
+prompt builder per category - and rename everything once, instead of twice.
 
 Flow for this route file:
     POST /sessions/situational          -> generates one question, opens a session
@@ -37,6 +43,14 @@ def _build_interviewer_prompt(role: str, company: str | None, location: str | No
     location are optional and simply omitted from the sentence rather than
     leaving an awkward blank when not given.
 
+    The prompt asks for a *technical* question only, to match the mode's
+    "Technical questions" label. An earlier version said "a single
+    behavioral or technical question", so the label was only accidentally
+    true (the "technical interviewer" persona happened to win every time).
+    Because `role` is free text, "technical" is defined as role-specific
+    knowledge or problem-solving, not "coding" - so it still makes sense for
+    a role that isn't software-related.
+
     Deliberately separate from the grading prompt in grading.py (scope doc
     Section 7.2: interviewer vs. grading personas are distinct prompts,
     iterated on empirically - this is a first pass, not a final version).
@@ -47,11 +61,12 @@ def _build_interviewer_prompt(role: str, company: str | None, location: str | No
     if location:
         persona += f" (location: {location})"
     persona += (
-        ". Ask exactly ONE clear, focused interview question - a single "
-        "behavioral or technical question relevant to this role. Keep the "
-        "question difficulty medium. Do not ask multiple questions, do not "
-        "number them, do not add preamble, explanation, or commentary. Reply "
-        "with nothing but the question itself."
+        ". Ask exactly ONE clear, focused technical question - one that "
+        "tests role-specific knowledge or problem-solving skills relevant "
+        "to this role. Do not ask a behavioral or 'tell me about a time' "
+        "question. Keep the question difficulty medium. Do not ask multiple "
+        "questions, do not number them, do not add preamble, explanation, or "
+        "commentary. Reply with nothing but the question itself."
     )
     return persona
 
