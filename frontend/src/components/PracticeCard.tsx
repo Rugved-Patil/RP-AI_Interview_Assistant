@@ -14,6 +14,9 @@ import './PracticeCard.css'
 
 /**
  * A discriminated union models the four stages of one practice attempt.
+ * `question` carries its own `error` so a failed grading attempt keeps the
+ * user on the question with their typed answer intact, instead of dropping
+ * them into the generic `error` stage (which can only restart from scratch).
  * `graded` also carries `sessionId` (needed to call the save endpoint)
  * and `saveState` - the opt-in save action is a sub-state of being
  * graded, not a separate stage, since you're still looking at the same
@@ -21,7 +24,14 @@ import './PracticeCard.css'
  */
 type Stage =
   | { name: 'idle' }
-  | { name: 'question'; sessionId: string; question: string; answer: string; submitting: boolean }
+  | {
+      name: 'question'
+      sessionId: string
+      question: string
+      answer: string
+      submitting: boolean
+      error: string | null
+    }
   | {
       name: 'graded'
       sessionId: string
@@ -45,31 +55,35 @@ type ActivePresetState =
 
 export function PracticeCard() {
   const [stage, setStage] = useState<Stage>({ name: 'idle' })
-  const [activePreset, setActivePreset] = useState<ActivePresetState>({ status: 'loading' })
+  // Lazy initial state: whether a preset id is stored is knowable
+  // synchronously (it's a localStorage read), so "none" is decided here
+  // instead of by calling setState inside the effect below - that's what
+  // the react-hooks/set-state-in-effect lint rule objects to.
+  const [activePreset, setActivePreset] = useState<ActivePresetState>(() =>
+    getActivePresetId() === null ? { status: 'none' } : { status: 'loading' },
+  )
 
   useEffect(() => {
     let cancelled = false
     const id = getActivePresetId()
-    if (id === null) {
-      setActivePreset({ status: 'none' })
-      return
+    if (id !== null) {
+      getPreset(id)
+        .then((preset) => {
+          if (!cancelled) setActivePreset({ status: 'loaded', preset })
+        })
+        .catch((err) => {
+          if (cancelled) return
+          // A 404 here means the active preset was deleted from another
+          // page/tab since this pointer was saved - clear the stale
+          // pointer instead of showing a permanent error for it.
+          if (err instanceof Error && err.message.includes('(404)')) {
+            setActivePresetId(null)
+            setActivePreset({ status: 'none' })
+          } else {
+            setActivePreset({ status: 'error', message: 'Could not load your interview preset.' })
+          }
+        })
     }
-    getPreset(id)
-      .then((preset) => {
-        if (!cancelled) setActivePreset({ status: 'loaded', preset })
-      })
-      .catch((err) => {
-        if (cancelled) return
-        // A 404 here means the active preset was deleted from another
-        // page/tab since this pointer was saved - clear the stale
-        // pointer instead of showing a permanent error for it.
-        if (err instanceof Error && err.message.includes('(404)')) {
-          setActivePresetId(null)
-          setActivePreset({ status: 'none' })
-        } else {
-          setActivePreset({ status: 'error', message: 'Could not load your interview preset.' })
-        }
-      })
     return () => {
       cancelled = true
     }
@@ -84,7 +98,14 @@ export function PracticeCard() {
         company: company ?? undefined,
         location: location ?? undefined,
       })
-      setStage({ name: 'question', sessionId: session_id, question, answer: '', submitting: false })
+      setStage({
+        name: 'question',
+        sessionId: session_id,
+        question,
+        answer: '',
+        submitting: false,
+        error: null,
+      })
     } catch (err) {
       setStage({ name: 'error', message: toMessage(err) })
     }
@@ -93,8 +114,10 @@ export function PracticeCard() {
   async function handleSubmit() {
     if (stage.name !== 'question') return
     const { sessionId, answer } = stage
-    setStage({ ...stage, submitting: true })
+    setStage({ ...stage, submitting: true, error: null })
     try {
+      // Re-sending the answer on a retry is harmless: the backend just
+      // overwrites session.answer with the same text (or the edited text).
       await submitAnswer(sessionId, answer)
       const grade = await gradeSession(sessionId)
       setStage({
@@ -105,7 +128,10 @@ export function PracticeCard() {
         saveState: 'unsaved',
       })
     } catch (err) {
-      setStage({ name: 'error', message: toMessage(err) })
+      // Stay on the question with the typed answer preserved, so a failed
+      // grade (e.g. a free-tier rate limit) costs the user a retry click,
+      // not their whole answer.
+      setStage({ ...stage, submitting: false, error: toMessage(err) })
     }
   }
 
@@ -126,7 +152,7 @@ export function PracticeCard() {
       <p className="practice-card__eyebrow">Situational practice</p>
 
       {stage.name === 'idle' && (
-        <div className="practice-card__panel practice-card__panel--idle">
+        <div className="practice-card__panel">
           <ActivePresetBanner state={activePreset} />
           <button
             className="practice-card__button"
@@ -155,13 +181,26 @@ export function PracticeCard() {
             disabled={stage.submitting}
           />
 
-          <button
-            className="practice-card__button"
-            onClick={handleSubmit}
-            disabled={stage.submitting || stage.answer.trim().length === 0}
-          >
-            {stage.submitting ? 'Grading…' : 'Submit answer'}
-          </button>
+          {stage.error && <p className="practice-card__error">{stage.error}</p>}
+
+          <div className="practice-card__actions">
+            <button
+              className="practice-card__button"
+              onClick={handleSubmit}
+              disabled={stage.submitting || stage.answer.trim().length === 0}
+            >
+              {stage.submitting ? 'Grading…' : stage.error ? 'Retry grading' : 'Submit answer'}
+            </button>
+            {stage.error && (
+              <button
+                className="practice-card__button practice-card__button--ghost"
+                onClick={() => setStage({ name: 'idle' })}
+                disabled={stage.submitting}
+              >
+                Start over
+              </button>
+            )}
+          </div>
         </div>
       )}
 

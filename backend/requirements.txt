@@ -4,5 +4,6 @@ pydantic-settings
 sqlalchemy
 groq
 google-genai
+httpx
 pytest
 pytest-asyncio

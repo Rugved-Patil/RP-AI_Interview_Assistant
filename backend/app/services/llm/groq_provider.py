@@ -79,7 +79,12 @@ class GroqProvider(LLMProvider):
 
         choice = completion.choices[0]
         return LLMResponse(
-            text=choice.message.content,
+            # `content` is Optional in the SDK's types: a reasoning model that
+            # burns its whole budget thinking can hand back None (or "")
+            # instead of raising. Normalizing to "" here means every caller
+            # can rely on `.text` being a real string and use a plain
+            # emptiness check, instead of each route guarding against None.
+            text=choice.message.content or "",
             provider="groq",
             model=self._model,
             raw=completion.model_dump(),
