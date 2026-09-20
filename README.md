@@ -4,7 +4,9 @@ An AI-powered mock interview practice app. Pick a role, get a technical intervie
 
 This is a self-directed learning project (AI coding tools + prompt engineering), built and documented as a CV portfolio piece. Full design rationale and decision history lives in [`RP-AI_Interview_Assistant_Project_Scope.md`](./docs/RP-AI_Interview_Assistant_Project_Scope.md).
 
-## Features (current — Phase 1 / v1)
+> **Status: v0.1.0.** Phase 1 (technical-question practice with presets and saved reports) is complete. The full mock interview and voice mode are planned for v1.0.0.
+
+## Features (current — Phase 1, v0.1.0)
 
 - **Technical questions:** get one AI-generated technical question tailored to your role (and optionally a company and location), answer it in the text box, and get graded right away with a 0–10 score and written feedback. The grader is told the same role/company/location, so the bar it applies fits the role rather than being generic.
 - **Interview presets:** save role / company / location combinations, choose which one is active, and edit or delete them on a dedicated Presets page. Only the role is required.
@@ -164,8 +166,7 @@ The frontend has no automated tests yet. Check it with:
 ```bash
 cd frontend
 npm run lint
-npx tsc --noEmit
-npm run build
+npm run build     # type-checks with tsc -b, then builds
 ```
 
 ## Troubleshooting
@@ -188,7 +189,7 @@ npm run build
 
 ## Roadmap
 
-- **Phase 2:** full mock interview mode (multi-turn, HR/Technical branching, holistic end-of-interview grading), and voice input/output via the Web Speech API with a text fallback.
+- **Phase 2 (the v1.0.0 milestone):** full mock interview mode (multi-turn, HR/Technical branching, holistic end-of-interview grading), and voice input/output via the Web Speech API with a text fallback.
 - **Behavioral mode:** its own mode, with its own interviewer prompt and a STAR-based grading rubric.
 - **Phase 3:** RAG-grounded question generation, and possible stretch goals (adaptive difficulty, deeper answer analysis).
 
