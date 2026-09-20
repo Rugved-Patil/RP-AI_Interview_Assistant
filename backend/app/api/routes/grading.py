@@ -42,7 +42,7 @@ def _build_grader_prompt(role: str, company: str | None, location: str | None) -
     """
     Builds the grading persona prompt using the same role/company/location
     context the question was generated with (stored on the session - see
-    session_store.PracticeSession), so the bar for "good answer" reflects
+    session_store.TechnicalSession), so the bar for "good answer" reflects
     what this specific role/company/location context would need rather
     than a role-agnostic average.
     """

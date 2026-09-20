@@ -1,5 +1,5 @@
 """
-In-memory store for situational practice sessions.
+In-memory store for Technical questions sessions.
 
 Why in-memory and not SQLite:
 Per the scope doc (Section 3.6, "Resolved"): a report is NOT saved
@@ -28,9 +28,9 @@ from dataclasses import dataclass
 
 
 @dataclass
-class PracticeSession:
+class TechnicalSession:
     """
-    One situational-practice attempt: one question, one answer, one grade.
+    One Technical questions attempt: one question, one answer, one grade.
 
     role/company/location are the personalization context the question was
     generated for (scope doc Section 3.4). They're captured on the session
@@ -52,7 +52,7 @@ class PracticeSession:
 # Process-lifetime storage. Fine for a single local user; would need to
 # become a real datastore (SQLite/Redis/etc.) for multi-user or multi-process
 # deployment - neither of which applies here (scope doc: local-only, $0 budget).
-_sessions: dict[str, PracticeSession] = {}
+_sessions: dict[str, TechnicalSession] = {}
 
 
 def create_session(
@@ -60,8 +60,8 @@ def create_session(
     role: str,
     company: str | None = None,
     location: str | None = None,
-) -> PracticeSession:
-    session = PracticeSession(
+) -> TechnicalSession:
+    session = TechnicalSession(
         id=str(uuid.uuid4()),
         question=question,
         role=role,
@@ -72,5 +72,5 @@ def create_session(
     return session
 
 
-def get_session(session_id: str) -> PracticeSession | None:
+def get_session(session_id: str) -> TechnicalSession | None:
     return _sessions.get(session_id)

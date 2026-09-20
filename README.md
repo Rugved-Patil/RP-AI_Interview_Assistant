@@ -62,7 +62,7 @@ RP-AI_Interview_Assistant/
 │   │   │   │   ├── groq_provider.py  # interviewer provider (Groq free tier)
 │   │   │   │   ├── gemini_provider.py# grader provider (Gemini free tier)
 │   │   │   │   └── retry.py          # shared retry-with-backoff for transient errors
-│   │   │   └── session_store.py      # in-memory store for in-progress PracticeSessions
+│   │   │   └── session_store.py      # in-memory store for in-progress TechnicalSessions
 │   │   └── main.py                   # FastAPI app, CORS, router registration
 │   ├── scripts/
 │   │   └── smoke_test_llm.py         # manual script - hits the real Groq/Gemini APIs
