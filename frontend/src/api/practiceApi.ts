@@ -12,6 +12,14 @@
 
 export const API_BASE_URL = 'http://localhost:8000'
 
+/**
+ * Longest answer the backend accepts. Mirrors MAX_ANSWER_LENGTH in
+ * backend/app/schemas/session.py - keep the two in sync. Used as the
+ * textarea's maxLength so the user is stopped at the limit instead of
+ * getting a 422 back after clicking Submit.
+ */
+export const MAX_ANSWER_LENGTH = 5000
+
 export interface StartSessionRequest {
   role: string
   company?: string

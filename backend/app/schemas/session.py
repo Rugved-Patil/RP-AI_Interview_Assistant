@@ -9,9 +9,27 @@ automatically - that's why response_model is worth setting on every route,
 not just a nice-to-have.
 """
 
-from pydantic import BaseModel, field_validator
+from typing import Annotated
+
+from pydantic import BaseModel, StringConstraints, field_validator
 
 from app.schemas.personalization import blank_optional_becomes_none, require_role
+
+# Longest answer accepted, in characters (after trimming). A spoken interview
+# answer is roughly 2-3 minutes, i.e. ~2,000-3,000 characters, so this leaves
+# generous headroom while stopping an accidental paste of a whole document
+# from being sent to the grader and eating free-tier quota. The frontend
+# mirrors this value (MAX_ANSWER_LENGTH in practiceApi.ts) - keep them in sync.
+MAX_ANSWER_LENGTH = 5000
+
+# Trim first, THEN check length: pydantic applies strip_whitespace before
+# min/max_length, so "   " counts as empty and trailing spaces never push a
+# maximum-length answer over the limit. Declarative constraints (rather than a
+# hand-written validator like role's) also show up in the /docs schema.
+Answer = Annotated[
+    str,
+    StringConstraints(strip_whitespace=True, min_length=1, max_length=MAX_ANSWER_LENGTH),
+]
 
 
 class CreateSessionRequest(BaseModel):
@@ -50,7 +68,7 @@ class CreateSessionResponse(BaseModel):
 
 
 class SubmitAnswerRequest(BaseModel):
-    answer: str
+    answer: Answer
 
 
 class SubmitAnswerResponse(BaseModel):

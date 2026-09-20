@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import {
   API_BASE_URL,
+  MAX_ANSWER_LENGTH,
   getPreset,
   gradeSession,
   saveReport,
@@ -178,6 +179,7 @@ export function PracticeCard() {
             onChange={(event) => setStage({ ...stage, answer: event.target.value })}
             placeholder="Type your answer here..."
             rows={8}
+            maxLength={MAX_ANSWER_LENGTH}
             disabled={stage.submitting}
           />
 

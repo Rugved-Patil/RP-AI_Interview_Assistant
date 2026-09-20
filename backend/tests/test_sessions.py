@@ -2,6 +2,7 @@
 
 import pytest
 
+from app.schemas.session import MAX_ANSWER_LENGTH
 from app.services import session_store
 from app.services.llm import LLMProviderError, Role
 
@@ -114,3 +115,65 @@ def test_an_answer_body_is_required(client, start_session):
     session_id = start_session()
 
     assert client.post(f"/sessions/{session_id}/answer", json={}).status_code == 422
+
+
+def test_the_stored_answer_is_trimmed(client, start_session):
+    session_id = start_session()
+
+    client.post(f"/sessions/{session_id}/answer", json={"answer": "  My answer.\n"})
+
+    assert session_store.get_session(session_id).answer == "My answer."
+
+
+@pytest.mark.parametrize("answer", ["", "   ", "\n\t  \n"])
+def test_a_blank_answer_is_rejected(client, start_session, answer):
+    session_id = start_session()
+
+    response = client.post(f"/sessions/{session_id}/answer", json={"answer": answer})
+
+    assert response.status_code == 422
+    assert session_store.get_session(session_id).answer is None
+
+
+def test_a_rejected_answer_does_not_overwrite_the_previous_one(client, start_session):
+    # A bad retry must not wipe out the last good answer.
+    session_id = start_session()
+    client.post(f"/sessions/{session_id}/answer", json={"answer": "First try."})
+
+    response = client.post(f"/sessions/{session_id}/answer", json={"answer": "   "})
+
+    assert response.status_code == 422
+    assert session_store.get_session(session_id).answer == "First try."
+
+
+def test_an_answer_at_the_length_limit_is_accepted(client, start_session):
+    session_id = start_session()
+    answer = "a" * MAX_ANSWER_LENGTH
+
+    response = client.post(f"/sessions/{session_id}/answer", json={"answer": answer})
+
+    assert response.status_code == 200
+    assert session_store.get_session(session_id).answer == answer
+
+
+def test_an_answer_over_the_length_limit_is_rejected(client, start_session):
+    session_id = start_session()
+
+    response = client.post(
+        f"/sessions/{session_id}/answer", json={"answer": "a" * (MAX_ANSWER_LENGTH + 1)}
+    )
+
+    assert response.status_code == 422
+    assert session_store.get_session(session_id).answer is None
+
+
+def test_padding_whitespace_does_not_count_towards_the_length_limit(client, start_session):
+    # Trimming happens before the length check, so a limit-sized answer with
+    # trailing whitespace is still accepted.
+    session_id = start_session()
+    answer = "a" * MAX_ANSWER_LENGTH
+
+    response = client.post(f"/sessions/{session_id}/answer", json={"answer": f"{answer}   \n"})
+
+    assert response.status_code == 200
+    assert session_store.get_session(session_id).answer == answer
