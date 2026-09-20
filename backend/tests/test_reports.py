@@ -36,6 +36,7 @@ def test_saving_a_graded_session_creates_a_report(client, providers, graded_sess
     assert report["answer"] == "My answer."
     assert report["score"] == 7
     assert report["feedback"] == "Solid answer."
+    assert report["role"] == "ML Engineer"
     assert report["created_at"]
 
 
@@ -47,6 +48,34 @@ def test_saving_twice_is_idempotent(client, graded_session):
     assert first.status_code == second.status_code == 200
     assert first.json()["id"] == second.json()["id"]
     assert len(client.get("/reports").json()) == 1
+
+
+def test_saved_report_records_the_context_it_was_graded_against(client, start_session):
+    session_id = start_session(role="ML Engineer", company="Acme", location="Berlin")
+    client.post(f"/sessions/{session_id}/answer", json={"answer": "My answer."})
+    assert client.post(f"/sessions/{session_id}/grade").status_code == 200
+    assert client.post(f"/sessions/{session_id}/save").status_code == 200
+
+    (report,) = client.get("/reports").json()
+
+    assert report["role"] == "ML Engineer"
+    assert report["company"] == "Acme"
+    assert report["location"] == "Berlin"
+
+
+def test_saved_report_leaves_omitted_optional_context_null(client, start_session):
+    # company is left out entirely; location is whitespace, which the request
+    # schema normalises to None - both should come back as null, not "".
+    session_id = start_session(role="Data Analyst", location="   ")
+    client.post(f"/sessions/{session_id}/answer", json={"answer": "My answer."})
+    client.post(f"/sessions/{session_id}/grade")
+    client.post(f"/sessions/{session_id}/save")
+
+    (report,) = client.get("/reports").json()
+
+    assert report["role"] == "Data Analyst"
+    assert report["company"] is None
+    assert report["location"] is None
 
 
 def test_saving_an_unknown_session_is_a_404(client):

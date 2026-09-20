@@ -37,6 +37,9 @@ def save_report(session_id: str, db: Session = Depends(get_db)) -> SaveReportRes
         answer=session.answer or "",
         score=session.score,
         feedback=session.feedback,
+        role=session.role,
+        company=session.company,
+        location=session.location,
     )
     db.add(report)
     try:

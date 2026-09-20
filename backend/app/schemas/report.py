@@ -30,4 +30,7 @@ class ReportSummary(BaseModel):
     answer: str
     score: int
     feedback: str
+    role: str | None
+    company: str | None
+    location: str | None
     created_at: datetime

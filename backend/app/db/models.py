@@ -31,6 +31,16 @@ class SavedReport(Base):
     answer: Mapped[str] = mapped_column(Text)
     score: Mapped[int] = mapped_column(Integer)
     feedback: Mapped[str] = mapped_column(Text)
+    # The personalization context this answer was graded against, copied
+    # from the PracticeSession at save time. Stored as plain text rather
+    # than a link to an InterviewPreset row on purpose: a report is a
+    # snapshot of what happened, and presets can be edited or deleted
+    # later - a foreign key would make an old report's context change (or
+    # vanish) along with the preset. Nullable because company/location are
+    # optional inputs.
+    role: Mapped[str | None] = mapped_column(String, nullable=True)
+    company: Mapped[str | None] = mapped_column(String, nullable=True)
+    location: Mapped[str | None] = mapped_column(String, nullable=True)
     created_at: Mapped[datetime] = mapped_column(
         DateTime, default=lambda: datetime.now(timezone.utc)
     )

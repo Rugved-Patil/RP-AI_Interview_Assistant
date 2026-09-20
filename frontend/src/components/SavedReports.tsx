@@ -72,6 +72,7 @@ function ReportRow({
   const [confirming, setConfirming] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
   const [deleteError, setDeleteError] = useState<string | null>(null)
+  const context = formatContext(report)
 
   async function handleConfirmDelete() {
     setIsDeleting(true)
@@ -97,6 +98,12 @@ function ReportRow({
 
       {expanded && (
         <div className="report-row__detail">
+          {context && (
+            <>
+              <p className="report-row__label">Graded for</p>
+              <p className="report-row__text">{context}</p>
+            </>
+          )}
           <p className="report-row__label">Question</p>
           <p className="report-row__text">{report.question}</p>
           <p className="report-row__label">Your answer</p>
@@ -135,6 +142,12 @@ function ReportRow({
       )}
     </li>
   )
+}
+
+// "ML Engineer · Acme · Berlin" - skips whichever parts weren't supplied.
+// Returns '' when none were, which the caller uses to hide the block.
+function formatContext(report: ReportSummary): string {
+  return [report.role, report.company, report.location].filter(Boolean).join(' · ')
 }
 
 function formatDate(iso: string): string {

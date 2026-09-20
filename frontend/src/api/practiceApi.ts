@@ -41,6 +41,9 @@ export interface ReportSummary {
   answer: string
   score: number
   feedback: string
+  role: string | null
+  company: string | null
+  location: string | null
   created_at: string
 }
 
