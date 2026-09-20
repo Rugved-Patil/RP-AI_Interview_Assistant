@@ -1,10 +1,10 @@
 # RP-AI Interview Assistant — Project Scope
 
-**Status:** Phase 1 (MVP) feature-complete — Technical questions, saved interview presets, and opt-in report saving working end-to-end; versioned **v0.1.0**. v1.0.0 is reserved for the release that includes the Phase 2 features (full mock interview mode)
+**Status:** Phase 1 (MVP) feature-complete — Technical questions, saved interview presets, and opt-in report saving working end-to-end; versioned **v0.1.0**. v1.0.0 is reserved for the release that includes the Phase 2 features (full mock interview mode). Phase 2 design is in progress — the session model is decided (see 7.1)
 
 **Owner:** AI & Data Science student (personal practice/passion project)
 
-**Last updated:** 2026-09-20 — release plan changed (Phase 1 = v0.1.0; v1.0.0 reserved for the release that includes Phase 2) and pre-release pass: role/company/location personalization and saved presets; "Situational practice" renamed "Technical questions" (separate modes per category); grader/LLM robustness fixes; saved reports now record their context; answer validation; pinned dependencies; scope doc moved to `docs/` — see Section 7
+**Last updated:** 2026-09-20 — Phase 2 design started (mock interview gets its own in-memory `InterviewSession`; `PracticeSession` renamed `TechnicalSession`); earlier the same day: release plan changed (Phase 1 = v0.1.0; v1.0.0 reserved for the release that includes Phase 2) and pre-release pass: role/company/location personalization and saved presets; "Situational practice" renamed "Technical questions" (separate modes per category); grader/LLM robustness fixes; saved reports now record their context; answer validation; pinned dependencies; scope doc moved to `docs/` — see Section 7
 
 **Purpose:** A self-directed learning project to improve skills in (a) using AI coding tools effectively (Claude Code) and (b) AI prompt engineering — built by designing and implementing a voice/text-based mock interview practice app. This is not intended as a commercial product; similar products exist, and that's fine — the goal is the learning process, with a working, polished result as a CV portfolio piece.
 
@@ -54,7 +54,9 @@ A RAG (Retrieval-Augmented Generation) pipeline is a planned Phase 3 addition: a
 
 LLM APIs are stateless — memory is implemented by resending the full running transcript (system prompt + all prior Q/A turns) with every request during a mock interview, so the model can generate contextually appropriate follow-ups. Session transcripts should be held server-side (in-memory or SQLite-backed) keyed by a session ID.
 
-Phase 1 already uses this shape in reduced form: a single-question `PracticeSession` (question, answer, score, feedback, plus the role/company/location it was created for) is held in an in-memory store keyed by session ID. Restarting the backend discards any unfinished session; that's accepted, since nothing is meant to persist unless the user saves it.
+Phase 1 already uses this shape in reduced form: a single-question `TechnicalSession` (formerly `PracticeSession`; question, answer, score, feedback, plus the role/company/location it was created for) is held in an in-memory store keyed by session ID. Restarting the backend discards any unfinished session; that's accepted, since nothing is meant to persist unless the user saves it.
+
+**Decided for Phase 2 (2026-09-20):** the full mock interview gets its own `InterviewSession` class (interview configuration, running transcript, status), separate from `TechnicalSession`, and it is held in memory keyed by session ID. Restarting the backend (including auto-reload during development) discards an in-progress interview; that's accepted for now, with SQLite-backed transcripts as an option to revisit later (see 7.2). The exact fields, the lifecycle, and how an interview starts, continues and ends are still to be designed.
 
 ### 3.6 Data Persistence
 
@@ -132,7 +134,7 @@ Phase 1 implements everything shown except the parts labelled Phase 2 (voice) an
 - Multi-page UI (home, Technical questions, Presets, Saved reports, and a Phase 2 placeholder page) with a persistent header
 - Backend pytest suite using fake providers and an in-memory database
 
-**Phase 2 — Full Feature Set — not started (completing it is the milestone for v1.0.0)**
+**Phase 2 — Full Feature Set — design in progress (completing it is the milestone for v1.0.0)**
 - Full mock interview mode: multi-turn conversational back-and-forth, HR/Technical branching, domain + company + experience-level personalization — *explicitly confirmed as out of Phase 1 scope (2026-09-15); this is where it lives, and it is the centerpiece of v1.0.0*
 - Voice mode via Web Speech API, with automatic text fallback
 - Holistic end-of-interview grading (numeric + qualitative) from full transcript
@@ -151,8 +153,14 @@ Phase 1 implements everything shown except the parts labelled Phase 2 (voice) an
 - **Versioning and release plan** *(revised 2026-09-20)*: Phase 1 is versioned **v0.1.0** (`0.x` = initial development). **v1.0.0 is reserved for the release that includes the Phase 2 features** (full mock interview mode and the rest of Phase 2), not for Phase 1 alone. This supersedes the earlier decision (2026-09-15) that "v1" = Phase 1 MVP only. Full mock interview mode is still not pulled forward into Phase 1 — it stays Phase 2, to be picked up deliberately rather than by drift. Version numbers are kept consistent across the release tag, `frontend/package.json` and the FastAPI app metadata in `backend/app/main.py`.
 - **Personalization pulled into Phase 1:** Questions and grading are personalized by role (required), company and location (optional) via prompt parameters — earlier than 3.4's original wording, which tied personalization to the full mock interview. This also replaces the "one domain (AI/DS technical)" framing: Phase 1 is role-driven, not tied to one domain. Grading receives the same context as question generation, rather than judging the question/answer pair in the abstract. Experience level stays in Phase 2.
 - **Interview presets:** After trying a blank per-attempt setup form with no memory between questions, the project moved to saved presets — one active at a time, managed on their own Presets page. Sub-decisions: the active selection lives in browser localStorage only (not a "default" flag on the database row); the practice page shows the active preset read-only, with editing only on the Presets page; presets support full create/edit/delete, not just create/delete.
-- **Mode split — "Technical questions":** "Situational practice" was renamed "Technical questions" because it only ever produced technical questions (the interviewer prompt opened with "You are a technical interviewer"). The prompt now asks explicitly for a technical question, defined as role-specific knowledge or problem-solving so it also works for non-coding roles. There is no category selector inside one mode: each category (Behavioral next) becomes its own mode, because each needs its own interviewer prompt and grading rubric (correctness for technical, STAR structure for behavioral). The internal names (`/sessions/situational`, `startSituationalSession`, `SituationalPracticePage`) are deliberately unchanged until a second mode decides the endpoint shape.
+- **Mode split — "Technical questions":** "Situational practice" was renamed "Technical questions" because it only ever produced technical questions (the interviewer prompt opened with "You are a technical interviewer"). The prompt now asks explicitly for a technical question, defined as role-specific knowledge or problem-solving so it also works for non-coding roles. There is no category selector inside one mode: each category (Behavioral next) becomes its own mode, because each needs its own interviewer prompt and grading rubric (correctness for technical, STAR structure for behavioral). The internal names (`/sessions/situational`, `startSituationalSession`, `SituationalPracticePage`) are deliberately unchanged until a second mode decides the endpoint shape. *Update (2026-09-20):* the session class `PracticeSession` has since been renamed `TechnicalSession`, because the mock interview now has its own class and the old name no longer distinguished them; the routes, function and page names above are still unchanged.
 - **Multi-page navigation:** `react-router-dom` over manual state-based view switching, for real URLs, working browser back/forward, and future-proofing (the mock interview will want its own route). A persistent header carries the Presets and Saved reports links on every page.
+
+**Phase 2 design** *(started 2026-09-20)*
+
+- **Separate session class for the mock interview:** `InterviewSession` sits beside `TechnicalSession` instead of generalizing one session type with a `kind` field and a list of turns. Reasons: it leaves the working, tested Technical questions mode untouched, and it matches the rule that each mode owns its own prompt and rubric. Cost accepted: some duplicated plumbing between the two classes. Considered and passed on: one generalized session (a single-question practice becoming a one-turn session) — less duplication, but it means refactoring working code and coupling two different grading approaches.
+- **In-memory transcripts to start:** the running interview transcript is held in memory, keyed by session ID, like `TechnicalSession`. Cost accepted: a backend restart (including auto-reload in development) loses an in-progress interview. Considered and deferred: SQLite from the start — it would let interviews survive restarts and be resumed, but it pulls the Alembic question forward and blurs the "nothing persists unless the user saves it" rule. It can be added later if wanted (see 7.2).
+- **`PracticeSession` renamed `TechnicalSession`:** the class now carries the mode name, since `PracticeSession` was an older name from before the mode split and no longer said what it was. It lives in `backend/app/services/session_store.py`, and that file keeps its name — it is the in-memory session store, not a file named after one class. Pure rename (plus two docstring wording tweaks), no behaviour change and no database change (sessions are in memory). Behavioral mode's session class is not decided yet.
 
 **LLM & backend behaviour**
 
@@ -179,10 +187,11 @@ Phase 1 implements everything shown except the parts labelled Phase 2 (voice) an
 ### 7.2 Deferred (intentionally)
 
 - **Exact prompt design** for the "interviewer persona" vs. "grading persona" — not finalized in the abstract; to be iterated on empirically now that there are real graded examples to look back on. First candidates: score spread and consistency across strong/vague/wrong answers, whether the grader's temperature (currently 0.3) is right for the chosen model, and question variety and difficulty on the interviewer side.
-- **Database migrations (Alembic):** not adopted — `create_all()` is enough for a single-developer, local-only project. Worth revisiting when Phase 2 adds mock-interview persistence.
+- **Database migrations (Alembic):** not adopted — `create_all()` is enough for a single-developer, local-only project. Worth revisiting if Phase 2 ends up persisting mock interviews (see the SQLite-backed transcripts item below).
 - **Friendlier UI error messages:** the UI currently shows raw text such as `Request failed (502): {"detail": …}`. Deliberately skipped for v0.1.0.
 - **Frontend automated tests:** none yet (see the testing approach in 7.1).
-- **Internal "situational" names:** left as-is until a second mode decides the endpoint shape (see the mode split in 7.1).
+- **Internal "situational" names:** the routes, `startSituationalSession` and `SituationalPracticePage` are left as-is until a second mode decides the endpoint shape (the session class itself was renamed `TechnicalSession` — see 7.1).
+- **SQLite-backed interview transcripts:** in-progress mock interviews live in memory for now. Revisit if losing an interview to a backend restart becomes a real annoyance, or when deciding whether finished interviews can be saved; that decision would also reopen the Alembic question.
 - **LICENSE:** no license is added yet; the choice is deferred to the v1.0.0 release. Until then the code is "all rights reserved" by default.
 - **README screenshot/GIF:** deferred to the v1.0.0 release, when the full feature set can be shown.
 - **Project rename:** a simpler name (e.g., "Interview Assistant") was considered and deferred as not important yet.
