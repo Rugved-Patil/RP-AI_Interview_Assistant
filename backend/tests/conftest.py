@@ -28,7 +28,7 @@ from sqlalchemy.pool import StaticPool
 from app.db import models  # noqa: F401  (registers the tables on Base)
 from app.db.base import Base, get_db
 from app.main import app
-from app.services import session_store
+from app.services import interview_store, session_store
 from app.services.llm import LLMProvider, LLMResponse, LLMRole, Message
 
 
@@ -66,6 +66,13 @@ def _clean_session_store():
     session_store._sessions.clear()
     yield
     session_store._sessions.clear()
+
+
+@pytest.fixture(autouse=True)
+def _clean_interview_store():
+    interview_store._interviews.clear()
+    yield
+    interview_store._interviews.clear()
 
 
 @pytest.fixture
@@ -108,6 +115,7 @@ def providers(monkeypatch):
     # module did `from app.services.llm import get_provider`, so each holds
     # its own reference.
     monkeypatch.setattr("app.api.routes.sessions.get_provider", fake_get_provider)
+    monkeypatch.setattr("app.api.routes.interviews.get_provider", fake_get_provider)
     monkeypatch.setattr("app.api.routes.grading.get_provider", fake_get_provider)
     return SimpleNamespace(interviewer=interviewer, grader=grader)
 

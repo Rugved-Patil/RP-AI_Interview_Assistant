@@ -1,7 +1,7 @@
 """
-Invariants for the two prompt builders - deliberately NOT their exact wording.
+Invariants for the prompt builders - deliberately NOT their exact wording.
 
-The scope doc (Section 7.2) says both prompts will be tuned empirically, so
+The scope doc (Section 7.2) says prompts will be tuned empirically, so
 tests that pinned the wording would fail on every tweak and end up deleted.
 These pin only what must stay true however the prompts get reworded.
 """
@@ -9,12 +9,16 @@ These pin only what must stay true however the prompts get reworded.
 import pytest
 
 from app.api.routes.grading import _build_grader_prompt
+from app.api.routes.interviews import _build_mock_interviewer_prompt
 from app.api.routes.sessions import _build_interviewer_prompt
+from app.services.interview_store import ExperienceLevel, InterviewType
 
-BUILDERS = [_build_interviewer_prompt, _build_grader_prompt]
+# --- shared: single-question interviewer + grader ----------------------------
+
+SINGLE_Q_BUILDERS = [_build_interviewer_prompt, _build_grader_prompt]
 
 
-@pytest.mark.parametrize("build", BUILDERS)
+@pytest.mark.parametrize("build", SINGLE_Q_BUILDERS)
 def test_prompt_includes_every_supplied_detail(build):
     prompt = build("Data Scientist", "Acme", "Berlin")
 
@@ -22,7 +26,7 @@ def test_prompt_includes_every_supplied_detail(build):
         assert expected in prompt
 
 
-@pytest.mark.parametrize("build", BUILDERS)
+@pytest.mark.parametrize("build", SINGLE_Q_BUILDERS)
 def test_prompt_with_only_a_role_has_no_leftover_placeholders(build):
     # The classic f-string bug: "... at None (location: None)".
     prompt = build("Data Scientist", None, None)
@@ -49,3 +53,43 @@ def test_interviewer_prompt_asks_for_a_technical_question_not_either_or():
 
     assert "technical question" in prompt
     assert "behavioral or technical" not in prompt
+
+
+# --- mock interview interviewer prompt ----------------------------------------
+
+
+def test_mock_prompt_includes_every_supplied_detail():
+    prompt = _build_mock_interviewer_prompt(
+        InterviewType.TECHNICAL, ExperienceLevel.SENIOR,
+        "Data Scientist", "Acme", "Berlin",
+    )
+    for expected in ("Data Scientist", "Acme", "Berlin", "senior"):
+        assert expected in prompt
+
+
+def test_mock_prompt_with_only_a_role_has_no_leftover_placeholders():
+    prompt = _build_mock_interviewer_prompt(
+        InterviewType.HR, ExperienceLevel.JUNIOR,
+        "Data Scientist", None, None,
+    )
+    assert "Data Scientist" in prompt
+    assert "None" not in prompt
+
+
+def test_hr_mock_prompt_focuses_on_behavioral_topics():
+    prompt = _build_mock_interviewer_prompt(
+        InterviewType.HR, ExperienceLevel.MID,
+        "ML Engineer", None, None,
+    ).lower()
+    # The HR prompt should mention behavioral or culture-fit topics,
+    # not be framed as a "technical interviewer".
+    assert "behavioral" in prompt or "culture" in prompt
+    assert "technical interviewer" not in prompt
+
+
+def test_technical_mock_prompt_focuses_on_technical_topics():
+    prompt = _build_mock_interviewer_prompt(
+        InterviewType.TECHNICAL, ExperienceLevel.MID,
+        "ML Engineer", None, None,
+    ).lower()
+    assert "technical" in prompt
