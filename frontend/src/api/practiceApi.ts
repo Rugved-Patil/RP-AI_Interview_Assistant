@@ -158,3 +158,65 @@ export function gradeSession(sessionId: string): Promise<GradeResponse> {
     parseOrThrow<GradeResponse>,
   )
 }
+
+export interface StartInterviewRequest {
+  interview_type: 'hr' | 'technical'
+  experience_level: 'junior' | 'mid' | 'senior'
+  role: string
+  company?: string
+  location?: string
+}
+
+export interface StartInterviewResponse {
+  session_id: string
+  first_question: string
+}
+
+export interface InterviewAnswerResponse {
+  session_id: string
+  interviewer_message: string | null
+  interview_ended: boolean
+  turn_number: number
+}
+
+export interface EndInterviewResponse {
+  session_id: string
+  status: string
+}
+
+export interface InterviewGradeResponse {
+  session_id: string
+  score: number
+  feedback: string
+}
+
+export function startInterview(body: StartInterviewRequest): Promise<StartInterviewResponse> {
+  return fetch(`${API_BASE_URL}/interviews/start`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  }).then(parseOrThrow<StartInterviewResponse>)
+}
+
+export function submitInterviewAnswer(
+  sessionId: string,
+  answer: string,
+): Promise<InterviewAnswerResponse> {
+  return fetch(`${API_BASE_URL}/interviews/${sessionId}/answer`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ answer }),
+  }).then(parseOrThrow<InterviewAnswerResponse>)
+}
+
+export function endInterview(sessionId: string): Promise<EndInterviewResponse> {
+  return fetch(`${API_BASE_URL}/interviews/${sessionId}/end`, {
+    method: 'POST',
+  }).then(parseOrThrow<EndInterviewResponse>)
+}
+
+export function gradeInterview(sessionId: string): Promise<InterviewGradeResponse> {
+  return fetch(`${API_BASE_URL}/interviews/${sessionId}/grade`, {
+    method: 'POST',
+  }).then(parseOrThrow<InterviewGradeResponse>)
+}

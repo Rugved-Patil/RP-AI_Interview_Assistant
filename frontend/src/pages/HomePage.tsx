@@ -15,11 +15,11 @@ export function HomePage() {
           </p>
         </Link>
 
-        <Link to="/mock-interview" className="mode-tile mode-tile--placeholder">
-          <span className="mode-tile__eyebrow">Phase 2</span>
+        <Link to="/mock-interview" className="mode-tile mode-tile--live">
+          <span className="mode-tile__eyebrow">Ready now</span>
           <h2 className="mode-tile__title">Full mock interview</h2>
           <p className="mode-tile__body">
-            A complete back-and-forth interview with follow-up questions, graded once at the end. Not built yet.
+            A complete back-and-forth interview with follow-up questions, graded holistically at the end.
           </p>
         </Link>
       </div>
