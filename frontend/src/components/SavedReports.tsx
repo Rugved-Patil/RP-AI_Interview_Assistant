@@ -1,86 +1,173 @@
 import { useEffect, useState } from 'react'
-import { deleteReport, listReports } from '../api/practiceApi'
-import type { ReportSummary } from '../api/practiceApi'
+import {
+  deleteInterviewReport,
+  deleteReport,
+  listInterviewReports,
+  listReports,
+} from '../api/practiceApi'
+import type { ReportSummary, SavedInterviewReportSummary } from '../api/practiceApi'
 import './SavedReports.css'
 
-type ReportsState =
-  | { name: 'loading' }
-  | { name: 'loaded'; reports: ReportSummary[] }
-  | { name: 'error'; message: string }
+type TabType = 'mock' | 'single'
+
+interface AllReportsState {
+  status: 'loading' | 'loaded' | 'error'
+  singleReports: ReportSummary[]
+  mockReports: SavedInterviewReportSummary[]
+  errorMessage: string | null
+}
 
 export function SavedReports() {
-  const [state, setState] = useState<ReportsState>({ name: 'loading' })
+  const [activeTab, setActiveTab] = useState<TabType>('mock')
+  const [state, setState] = useState<AllReportsState>({
+    status: 'loading',
+    singleReports: [],
+    mockReports: [],
+    errorMessage: null,
+  })
 
   useEffect(() => {
     let cancelled = false
-    listReports()
-      .then((reports) => {
-        if (!cancelled) setState({ name: 'loaded', reports })
+    Promise.all([listReports(), listInterviewReports()])
+      .then(([singleReports, mockReports]) => {
+        if (!cancelled) {
+          setState({
+            status: 'loaded',
+            singleReports,
+            mockReports,
+            errorMessage: null,
+          })
+          // If there are no mock reports but there are single reports, default to single
+          if (mockReports.length === 0 && singleReports.length > 0) {
+            setActiveTab('single')
+          }
+        }
       })
       .catch((err) => {
-        if (!cancelled) setState({ name: 'error', message: toMessage(err) })
+        if (!cancelled) {
+          setState({
+            status: 'error',
+            singleReports: [],
+            mockReports: [],
+            errorMessage: toMessage(err),
+          })
+        }
       })
     return () => {
       cancelled = true
     }
   }, [])
 
-  // Called after a row's own delete request succeeds. Filters the report
-  // out of local state directly instead of re-fetching the whole list (the
-  // reportsVersion-bump pattern App.tsx uses for saves) - one row leaving
-  // doesn't need a full round trip back to SQLite plus a 'Loading…' flash.
-  async function handleDelete(id: number) {
+  async function handleDeleteSingle(id: number) {
     await deleteReport(id)
-    setState((prev) =>
-      prev.name === 'loaded' ? { name: 'loaded', reports: prev.reports.filter((r) => r.id !== id) } : prev,
-    )
+    setState((prev) => ({
+      ...prev,
+      singleReports: prev.singleReports.filter((r) => r.id !== id),
+    }))
+  }
+
+  async function handleDeleteMock(id: number) {
+    await deleteInterviewReport(id)
+    setState((prev) => ({
+      ...prev,
+      mockReports: prev.mockReports.filter((r) => r.id !== id),
+    }))
   }
 
   return (
     <section className="saved-reports">
-      <p className="saved-reports__eyebrow">Past reports</p>
+      <div className="saved-reports__header">
+        <p className="saved-reports__eyebrow">Past reports</p>
+        <div className="saved-reports__tabs">
+          <button
+            type="button"
+            className={`saved-reports__tab ${
+              activeTab === 'mock' ? 'saved-reports__tab--active' : ''
+            }`}
+            onClick={() => setActiveTab('mock')}
+          >
+            Mock Interviews ({state.mockReports.length})
+          </button>
+          <button
+            type="button"
+            className={`saved-reports__tab ${
+              activeTab === 'single' ? 'saved-reports__tab--active' : ''
+            }`}
+            onClick={() => setActiveTab('single')}
+          >
+            Technical Questions ({state.singleReports.length})
+          </button>
+        </div>
+      </div>
 
-      {state.name === 'loading' && <p className="saved-reports__meta">Loading…</p>}
-      {state.name === 'error' && <p className="saved-reports__meta">{state.message}</p>}
-      {state.name === 'loaded' && state.reports.length === 0 && (
-        <p className="saved-reports__meta">Nothing saved yet — grade an answer and save it to see it here.</p>
+      {state.status === 'loading' && <p className="saved-reports__meta">Loading saved reports…</p>}
+      {state.status === 'error' && <p className="saved-reports__meta">{state.errorMessage}</p>}
+
+      {state.status === 'loaded' && activeTab === 'mock' && (
+        <>
+          {state.mockReports.length === 0 ? (
+            <p className="saved-reports__meta">
+              No saved mock interviews yet. Complete a full mock interview and save its report to view it here.
+            </p>
+          ) : (
+            <ul className="saved-reports__list">
+              {state.mockReports.map((report) => (
+                <MockReportRow
+                  key={report.id}
+                  report={report}
+                  onDelete={handleDeleteMock}
+                />
+              ))}
+            </ul>
+          )}
+        </>
       )}
 
-      {state.name === 'loaded' && state.reports.length > 0 && (
-        <ul className="saved-reports__list">
-          {state.reports.map((report) => (
-            <ReportRow key={report.id} report={report} onDelete={handleDelete} />
-          ))}
-        </ul>
+      {state.status === 'loaded' && activeTab === 'single' && (
+        <>
+          {state.singleReports.length === 0 ? (
+            <p className="saved-reports__meta">
+              No saved technical questions yet. Practice a technical question and save it to view it here.
+            </p>
+          ) : (
+            <ul className="saved-reports__list">
+              {state.singleReports.map((report) => (
+                <ReportRow
+                  key={report.id}
+                  report={report}
+                  onDelete={handleDeleteSingle}
+                />
+              ))}
+            </ul>
+          )}
+        </>
       )}
     </section>
   )
 }
 
-function ReportRow({
+function MockReportRow({
   report,
   onDelete,
 }: {
-  report: ReportSummary
+  report: SavedInterviewReportSummary
   onDelete: (id: number) => Promise<void>
 }) {
   const [expanded, setExpanded] = useState(false)
-  // Two-step delete: first click arms confirmation, second click actually
-  // deletes. Chosen over a native confirm() popup to keep the interaction
-  // inline and in the app's own style, while still guarding against an
-  // accidental single click removing a saved report for good.
   const [confirming, setConfirming] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
   const [deleteError, setDeleteError] = useState<string | null>(null)
-  const context = formatContext(report)
+  const context = formatContext({
+    role: report.role,
+    company: report.company,
+    location: report.location,
+  })
 
   async function handleConfirmDelete() {
     setIsDeleting(true)
     setDeleteError(null)
     try {
       await onDelete(report.id)
-      // On success this row unmounts (the parent drops it from `reports`),
-      // so there's nothing left here to reset.
     } catch (err) {
       setIsDeleting(false)
       setConfirming(false)
@@ -90,9 +177,19 @@ function ReportRow({
 
   return (
     <li className="report-row">
-      <button className="report-row__summary" onClick={() => setExpanded((e) => !e)} aria-expanded={expanded}>
+      <button
+        type="button"
+        className="report-row__summary"
+        onClick={() => setExpanded((e) => !e)}
+        aria-expanded={expanded}
+      >
         <span className="report-row__score">{report.score}/10</span>
-        <span className="report-row__question">{report.question}</span>
+        <span className="report-row__title">
+          <span className="report-row__badge">
+            {report.interview_type.toUpperCase()} • {report.experience_level.toUpperCase()}
+          </span>
+          <span className="report-row__role">{report.role}</span>
+        </span>
         <span className="report-row__date">{formatDate(report.created_at)}</span>
       </button>
 
@@ -100,20 +197,38 @@ function ReportRow({
         <div className="report-row__detail">
           {context && (
             <>
-              <p className="report-row__label">Graded for</p>
+              <p className="report-row__label">Target Role & Context</p>
               <p className="report-row__text">{context}</p>
             </>
           )}
-          <p className="report-row__label">Question</p>
-          <p className="report-row__text">{report.question}</p>
-          <p className="report-row__label">Your answer</p>
-          <p className="report-row__text">{report.answer}</p>
-          <p className="report-row__label">Feedback</p>
+
+          <p className="report-row__label">Holistic Feedback</p>
           <p className="report-row__text">{report.feedback}</p>
+
+          <p className="report-row__label">
+            Full Transcript ({report.transcript.length} turns)
+          </p>
+          <div className="report-row__transcript">
+            {report.transcript.map((t, idx) => (
+              <div
+                key={idx}
+                className={`report-row__turn report-row__turn--${t.role}`}
+              >
+                <div className="report-row__turn-sender">
+                  {t.role === 'interviewer' ? 'AI Interviewer' : 'You'}
+                </div>
+                <div className="report-row__turn-content">{t.content}</div>
+              </div>
+            ))}
+          </div>
 
           <div className="report-row__actions">
             {!confirming ? (
-              <button type="button" className="report-row__delete" onClick={() => setConfirming(true)}>
+              <button
+                type="button"
+                className="report-row__delete"
+                onClick={() => setConfirming(true)}
+              >
                 Delete
               </button>
             ) : (
@@ -144,15 +259,112 @@ function ReportRow({
   )
 }
 
-// "ML Engineer · Acme · Berlin" - skips whichever parts weren't supplied.
-// Returns '' when none were, which the caller uses to hide the block.
-function formatContext(report: ReportSummary): string {
-  return [report.role, report.company, report.location].filter(Boolean).join(' · ')
+function ReportRow({
+  report,
+  onDelete,
+}: {
+  report: ReportSummary
+  onDelete: (id: number) => Promise<void>
+}) {
+  const [expanded, setExpanded] = useState(false)
+  const [confirming, setConfirming] = useState(false)
+  const [isDeleting, setIsDeleting] = useState(false)
+  const [deleteError, setDeleteError] = useState<string | null>(null)
+  const context = formatContext(report)
+
+  async function handleConfirmDelete() {
+    setIsDeleting(true)
+    setDeleteError(null)
+    try {
+      await onDelete(report.id)
+    } catch (err) {
+      setIsDeleting(false)
+      setConfirming(false)
+      setDeleteError(err instanceof Error ? err.message : 'Could not delete this report.')
+    }
+  }
+
+  return (
+    <li className="report-row">
+      <button
+        type="button"
+        className="report-row__summary"
+        onClick={() => setExpanded((e) => !e)}
+        aria-expanded={expanded}
+      >
+        <span className="report-row__score">{report.score}/10</span>
+        <span className="report-row__question">{report.question}</span>
+        <span className="report-row__date">{formatDate(report.created_at)}</span>
+      </button>
+
+      {expanded && (
+        <div className="report-row__detail">
+          {context && (
+            <>
+              <p className="report-row__label">Graded for</p>
+              <p className="report-row__text">{context}</p>
+            </>
+          )}
+          <p className="report-row__label">Question</p>
+          <p className="report-row__text">{report.question}</p>
+          <p className="report-row__label">Your answer</p>
+          <p className="report-row__text">{report.answer}</p>
+          <p className="report-row__label">Feedback</p>
+          <p className="report-row__text">{report.feedback}</p>
+
+          <div className="report-row__actions">
+            {!confirming ? (
+              <button
+                type="button"
+                className="report-row__delete"
+                onClick={() => setConfirming(true)}
+              >
+                Delete
+              </button>
+            ) : (
+              <span className="report-row__confirm-group">
+                <button
+                  type="button"
+                  className="report-row__delete report-row__delete--confirm"
+                  onClick={handleConfirmDelete}
+                  disabled={isDeleting}
+                >
+                  {isDeleting ? 'Deleting…' : 'Confirm delete'}
+                </button>
+                <button
+                  type="button"
+                  className="report-row__cancel"
+                  onClick={() => setConfirming(false)}
+                  disabled={isDeleting}
+                >
+                  Cancel
+                </button>
+              </span>
+            )}
+            {deleteError && <p className="report-row__error">{deleteError}</p>}
+          </div>
+        </div>
+      )}
+    </li>
+  )
+}
+
+function formatContext(item: {
+  role?: string | null
+  company?: string | null
+  location?: string | null
+}): string {
+  return [item.role, item.company, item.location].filter(Boolean).join(' · ')
 }
 
 function formatDate(iso: string): string {
   const date = new Date(iso.endsWith('Z') ? iso : `${iso}Z`)
-  return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })
+  return date.toLocaleDateString(undefined, {
+    month: 'short',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+  })
 }
 
 function toMessage(err: unknown): string {

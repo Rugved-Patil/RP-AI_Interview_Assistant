@@ -68,3 +68,28 @@ class InterviewPreset(Base):
     created_at: Mapped[datetime] = mapped_column(
         DateTime, default=lambda: datetime.now(timezone.utc)
     )
+
+
+class SavedInterviewReport(Base):
+    """
+    ORM model for explicitly-saved mock interview reports (scope doc Section 3.6, Phase 2).
+
+    Persists the multi-turn transcript (as a JSON string), holistic score,
+    qualitative feedback, interview type, and experience level.
+    """
+
+    __tablename__ = "saved_interview_reports"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    session_id: Mapped[str] = mapped_column(String, unique=True, index=True)
+    interview_type: Mapped[str] = mapped_column(String)  # 'hr' or 'technical'
+    experience_level: Mapped[str] = mapped_column(String)  # 'junior', 'mid', 'senior'
+    role: Mapped[str] = mapped_column(String)
+    company: Mapped[str | None] = mapped_column(String, nullable=True)
+    location: Mapped[str | None] = mapped_column(String, nullable=True)
+    score: Mapped[int] = mapped_column(Integer)
+    feedback: Mapped[str] = mapped_column(Text)
+    transcript_json: Mapped[str] = mapped_column(Text)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime, default=lambda: datetime.now(timezone.utc)
+    )

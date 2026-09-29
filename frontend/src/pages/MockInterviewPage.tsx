@@ -6,6 +6,7 @@ import {
   endInterview,
   getPreset,
   gradeInterview,
+  saveInterviewReport,
   startInterview,
   submitInterviewAnswer,
 } from '../api/practiceApi'
@@ -54,6 +55,9 @@ type MockStage =
       transcript: MessageTurn[]
       score: number
       feedback: string
+      saving?: boolean
+      saved?: boolean
+      saveError?: string | null
     }
   | { name: 'error'; message: string }
 
@@ -278,6 +282,33 @@ export function MockInterviewPage() {
         ...stage,
         grading: false,
         error: toMessage(err),
+      })
+    }
+  }
+
+  async function handleSaveReport() {
+    if (stage.name !== 'graded') return
+    const { sessionId } = stage
+
+    setStage({
+      ...stage,
+      saving: true,
+      saveError: null,
+    })
+
+    try {
+      await saveInterviewReport(sessionId)
+      setStage({
+        ...stage,
+        saving: false,
+        saved: true,
+        saveError: null,
+      })
+    } catch (err) {
+      setStage({
+        ...stage,
+        saving: false,
+        saveError: toMessage(err),
       })
     }
   }
@@ -570,12 +601,26 @@ export function MockInterviewPage() {
 
             <div className="mock-card__actions">
               <button
+                type="button"
                 className="mock-card__button"
+                onClick={handleSaveReport}
+                disabled={stage.saving || stage.saved}
+              >
+                {stage.saved
+                  ? '✓ Saved to reports'
+                  : stage.saving
+                    ? 'Saving report…'
+                    : 'Save this interview report'}
+              </button>
+              <button
+                className="mock-card__button mock-card__button--ghost"
                 onClick={() => setStage({ name: 'setup' })}
               >
                 Start another interview
               </button>
             </div>
+
+            {stage.saveError && <p className="mock-card__error">{stage.saveError}</p>}
           </div>
         )}
 

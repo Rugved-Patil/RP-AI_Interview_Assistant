@@ -20,18 +20,28 @@ Flow:
 
 from __future__ import annotations
 
+import json
 import logging
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy import select
+from sqlalchemy.exc import IntegrityError
+from sqlalchemy.orm import Session
 
 from app.api.routes.grading import GradeParseError, _parse_grade
+from app.db.base import get_db
+from app.db.models import SavedInterviewReport
 from app.schemas.interview import (
+    DeleteInterviewReportResponse,
     EndInterviewResponse,
     InterviewAnswerRequest,
     InterviewAnswerResponse,
     InterviewGradeResponse,
+    SaveInterviewReportResponse,
+    SavedInterviewReportSummary,
     StartInterviewRequest,
     StartInterviewResponse,
+    TurnSchema,
 )
 from app.services.interview_store import (
     ExperienceLevel,
@@ -431,3 +441,105 @@ async def grade_interview(session_id: str) -> InterviewGradeResponse:
     session.status = InterviewStatus.GRADED
 
     return InterviewGradeResponse(session_id=session.id, score=score, feedback=feedback)
+
+
+@router.post("/{session_id}/save", response_model=SaveInterviewReportResponse)
+def save_interview_report(
+    session_id: str, db: Session = Depends(get_db)
+) -> SaveInterviewReportResponse:
+    """
+    Opt-in save endpoint for a completed and graded mock interview session.
+    Saves full transcript turns as JSON, along with score, feedback, and configuration.
+    """
+    session = get_interview(session_id)
+    if session is None:
+        raise HTTPException(status_code=404, detail="Interview session not found.")
+    if session.status is not InterviewStatus.GRADED or session.score is None or session.feedback is None:
+        raise HTTPException(
+            status_code=400, detail="Interview has not been graded yet."
+        )
+
+    transcript_data = [{"role": t.role, "content": t.content} for t in session.transcript]
+    transcript_json = json.dumps(transcript_data)
+
+    report = SavedInterviewReport(
+        session_id=session.id,
+        interview_type=session.interview_type.value,
+        experience_level=session.experience_level.value,
+        role=session.role,
+        company=session.company,
+        location=session.location,
+        score=session.score,
+        feedback=session.feedback,
+        transcript_json=transcript_json,
+    )
+    db.add(report)
+    try:
+        db.commit()
+    except IntegrityError:
+        db.rollback()
+        existing = db.scalar(
+            select(SavedInterviewReport).where(SavedInterviewReport.session_id == session_id)
+        )
+        if existing is not None:
+            return SaveInterviewReportResponse(id=existing.id, session_id=session_id)
+        raise HTTPException(status_code=500, detail="Failed to save report.")
+
+    db.refresh(report)
+    return SaveInterviewReportResponse(id=report.id, session_id=report.session_id)
+
+
+@router.get("/reports", response_model=list[SavedInterviewReportSummary])
+def list_interview_reports(
+    db: Session = Depends(get_db),
+) -> list[SavedInterviewReportSummary]:
+    """
+    Returns saved mock interview reports ordered by created_at descending.
+    """
+    reports = db.scalars(
+        select(SavedInterviewReport).order_by(SavedInterviewReport.created_at.desc())
+    ).all()
+
+    results: list[SavedInterviewReportSummary] = []
+    for r in reports:
+        try:
+            turns = json.loads(r.transcript_json)
+        except Exception:
+            turns = []
+        results.append(
+            SavedInterviewReportSummary(
+                id=r.id,
+                session_id=r.session_id,
+                interview_type=r.interview_type,
+                experience_level=r.experience_level,
+                role=r.role,
+                company=r.company,
+                location=r.location,
+                score=r.score,
+                feedback=r.feedback,
+                transcript=[
+                    TurnSchema(
+                        role=t.get("role", "interviewer"),
+                        content=t.get("content", ""),
+                    )
+                    for t in turns
+                ],
+                created_at=r.created_at.isoformat(),
+            )
+        )
+    return results
+
+
+@router.delete("/reports/{report_id}", response_model=DeleteInterviewReportResponse)
+def delete_interview_report(
+    report_id: int, db: Session = Depends(get_db)
+) -> DeleteInterviewReportResponse:
+    """Deletes a saved mock interview report by ID."""
+    report = db.get(SavedInterviewReport, report_id)
+    if report is None:
+        raise HTTPException(status_code=404, detail="Saved interview report not found.")
+
+    db.delete(report)
+    db.commit()
+    return DeleteInterviewReportResponse(id=report_id)
+

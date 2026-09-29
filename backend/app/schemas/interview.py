@@ -67,3 +67,33 @@ class InterviewGradeResponse(BaseModel):
     session_id: str
     score: int
     feedback: str
+
+
+class TurnSchema(BaseModel):
+    role: str
+    content: str
+
+
+class SaveInterviewReportResponse(BaseModel):
+    id: int
+    session_id: str
+    saved: bool = True
+
+
+class DeleteInterviewReportResponse(BaseModel):
+    id: int
+    deleted: bool = True
+
+
+class SavedInterviewReportSummary(BaseModel):
+    id: int
+    session_id: str
+    interview_type: str
+    experience_level: str
+    role: str
+    company: str | None = None
+    location: str | None = None
+    score: int
+    feedback: str
+    transcript: list[TurnSchema]
+    created_at: str  # ISO string representation of datetime

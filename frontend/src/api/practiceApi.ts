@@ -220,3 +220,51 @@ export function gradeInterview(sessionId: string): Promise<InterviewGradeRespons
     method: 'POST',
   }).then(parseOrThrow<InterviewGradeResponse>)
 }
+
+export interface SaveInterviewReportResponse {
+  id: number
+  session_id: string
+  saved: boolean
+}
+
+export interface DeleteInterviewReportResponse {
+  id: number
+  deleted: boolean
+}
+
+export interface TurnSummary {
+  role: 'interviewer' | 'candidate'
+  content: string
+}
+
+export interface SavedInterviewReportSummary {
+  id: number
+  session_id: string
+  interview_type: 'hr' | 'technical'
+  experience_level: 'junior' | 'mid' | 'senior'
+  role: string
+  company: string | null
+  location: string | null
+  score: number
+  feedback: string
+  transcript: TurnSummary[]
+  created_at: string
+}
+
+export function saveInterviewReport(sessionId: string): Promise<SaveInterviewReportResponse> {
+  return fetch(`${API_BASE_URL}/interviews/${sessionId}/save`, {
+    method: 'POST',
+  }).then(parseOrThrow<SaveInterviewReportResponse>)
+}
+
+export function listInterviewReports(): Promise<SavedInterviewReportSummary[]> {
+  return fetch(`${API_BASE_URL}/interviews/reports`).then(
+    parseOrThrow<SavedInterviewReportSummary[]>,
+  )
+}
+
+export function deleteInterviewReport(reportId: number): Promise<DeleteInterviewReportResponse> {
+  return fetch(`${API_BASE_URL}/interviews/reports/${reportId}`, {
+    method: 'DELETE',
+  }).then(parseOrThrow<DeleteInterviewReportResponse>)
+}

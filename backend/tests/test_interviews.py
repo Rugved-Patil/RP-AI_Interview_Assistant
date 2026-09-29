@@ -580,3 +580,96 @@ def test_failed_interview_grade_can_be_retried(client, providers, start_intervie
     assert session.status is InterviewStatus.GRADED
 
 
+# --- POST /interviews/{id}/save, GET /interviews/reports, DELETE /interviews/reports/{id} ---
+
+
+def test_save_graded_interview_report_success(client, providers, start_interview):
+    session_id = start_interview(
+        role="Backend Engineer",
+        company="Stripe",
+        location="Remote",
+        interview_type="technical",
+        experience_level="senior",
+    )
+    providers.interviewer.reply = "Follow-up question?"
+    client.post(f"/interviews/{session_id}/answer", json={"answer": "I use Redis for distributed caching."})
+
+    providers.grader.reply = "SCORE: 8\nFEEDBACK: Strong architectural sense."
+    client.post(f"/interviews/{session_id}/grade")
+
+    save_resp = client.post(f"/interviews/{session_id}/save")
+    assert save_resp.status_code == 200
+    data = save_resp.json()
+    assert data["session_id"] == session_id
+    assert data["saved"] is True
+    assert "id" in data
+
+    # Verify listing reports includes the saved report and parsed transcript
+    list_resp = client.get("/interviews/reports")
+    assert list_resp.status_code == 200
+    reports = list_resp.json()
+    assert len(reports) == 1
+    r = reports[0]
+    assert r["id"] == data["id"]
+    assert r["session_id"] == session_id
+    assert r["role"] == "Backend Engineer"
+    assert r["company"] == "Stripe"
+    assert r["location"] == "Remote"
+    assert r["interview_type"] == "technical"
+    assert r["experience_level"] == "senior"
+    assert r["score"] == 8
+    assert r["feedback"] == "Strong architectural sense."
+    assert len(r["transcript"]) >= 2
+    assert r["transcript"][0]["role"] == "interviewer"
+    assert r["transcript"][1]["role"] == "candidate"
+
+
+def test_save_ungraded_interview_is_a_400(client, start_interview):
+    session_id = start_interview()
+    response = client.post(f"/interviews/{session_id}/save")
+    assert response.status_code == 400
+    assert "not been graded yet" in response.json()["detail"]
+
+
+def test_save_unknown_interview_is_a_404(client):
+    response = client.post("/interviews/unknown-id/save")
+    assert response.status_code == 404
+
+
+def test_save_interview_report_is_idempotent(client, providers, start_interview):
+    session_id = start_interview()
+    client.post(f"/interviews/{session_id}/answer", json={"answer": "My answer"})
+    providers.grader.reply = "SCORE: 7\nFEEDBACK: Solid answer."
+    client.post(f"/interviews/{session_id}/grade")
+
+    first_save = client.post(f"/interviews/{session_id}/save")
+    assert first_save.status_code == 200
+
+    second_save = client.post(f"/interviews/{session_id}/save")
+    assert second_save.status_code == 200
+    assert second_save.json()["id"] == first_save.json()["id"]
+
+
+def test_delete_interview_report_success(client, providers, start_interview):
+    session_id = start_interview()
+    client.post(f"/interviews/{session_id}/answer", json={"answer": "My answer"})
+    providers.grader.reply = "SCORE: 7\nFEEDBACK: Solid answer."
+    client.post(f"/interviews/{session_id}/grade")
+
+    save_resp = client.post(f"/interviews/{session_id}/save")
+    report_id = save_resp.json()["id"]
+
+    delete_resp = client.delete(f"/interviews/reports/{report_id}")
+    assert delete_resp.status_code == 200
+    assert delete_resp.json()["deleted"] is True
+
+    # Check list is now empty
+    list_resp = client.get("/interviews/reports")
+    assert len(list_resp.json()) == 0
+
+
+def test_delete_unknown_interview_report_is_a_404(client):
+    assert client.delete("/interviews/reports/999999").status_code == 404
+
+
+
