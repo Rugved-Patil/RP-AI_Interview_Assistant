@@ -211,6 +211,34 @@
   padding-bottom: 0.75rem;
 }
 
+.mock-chat__header-left {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.mock-voice__toggle-btn {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--ink);
+  background: var(--paper);
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  padding: 0.2rem 0.55rem;
+  cursor: pointer;
+  transition: all 150ms ease;
+}
+
+.mock-voice__toggle-btn:hover {
+  border-color: var(--ink-muted);
+}
+
+.mock-voice__toggle-btn--muted {
+  color: var(--ink-muted);
+  background: transparent;
+}
+
 .mock-chat__badge {
   font-family: var(--font-mono);
   font-size: 0.75rem;
@@ -270,6 +298,13 @@
   align-self: flex-end;
 }
 
+.mock-chat__sender-line {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.5rem;
+}
+
 .mock-chat__sender {
   font-family: var(--font-mono);
   font-size: 0.72rem;
@@ -280,6 +315,21 @@
 
 .mock-chat__bubble--candidate .mock-chat__sender {
   text-align: right;
+}
+
+.mock-voice__replay-btn {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--ink-muted);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0 0.25rem;
+  transition: color 150ms ease;
+}
+
+.mock-voice__replay-btn:hover {
+  color: var(--ink-red);
 }
 
 .mock-chat__message {
@@ -359,6 +409,101 @@
 .mock-chat__textarea:focus {
   outline: 2px solid var(--ink-red);
   outline-offset: 1px;
+}
+
+.mock-voice__listening-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--ink-red);
+  margin-top: 0.55rem;
+  padding: 0.4rem 0.65rem;
+  background: rgba(184, 51, 42, 0.08);
+  border: 1px solid rgba(184, 51, 42, 0.2);
+  border-radius: 4px;
+}
+
+.mock-voice__pulse-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--ink-red);
+  flex-shrink: 0;
+  animation: mic-pulse 1.2s infinite ease-in-out;
+}
+
+@keyframes mic-pulse {
+  0%, 100% {
+    transform: scale(0.85);
+    opacity: 0.5;
+  }
+  50% {
+    transform: scale(1.35);
+    opacity: 1;
+  }
+}
+
+.mock-voice__speaking-badge {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--ink);
+  margin-top: 0.55rem;
+  padding: 0.35rem 0.65rem;
+  background: var(--paper);
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+}
+
+.mock-voice__stop-speech-btn {
+  background: none;
+  border: none;
+  color: var(--ink-red);
+  text-decoration: underline;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  cursor: pointer;
+  padding: 0 0.2rem;
+}
+
+.mock-voice__stop-speech-btn:hover {
+  color: var(--ink);
+}
+
+.mock-voice__mic-btn {
+  background: var(--paper);
+  color: var(--ink);
+  border: 1px solid var(--rule);
+}
+
+.mock-voice__mic-btn:hover:not(:disabled) {
+  background: #eae3d7;
+  color: var(--ink);
+}
+
+.mock-voice__mic-btn--listening {
+  background: var(--ink-red);
+  color: #ffffff;
+  border-color: var(--ink-red);
+  animation: mic-btn-glow 1.4s infinite alternate ease-in-out;
+}
+
+.mock-voice__mic-btn--listening:hover:not(:disabled) {
+  background: #962820;
+  color: #ffffff;
+}
+
+@keyframes mic-btn-glow {
+  from {
+    box-shadow: 0 0 0 0 rgba(184, 51, 42, 0.4);
+  }
+  to {
+    box-shadow: 0 0 0 6px rgba(184, 51, 42, 0);
+  }
 }
 
 /* --- Concluded & Graded Panels --- */

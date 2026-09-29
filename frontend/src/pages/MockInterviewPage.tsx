@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import {
   API_BASE_URL,
@@ -11,6 +11,8 @@ import {
 } from '../api/practiceApi'
 import type { PresetSummary } from '../api/practiceApi'
 import { getActivePresetId, setActivePresetId } from '../activePreset'
+import { useSpeechRecognition } from '../hooks/useSpeechRecognition'
+import { useSpeechSynthesis } from '../hooks/useSpeechSynthesis'
 import './MockInterviewPage.css'
 
 interface MessageTurn {
@@ -66,6 +68,40 @@ export function MockInterviewPage() {
 
   const transcriptEndRef = useRef<HTMLDivElement>(null)
 
+  // Voice Output (TTS)
+  const {
+    speak,
+    cancel: cancelSpeech,
+    toggleMute,
+    isMuted,
+    isSpeaking: isAiSpeaking,
+    isSupported: isTtsSupported,
+  } = useSpeechSynthesis()
+
+  // Voice Input (STT) callback to append transcribed text
+  const handleTranscriptAppend = useCallback((text: string) => {
+    setStage((prev) => {
+      if (prev.name !== 'in_progress') return prev
+      const current = prev.currentAnswer
+      const separator = current.length > 0 && !current.endsWith(' ') ? ' ' : ''
+      const combined = (current + separator + text).slice(0, MAX_ANSWER_LENGTH)
+      return {
+        ...prev,
+        currentAnswer: combined,
+      }
+    })
+  }, [])
+
+  const {
+    isSupported: isSttSupported,
+    isListening,
+    error: sttError,
+    toggleListening,
+    stopListening,
+  } = useSpeechRecognition({
+    onTranscriptChange: handleTranscriptAppend,
+  })
+
   useEffect(() => {
     let cancelled = false
     const id = getActivePresetId()
@@ -119,6 +155,9 @@ export function MockInterviewPage() {
         submitting: false,
         error: null,
       })
+
+      // Speak opening question
+      speak(response.first_question)
     } catch (err) {
       setStage({ name: 'error', message: toMessage(err) })
     }
@@ -129,6 +168,10 @@ export function MockInterviewPage() {
     const { sessionId, currentAnswer, transcript } = stage
     const trimmed = currentAnswer.trim()
     if (!trimmed) return
+
+    // Stop recording and cancel any speech output before sending
+    stopListening()
+    cancelSpeech()
 
     const updatedTranscript: MessageTurn[] = [
       ...transcript,
@@ -157,6 +200,10 @@ export function MockInterviewPage() {
           grading: false,
           error: null,
         })
+
+        if (response.interviewer_message) {
+          speak(response.interviewer_message)
+        }
       } else if (response.interviewer_message) {
         setStage({
           ...stage,
@@ -168,6 +215,8 @@ export function MockInterviewPage() {
           submitting: false,
           error: null,
         })
+
+        speak(response.interviewer_message)
       }
     } catch (err) {
       // Keep candidate answer in state so it isn't lost on network/provider failure
@@ -183,6 +232,9 @@ export function MockInterviewPage() {
   async function handleEndInterviewEarly() {
     if (stage.name !== 'in_progress') return
     const { sessionId, transcript } = stage
+
+    stopListening()
+    cancelSpeech()
 
     try {
       await endInterview(sessionId)
@@ -205,6 +257,7 @@ export function MockInterviewPage() {
     if (stage.name !== 'concluded') return
     const { sessionId, transcript } = stage
 
+    cancelSpeech()
     setStage({
       ...stage,
       grading: true,
@@ -231,7 +284,14 @@ export function MockInterviewPage() {
 
   return (
     <div className="page-section">
-      <Link to="/" className="page-back">
+      <Link
+        to="/"
+        className="page-back"
+        onClick={() => {
+          stopListening()
+          cancelSpeech()
+        }}
+      >
         ← All practice modes
       </Link>
 
@@ -305,11 +365,26 @@ export function MockInterviewPage() {
         {(stage.name === 'in_progress' || stage.name === 'concluded') && (
           <div className="mock-card__panel mock-chat__container">
             <div className="mock-chat__header">
-              <span className="mock-chat__badge">
-                {stage.name === 'in_progress'
-                  ? `${stage.interviewType.toUpperCase()} • ${stage.experienceLevel.toUpperCase()}`
-                  : 'CONCLUDED'}
-              </span>
+              <div className="mock-chat__header-left">
+                <span className="mock-chat__badge">
+                  {stage.name === 'in_progress'
+                    ? `${stage.interviewType.toUpperCase()} • ${stage.experienceLevel.toUpperCase()}`
+                    : 'CONCLUDED'}
+                </span>
+                {isTtsSupported && (
+                  <button
+                    type="button"
+                    className={`mock-voice__toggle-btn ${
+                      isMuted ? 'mock-voice__toggle-btn--muted' : ''
+                    }`}
+                    onClick={toggleMute}
+                    title={isMuted ? 'Unmute AI Voice' : 'Mute AI Voice'}
+                    aria-label={isMuted ? 'Unmute AI Voice' : 'Mute AI Voice'}
+                  >
+                    {isMuted ? '🔇 Voice: Off' : '🔊 Voice: On'}
+                  </button>
+                )}
+              </div>
               {stage.name === 'in_progress' && (
                 <button
                   type="button"
@@ -328,8 +403,21 @@ export function MockInterviewPage() {
                   key={idx}
                   className={`mock-chat__bubble mock-chat__bubble--${msg.role}`}
                 >
-                  <div className="mock-chat__sender">
-                    {msg.role === 'interviewer' ? 'AI Interviewer' : 'You'}
+                  <div className="mock-chat__sender-line">
+                    <div className="mock-chat__sender">
+                      {msg.role === 'interviewer' ? 'AI Interviewer' : 'You'}
+                    </div>
+                    {msg.role === 'interviewer' && isTtsSupported && (
+                      <button
+                        type="button"
+                        className="mock-voice__replay-btn"
+                        onClick={() => speak(msg.content)}
+                        title="Replay question audio"
+                        aria-label="Replay question audio"
+                      >
+                        🔊 Replay
+                      </button>
+                    )}
                   </div>
                   <div className="mock-chat__message">{msg.content}</div>
                 </div>
@@ -361,15 +449,57 @@ export function MockInterviewPage() {
                   onChange={(e) =>
                     setStage({ ...stage, currentAnswer: e.target.value })
                   }
-                  placeholder="Type your response to the interviewer..."
+                  placeholder={
+                    isListening
+                      ? 'Listening... Speak your answer now (click microphone or send when finished)'
+                      : 'Type your response to the interviewer...'
+                  }
                   rows={4}
                   maxLength={MAX_ANSWER_LENGTH}
                   disabled={stage.submitting}
                 />
 
+                {isListening && (
+                  <div className="mock-voice__listening-badge">
+                    <span className="mock-voice__pulse-dot" aria-hidden="true" />
+                    <span>Microphone active — speaking will transcribe into the box above</span>
+                  </div>
+                )}
+
+                {isAiSpeaking && (
+                  <div className="mock-voice__speaking-badge">
+                    <span>🔊 AI Interviewer is speaking…</span>
+                    <button
+                      type="button"
+                      className="mock-voice__stop-speech-btn"
+                      onClick={cancelSpeech}
+                    >
+                      Stop audio
+                    </button>
+                  </div>
+                )}
+
+                {sttError && <p className="mock-card__error">{sttError}</p>}
                 {stage.error && <p className="mock-card__error">{stage.error}</p>}
 
-                <div className="mock-card__actions">
+                <div className="mock-card__actions mock-chat__actions">
+                  {isSttSupported && (
+                    <button
+                      type="button"
+                      className={`mock-card__button mock-voice__mic-btn ${
+                        isListening ? 'mock-voice__mic-btn--listening' : ''
+                      }`}
+                      onClick={() => {
+                        cancelSpeech()
+                        toggleListening()
+                      }}
+                      disabled={stage.submitting}
+                      title={isListening ? 'Stop recording' : 'Dictate answer with microphone'}
+                    >
+                      {isListening ? '⏹ Stop dictation' : '🎙 Speak answer'}
+                    </button>
+                  )}
+
                   <button
                     className="mock-card__button"
                     onClick={handleSubmitAnswer}
