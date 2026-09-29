@@ -177,3 +177,31 @@ def test_padding_whitespace_does_not_count_towards_the_length_limit(client, star
 
     assert response.status_code == 200
     assert session_store.get_session(session_id).answer == answer
+
+
+# --- POST /sessions/behavioral ---------------------------------------------
+
+
+def test_start_behavioral_session_success(client, providers):
+    providers.interviewer.reply = "Tell me about a time you handled a difficult stakeholder."
+
+    response = client.post("/sessions/behavioral", json={
+        "role": "Product Manager",
+        "company": "Google",
+        "location": "London",
+    })
+
+    assert response.status_code == 200
+    data = response.json()
+    assert data["question"] == "Tell me about a time you handled a difficult stakeholder."
+    session = session_store.get_session(data["session_id"])
+    assert session is not None
+    assert session.category == "behavioral"
+    assert session.role == "Product Manager"
+    assert session.company == "Google"
+    assert session.location == "London"
+
+    # Verify prompt asked for behavioral question
+    (message,) = providers.interviewer.calls[0]
+    assert "behavioral" in message.content
+    assert "Product Manager" in message.content

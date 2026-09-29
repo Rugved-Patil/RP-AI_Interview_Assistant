@@ -71,6 +71,28 @@ def _build_interviewer_prompt(role: str, company: str | None, location: str | No
     return persona
 
 
+def _build_behavioral_interviewer_prompt(role: str, company: str | None, location: str | None) -> str:
+    """
+    Builds the behavioral interviewer persona prompt around role/company/location.
+    Generates a single open-ended behavioral question (e.g. STAR prompt).
+    """
+    persona = f"You are a behavioral interviewer conducting an interview for a {role} role"
+    if company:
+        persona += f" at {company}"
+    if location:
+        persona += f" (location: {location})"
+    persona += (
+        ". Ask exactly ONE realistic, open-ended behavioral interview question — "
+        "such as a 'Tell me about a time when...', 'Describe a situation where...', "
+        "or 'Give an example of...' prompt that tests interpersonal skills, teamwork, "
+        "conflict resolution, ownership, handling failure, or adaptability relevant to this role. "
+        "Do not ask a technical or coding question. Keep the question difficulty medium and focused. "
+        "Do not ask multiple questions, do not number them, do not add preamble, explanation, or "
+        "commentary. Reply with nothing but the question itself."
+    )
+    return persona
+
+
 @router.post("/situational", response_model=CreateSessionResponse)
 async def start_situational_session(body: CreateSessionRequest) -> CreateSessionResponse:
     """Generates a single practice question via the INTERVIEWER provider and opens a session for it."""
@@ -106,6 +128,40 @@ async def start_situational_session(body: CreateSessionRequest) -> CreateSession
         role=body.role,
         company=body.company,
         location=body.location,
+        category="technical",
+    )
+    return CreateSessionResponse(session_id=session.id, question=session.question)
+
+
+@router.post("/behavioral", response_model=CreateSessionResponse)
+async def start_behavioral_session(body: CreateSessionRequest) -> CreateSessionResponse:
+    """Generates a single behavioral question via the INTERVIEWER provider and opens a session for it."""
+    provider = get_provider(LLMRole.INTERVIEWER)
+    system_prompt = _build_behavioral_interviewer_prompt(body.role, body.company, body.location)
+
+    try:
+        response = await provider.generate(
+            [Message(role=Role.SYSTEM, content=system_prompt)],
+            temperature=0.9,
+            max_tokens=400,
+        )
+    except LLMProviderError as exc:
+        raise HTTPException(
+            status_code=502, detail=f"Interviewer provider failed: {exc}"
+        ) from exc
+
+    question = response.text.strip()
+    if not question:
+        raise HTTPException(
+            status_code=502, detail="Interviewer provider returned an empty question."
+        )
+
+    session = create_session(
+        question=question,
+        role=body.role,
+        company=body.company,
+        location=body.location,
+        category="behavioral",
     )
     return CreateSessionResponse(session_id=session.id, question=session.question)
 

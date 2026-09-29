@@ -141,6 +141,14 @@ export function startSituationalSession(body: StartSessionRequest): Promise<Star
   }).then(parseOrThrow<StartSessionResponse>)
 }
 
+export function startBehavioralSession(body: StartSessionRequest): Promise<StartSessionResponse> {
+  return fetch(`${API_BASE_URL}/sessions/behavioral`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  }).then(parseOrThrow<StartSessionResponse>)
+}
+
 export async function submitAnswer(sessionId: string, answer: string): Promise<void> {
   const response = await fetch(`${API_BASE_URL}/sessions/${sessionId}/answer`, {
     method: 'POST',

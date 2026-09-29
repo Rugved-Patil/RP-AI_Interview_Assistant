@@ -53,13 +53,37 @@ def _build_grader_prompt(role: str, company: str | None, location: str | None) -
         context += f" (location: {location})"
 
     return (
-        f"You are grading a candidate's answer to a single interview question for {context}. "
+        f"You are grading a candidate's answer to a single technical interview question for {context}. "
         "Keep the grading harsh but realistic, and calibrate your expectations to what would "
         "actually be expected for this role (and this company/location, if given) rather than "
         "grading in the abstract. "
         "Reply with EXACTLY this format and nothing else:\n"
         "SCORE: <an integer from 0 to 10>\n"
         "FEEDBACK: <two or three sentences of specific, constructive feedback>"
+    )
+
+
+def _build_behavioral_grader_prompt(role: str, company: str | None, location: str | None) -> str:
+    """
+    Builds the STAR-method grading prompt for behavioral interview questions.
+    Evaluates Situation, Task, Action, and Result thoroughly.
+    """
+    context = f"a {role} role"
+    if company:
+        context += f" at {company}"
+    if location:
+        context += f" (location: {location})"
+
+    return (
+        f"You are an expert interviewer evaluating a candidate's response to a behavioral interview question for {context}.\n\n"
+        "Evaluate the response rigorously using the STAR framework:\n"
+        "- Situation & Task: Did the candidate set up clear context and outline the challenge?\n"
+        "- Action: Did they focus on their OWN concrete actions and decisions (using 'I' vs vague 'we')?\n"
+        "- Result: Did they quantify the outcome, impact, or key lessons learned?\n\n"
+        "Calibrate your scoring to what is expected for this specific role.\n\n"
+        "Reply with EXACTLY this format and nothing else:\n"
+        "SCORE: <an integer from 0 to 10>\n"
+        "FEEDBACK: <two to four sentences of constructive feedback explicitly referencing their STAR structure and impact>"
     )
 
 
@@ -72,7 +96,10 @@ async def grade_session(session_id: str) -> GradeResponse:
         raise HTTPException(status_code=400, detail="No answer submitted for this session yet")
 
     provider = get_provider(LLMRole.GRADER)
-    system_prompt = _build_grader_prompt(session.role, session.company, session.location)
+    if getattr(session, "category", "technical") == "behavioral":
+        system_prompt = _build_behavioral_grader_prompt(session.role, session.company, session.location)
+    else:
+        system_prompt = _build_grader_prompt(session.role, session.company, session.location)
 
     try:
         response = await provider.generate(

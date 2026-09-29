@@ -142,3 +142,21 @@ def test_a_failed_grade_can_be_retried_and_then_saved(client, providers, start_s
     assert retry.json()["score"] == 6
 
     assert client.post(f"/sessions/{session_id}/save").status_code == 200
+
+
+def test_behavioral_session_uses_star_grader_prompt(client, providers):
+    providers.interviewer.reply = "Tell me about a time you led a challenging migration."
+    start_resp = client.post("/sessions/behavioral", json={"role": "Lead Engineer"})
+    session_id = start_resp.json()["session_id"]
+
+    _submit_answer(client, session_id, "In my last role, I migrated 10 microservices with zero downtime.")
+
+    providers.grader.reply = "SCORE: 9\nFEEDBACK: Clear STAR structure with solid metrics."
+    grade_resp = client.post(f"/sessions/{session_id}/grade")
+    assert grade_resp.status_code == 200
+    assert grade_resp.json()["score"] == 9
+
+    (system_message, user_message) = providers.grader.calls[0]
+    assert "STAR" in system_message.content
+    assert "Lead Engineer" in system_message.content
+    assert "Candidate's answer: In my last role, I migrated 10 microservices" in user_message.content

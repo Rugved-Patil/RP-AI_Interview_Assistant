@@ -30,13 +30,12 @@ from dataclasses import dataclass
 @dataclass
 class TechnicalSession:
     """
-    One Technical questions attempt: one question, one answer, one grade.
+    One single-question practice attempt: one question, one answer, one grade.
 
     role/company/location are the personalization context the question was
-    generated for (scope doc Section 3.4). They're captured on the session
-    - not just used transiently in the prompt at creation time - because
-    grading later needs the same context to judge the answer against the
-    right bar (see grading.py's _build_grader_prompt).
+    generated for (scope doc Section 3.4). category tracks whether this is a
+    "technical" or "behavioral" practice attempt so the grader applies the
+    correct rubric.
     """
 
     id: str
@@ -44,6 +43,7 @@ class TechnicalSession:
     role: str
     company: str | None = None
     location: str | None = None
+    category: str = "technical"  # "technical" | "behavioral"
     answer: str | None = None
     score: int | None = None
     feedback: str | None = None
@@ -60,6 +60,7 @@ def create_session(
     role: str,
     company: str | None = None,
     location: str | None = None,
+    category: str = "technical",
 ) -> TechnicalSession:
     session = TechnicalSession(
         id=str(uuid.uuid4()),
@@ -67,6 +68,7 @@ def create_session(
         role=role,
         company=company,
         location=location,
+        category=category,
     )
     _sessions[session.id] = session
     return session

@@ -1,4 +1,5 @@
 import { BrowserRouter, Link, Outlet, Route, Routes } from 'react-router-dom'
+import { BehavioralPracticePage } from './pages/BehavioralPracticePage'
 import { HomePage } from './pages/HomePage'
 import { MockInterviewPage } from './pages/MockInterviewPage'
 import { PresetsPage } from './pages/PresetsPage'
@@ -41,6 +42,7 @@ function App() {
         <Route element={<Layout />}>
           <Route index element={<HomePage />} />
           <Route path="practice" element={<SituationalPracticePage />} />
+          <Route path="practice/behavioral" element={<BehavioralPracticePage />} />
           <Route path="mock-interview" element={<MockInterviewPage />} />
           <Route path="presets" element={<PresetsPage />} />
           <Route path="reports" element={<SavedReportsPage />} />
