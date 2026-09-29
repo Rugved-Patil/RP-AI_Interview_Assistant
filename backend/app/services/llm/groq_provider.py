@@ -23,8 +23,8 @@ does the latter and defaults to "low" here - pass reasoning_effort=None if
 you switch to a Groq model that doesn't support the parameter.
 """
 
-from __future__ import annotations
-
+import json
+import re
 from groq import AsyncGroq, GroqError
 
 from app.services.llm.base import LLMProvider, LLMProviderError, LLMResponse, Message
@@ -38,9 +38,39 @@ from app.services.llm.retry import retry_transient
 # (e.g. a connection-level error with no status code at all) reaches here.
 _TRANSIENT_STATUS_CODES = {429, 500, 502, 503, 504}
 
+# Substrings for models on Groq that explicitly support reasoning_effort
+_REASONING_MODEL_SUBSTRINGS = ("gpt-oss", "deepseek-r1", "qwq")
+
 
 def _is_transient(exc: Exception) -> bool:
     return getattr(exc, "status_code", None) in _TRANSIENT_STATUS_CODES
+
+
+def _extract_text_from_failed_generation(exc: Exception) -> str | None:
+    """
+    Recovers text from Groq's `tool_use_failed` error.
+
+    Some models (such as openai/gpt-oss-20b) output internal channel tags like
+    `assistant<|channel|>final`, which Groq's parser may mistake for a tool call.
+    When tool_choice is none, Groq raises a 400 error with the generated message
+    packed inside the `failed_generation` field.
+    """
+    body = getattr(exc, "body", None)
+    if isinstance(body, dict):
+        error_info = body.get("error", {})
+        if error_info.get("code") == "tool_use_failed":
+            failed_gen = error_info.get("failed_generation")
+            if isinstance(failed_gen, str):
+                try:
+                    data = json.loads(failed_gen)
+                    if isinstance(data, dict) and "arguments" in data:
+                        return str(data["arguments"]).strip()
+                except Exception:
+                    pass
+                match = re.search(r'"arguments"\s*:\s*(.+?)\}?$', failed_gen, re.DOTALL)
+                if match:
+                    return match.group(1).strip().strip('"').strip("'")
+    return None
 
 
 class GroqProvider(LLMProvider):
@@ -66,7 +96,9 @@ class GroqProvider(LLMProvider):
             temperature=temperature,
             max_tokens=max_tokens,
         )
-        if self._reasoning_effort is not None:
+        # Only pass reasoning_effort if the model actually supports reasoning on Groq
+        is_reasoning_model = any(sub in self._model.lower() for sub in _REASONING_MODEL_SUBSTRINGS)
+        if self._reasoning_effort is not None and is_reasoning_model:
             kwargs["reasoning_effort"] = self._reasoning_effort
 
         try:
@@ -75,6 +107,15 @@ class GroqProvider(LLMProvider):
                 is_transient=_is_transient,
             )
         except GroqError as exc:
+            # Check if this is a tool_use_failed error from which we can recover the message
+            recovered = _extract_text_from_failed_generation(exc)
+            if recovered:
+                return LLMResponse(
+                    text=recovered,
+                    provider="groq",
+                    model=self._model,
+                    raw={"recovered_from_tool_use_failed": True},
+                )
             raise LLMProviderError(f"Groq API call failed: {exc}", provider="groq", original=exc) from exc
 
         choice = completion.choices[0]

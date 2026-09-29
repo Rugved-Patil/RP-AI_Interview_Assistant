@@ -41,7 +41,7 @@ class Settings(BaseSettings):
     # https://ai.google.dev/gemini-api/docs/models for the current list and
     # update these two defaults (or override via .env with GROQ_MODEL= /
     # GEMINI_MODEL= instead of editing code).
-    groq_model: str = "openai/gpt-oss-20b"
+    groq_model: str = "llama-3.3-70b-versatile"
     gemini_model: str = "gemini-3.6-flash"
 
     # --- CORS -----------------------------------------------------------------

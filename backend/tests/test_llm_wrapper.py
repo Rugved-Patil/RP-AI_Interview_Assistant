@@ -56,6 +56,45 @@ async def test_groq_provider_wraps_sdk_errors():
             await provider.generate([Message(Role.USER, "Hi")])
 
 
+async def test_groq_provider_recovers_from_tool_use_failed():
+    from groq import GroqError
+
+    with patch("app.services.llm.groq_provider.AsyncGroq") as mock_groq_cls:
+        mock_client = mock_groq_cls.return_value
+        fake_err = GroqError("Tool choice is none")
+        fake_err.status_code = 400
+        fake_err.body = {
+            "error": {
+                "code": "tool_use_failed",
+                "message": "Tool choice is none, but model called a tool",
+                "failed_generation": '{"name": "assistant<|channel|>final", "arguments": "How would you design a caching layer?"}',
+            }
+        }
+        mock_client.chat.completions.create = AsyncMock(side_effect=fake_err)
+
+        provider = GroqProvider(api_key="fake-key", model="openai/gpt-oss-20b")
+        result = await provider.generate([Message(Role.USER, "Hi")])
+
+        assert result.text == "How would you design a caching layer?"
+        assert result.provider == "groq"
+        assert result.raw.get("recovered_from_tool_use_failed") is True
+
+
+async def test_groq_provider_skips_reasoning_effort_for_standard_models():
+    with patch("app.services.llm.groq_provider.AsyncGroq") as mock_groq_cls:
+        mock_client = mock_groq_cls.return_value
+        fake_completion = MagicMock()
+        fake_completion.choices = [MagicMock(message=MagicMock(content="Hello from Llama"))]
+        fake_completion.model_dump.return_value = {"id": "fake"}
+        mock_client.chat.completions.create = AsyncMock(return_value=fake_completion)
+
+        provider = GroqProvider(api_key="fake-key", model="llama-3.3-70b-versatile")
+        await provider.generate([Message(Role.USER, "Hi")])
+
+        call_kwargs = mock_client.chat.completions.create.call_args.kwargs
+        assert "reasoning_effort" not in call_kwargs
+
+
 async def test_gemini_provider_generate_success():
     # google-genai shape: genai.Client(...).aio.models.generate_content(...)
     # - different from the old google-generativeai GenerativeModel shape.
