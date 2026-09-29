@@ -10,6 +10,7 @@ from __future__ import annotations
 from pydantic import BaseModel, field_validator
 
 from app.schemas.personalization import blank_optional_becomes_none, require_role
+from app.schemas.session import Answer
 from app.services.interview_store import ExperienceLevel, InterviewType
 
 
@@ -42,3 +43,27 @@ class StartInterviewRequest(BaseModel):
 class StartInterviewResponse(BaseModel):
     session_id: str
     first_question: str
+
+
+class InterviewAnswerRequest(BaseModel):
+    """Same trim + length validation as Technical questions (reuses the Answer type)."""
+
+    answer: Answer
+
+
+class InterviewAnswerResponse(BaseModel):
+    session_id: str
+    interviewer_message: str | None  # next question, closing remark, or None (hard cap)
+    interview_ended: bool
+    turn_number: int  # number of Q/A pairs completed so far
+
+
+class EndInterviewResponse(BaseModel):
+    session_id: str
+    status: str
+
+
+class InterviewGradeResponse(BaseModel):
+    session_id: str
+    score: int
+    feedback: str

@@ -6,27 +6,60 @@ because it's a fundamentally different mode: multi-turn conversational
 interview vs. single question + grade. Keeping them separate matches the
 scope doc's design decision that each mode owns its own prompt and rubric.
 
-Flow (Step 1 — interview setup):
-    POST /interviews/start  -> configures the interview, gets the opening
-                               question from Groq, returns session ID + question
-
-Steps 2–3 (turn loop + ending/grading) will add more endpoints here.
+Flow:
+    POST /interviews/start            -> configures the interview, gets the
+                                         opening question from Groq, returns
+                                         session ID + question
+    POST /interviews/{id}/answer      -> appends the user's answer to the
+                                         transcript, gets the next question
+                                         (or an end signal), returns it
+    POST /interviews/{id}/end         -> explicitly ends an in-progress interview
+    POST /interviews/{id}/grade       -> holistically grades the full transcript
+                                         using Gemini (GRADER role)
 """
 
 from __future__ import annotations
 
+import logging
+
 from fastapi import APIRouter, HTTPException
 
-from app.schemas.interview import StartInterviewRequest, StartInterviewResponse
+from app.api.routes.grading import GradeParseError, _parse_grade
+from app.schemas.interview import (
+    EndInterviewResponse,
+    InterviewAnswerRequest,
+    InterviewAnswerResponse,
+    InterviewGradeResponse,
+    StartInterviewRequest,
+    StartInterviewResponse,
+)
 from app.services.interview_store import (
     ExperienceLevel,
+    InterviewSession,
+    InterviewStatus,
     InterviewType,
     Turn,
     create_interview,
+    get_interview,
 )
 from app.services.llm import LLMProviderError, LLMRole, Message, Role, get_provider
 
+logger = logging.getLogger(__name__)
+
 router = APIRouter(prefix="/interviews", tags=["interviews"])
+
+# --- constants ----------------------------------------------------------------
+
+# Hard ceiling on questions asked per interview (safety net).
+# The prompt aims for 5-8; this cap prevents runaway conversations
+# when the model ignores the guidance.
+MAX_QUESTIONS = 10
+
+# The token the model emits when it decides the interview is done.
+END_SIGNAL = "[END_INTERVIEW]"
+
+
+# --- prompt builders ----------------------------------------------------------
 
 
 def _build_mock_interviewer_prompt(
@@ -47,9 +80,6 @@ def _build_mock_interviewer_prompt(
       - the single-question prompt in sessions.py (different mode)
       - the holistic grading prompt that will grade the full transcript
         at the end (scope doc 3.3 — interviewer and grader are distinct)
-
-    The prompt does NOT yet include guidance on when to end the interview.
-    That will be added in Step 2/3 once the ending mechanism is decided.
     """
     if interview_type is InterviewType.HR:
         persona = f"You are an HR interviewer conducting a full interview for a {role} role"
@@ -82,8 +112,107 @@ def _build_mock_interviewer_prompt(
         "Do not grade, evaluate, or comment on the quality of answers during the "
         "interview. Do not say things like 'Great answer!' or 'That's correct.' "
         "Just ask your next question naturally.\n\n"
-        "Reply with ONLY your question. No preamble, no numbering, no commentary."
+        "Reply with ONLY your question — no preamble, no numbering, no commentary.\n\n"
+        "Aim for around 5 to 8 questions total (including follow-ups). When you "
+        "feel the interview has covered enough ground, end it naturally: say a "
+        "brief closing line (e.g., 'Thank you, that covers everything I wanted "
+        "to discuss today.') followed by [END_INTERVIEW] on a new line at the "
+        "very end of your reply. Do not use [END_INTERVIEW] in your opening "
+        "question."
     )
+
+
+def _build_mock_grader_prompt(
+    interview_type: InterviewType,
+    experience_level: ExperienceLevel,
+    role: str,
+    company: str | None,
+    location: str | None,
+) -> str:
+    """
+    Builds the system prompt for the holistic mock interview grader persona (Gemini).
+
+    Scope doc Section 3.3: "Full mock interview: graded holistically at the end
+    from the full transcript, using a separate 'grading' prompt distinct from the
+    'interviewer' prompt used during the conversation."
+
+    Calibrates expectations to the specific role, experience level, and
+    HR vs Technical interview focus.
+    """
+    context = f"a {role} role"
+    if company:
+        context += f" at {company}"
+    if location:
+        context += f" (location: {location})"
+    context += f" with {experience_level.value}-level experience expectations"
+
+    if interview_type is InterviewType.HR:
+        focus = (
+            "Evaluate the candidate holistically on communication skills, behavioral fit, "
+            "clarity, structure (such as STAR method), motivation, and interpersonal effectiveness. "
+            "Consider whether answers showed genuine reflection, self-awareness, and team collaboration."
+        )
+    else:
+        focus = (
+            "Evaluate the candidate holistically on technical depth, problem-solving ability, "
+            "system thinking, conceptual accuracy, and handling of technical nuances. "
+            "Consider whether answers demonstrated hands-on mastery appropriate for their level."
+        )
+
+    return (
+        f"You are an expert interviewer and evaluator reviewing a complete mock interview transcript for {context}.\n\n"
+        f"{focus}\n\n"
+        f"Evaluate the candidate's performance across the entire conversation. "
+        f"Calibrate your assessment to what is realistic and expected for a {experience_level.value}-level candidate.\n\n"
+        "Reply with EXACTLY this format and nothing else:\n"
+        "SCORE: <an integer from 0 to 10>\n"
+        "FEEDBACK: <detailed, structured, and constructive feedback highlighting overall strengths and specific areas for improvement across the interview>"
+    )
+
+
+# --- helpers ------------------------------------------------------------------
+
+
+def _transcript_to_messages(session: InterviewSession) -> list[Message]:
+    """
+    Converts the stored transcript to the LLM Message list format.
+
+    The system prompt (stored on the session at creation time) goes first,
+    then each interviewer turn becomes ASSISTANT and each candidate turn
+    becomes USER — the standard chat-completion shape.
+    """
+    messages = [Message(role=Role.SYSTEM, content=session.system_prompt)]
+    for turn in session.transcript:
+        if turn.role == "interviewer":
+            messages.append(Message(role=Role.ASSISTANT, content=turn.content))
+        else:
+            messages.append(Message(role=Role.USER, content=turn.content))
+    return messages
+
+
+def _format_transcript_for_grading(transcript: list[Turn]) -> str:
+    """Formats the running transcript into readable multi-turn dialogue text."""
+    formatted = []
+    for turn in transcript:
+        label = "Interviewer" if turn.role == "interviewer" else "Candidate"
+        formatted.append(f"{label}: {turn.content}")
+    return "\n\n".join(formatted)
+
+
+def _parse_interviewer_reply(text: str) -> tuple[str, bool]:
+    """
+    Checks the model's reply for the end signal.
+
+    Returns (cleaned_message, interview_ended). If the signal is present,
+    it's stripped and any remaining text (a closing remark) is returned.
+    """
+    if END_SIGNAL in text:
+        message = text.replace(END_SIGNAL, "").strip()
+        return message, True
+    return text, False
+
+
+# --- endpoints ----------------------------------------------------------------
 
 
 @router.post("/start", response_model=StartInterviewResponse)
@@ -134,3 +263,171 @@ async def start_interview(body: StartInterviewRequest) -> StartInterviewResponse
     session.transcript.append(Turn(role="interviewer", content=question))
 
     return StartInterviewResponse(session_id=session.id, first_question=question)
+
+
+@router.post("/{session_id}/answer", response_model=InterviewAnswerResponse)
+async def submit_interview_answer(
+    session_id: str, body: InterviewAnswerRequest
+) -> InterviewAnswerResponse:
+    """
+    Appends the user's answer to the transcript, sends the full conversation
+    to Groq for the next question (or end signal), and returns the result.
+
+    Three ways an interview can end:
+      1. The model emits [END_INTERVIEW] — natural ending.
+      2. The backend hits MAX_QUESTIONS — safety cap.
+      3. The user ends early via POST /interviews/{id}/end.
+    """
+    session = get_interview(session_id)
+    if session is None:
+        raise HTTPException(status_code=404, detail="Interview session not found.")
+    if session.status is not InterviewStatus.IN_PROGRESS:
+        raise HTTPException(
+            status_code=409, detail="This interview has already ended."
+        )
+
+    # Append the candidate's answer to the transcript.
+    session.transcript.append(Turn(role="candidate", content=body.answer))
+
+    questions_asked = sum(1 for t in session.transcript if t.role == "interviewer")
+    turn_number = sum(1 for t in session.transcript if t.role == "candidate")
+
+    # Hard cap: all questions have been asked and answered — end without
+    # another Groq call.
+    if questions_asked >= MAX_QUESTIONS:
+        session.status = InterviewStatus.COMPLETED
+        return InterviewAnswerResponse(
+            session_id=session.id,
+            interviewer_message=None,
+            interview_ended=True,
+            turn_number=turn_number,
+        )
+
+    # Send the full transcript to Groq for the next question.
+    provider = get_provider(LLMRole.INTERVIEWER)
+    messages = _transcript_to_messages(session)
+
+    try:
+        response = await provider.generate(
+            messages,
+            temperature=0.9,
+            max_tokens=400,
+        )
+    except LLMProviderError as exc:
+        # Roll back the answer so the user can retry the same submission.
+        session.transcript.pop()
+        raise HTTPException(
+            status_code=502, detail=f"Interviewer provider failed: {exc}"
+        ) from exc
+
+    raw_reply = response.text.strip()
+    if not raw_reply:
+        session.transcript.pop()
+        raise HTTPException(
+            status_code=502,
+            detail="Interviewer provider returned an empty reply.",
+        )
+
+    interviewer_message, ended = _parse_interviewer_reply(raw_reply)
+
+    if ended:
+        session.status = InterviewStatus.COMPLETED
+        # Store the closing remark (if any) in the transcript for grading.
+        if interviewer_message:
+            session.transcript.append(
+                Turn(role="interviewer", content=interviewer_message)
+            )
+    else:
+        session.transcript.append(
+            Turn(role="interviewer", content=interviewer_message)
+        )
+
+    return InterviewAnswerResponse(
+        session_id=session.id,
+        interviewer_message=interviewer_message or None,
+        interview_ended=ended,
+        turn_number=turn_number,
+    )
+
+
+@router.post("/{session_id}/end", response_model=EndInterviewResponse)
+async def end_interview(session_id: str) -> EndInterviewResponse:
+    """
+    Explicitly ends an in-progress interview at the user's request so they
+    can proceed to holistic grading.
+    """
+    session = get_interview(session_id)
+    if session is None:
+        raise HTTPException(status_code=404, detail="Interview session not found.")
+
+    if session.status is InterviewStatus.IN_PROGRESS:
+        session.status = InterviewStatus.COMPLETED
+
+    return EndInterviewResponse(session_id=session.id, status=session.status.value)
+
+
+@router.post("/{session_id}/grade", response_model=InterviewGradeResponse)
+async def grade_interview(session_id: str) -> InterviewGradeResponse:
+    """
+    Holistically grades the entire mock interview transcript using Gemini
+    (GRADER role). Calibrates assessment to the interview type, experience
+    level, and target role/company/location.
+    """
+    session = get_interview(session_id)
+    if session is None:
+        raise HTTPException(status_code=404, detail="Interview session not found.")
+
+    candidate_answers = sum(1 for t in session.transcript if t.role == "candidate")
+    if candidate_answers == 0:
+        raise HTTPException(
+            status_code=400,
+            detail="Cannot grade an interview with no answers submitted.",
+        )
+
+    provider = get_provider(LLMRole.GRADER)
+    system_prompt = _build_mock_grader_prompt(
+        session.interview_type,
+        session.experience_level,
+        session.role,
+        session.company,
+        session.location,
+    )
+    transcript_text = _format_transcript_for_grading(session.transcript)
+
+    try:
+        response = await provider.generate(
+            [
+                Message(role=Role.SYSTEM, content=system_prompt),
+                Message(
+                    role=Role.USER,
+                    content=f"Full Interview Transcript:\n\n{transcript_text}",
+                ),
+            ],
+            temperature=0.3,
+            max_tokens=4096,
+        )
+    except LLMProviderError as exc:
+        raise HTTPException(
+            status_code=502, detail=f"Grader provider failed: {exc}"
+        ) from exc
+
+    text = response.text.strip()
+    if not text:
+        raise HTTPException(
+            status_code=502, detail="Grader provider returned an empty reply."
+        )
+
+    try:
+        score, feedback = _parse_grade(text)
+    except GradeParseError as exc:
+        logger.warning("Unparseable mock interview grader reply (%s): %r", exc, text[:500])
+        raise HTTPException(
+            status_code=502,
+            detail="The grader's reply wasn't in the expected format - please retry.",
+        ) from exc
+
+    session.score = score
+    session.feedback = feedback
+    session.status = InterviewStatus.GRADED
+
+    return InterviewGradeResponse(session_id=session.id, score=score, feedback=feedback)

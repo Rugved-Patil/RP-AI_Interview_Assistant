@@ -140,3 +140,28 @@ def graded_session(client, start_session) -> str:
     response = client.post(f"/sessions/{session_id}/grade")
     assert response.status_code == 200, response.text
     return session_id
+
+
+@pytest.fixture
+def start_interview(client, providers):
+    """Returns a function that starts a mock interview and hands back its session id."""
+
+    def _start(
+        interview_type: str = "technical",
+        experience_level: str = "mid",
+        role: str = "ML Engineer",
+        **extra: str,
+    ) -> str:
+        response = client.post(
+            "/interviews/start",
+            json={
+                "interview_type": interview_type,
+                "experience_level": experience_level,
+                "role": role,
+                **extra,
+            },
+        )
+        assert response.status_code == 200, response.text
+        return response.json()["session_id"]
+
+    return _start

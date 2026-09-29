@@ -93,3 +93,67 @@ def test_technical_mock_prompt_focuses_on_technical_topics():
         "ML Engineer", None, None,
     ).lower()
     assert "technical" in prompt
+
+
+def test_mock_prompt_includes_end_signal_instruction():
+    # The turn loop's _parse_interviewer_reply looks for [END_INTERVIEW].
+    # If prompt tuning ever drops this instruction, the model would never
+    # signal the end and every interview would hit the hard cap — this test
+    # fails first and says why.
+    prompt = _build_mock_interviewer_prompt(
+        InterviewType.TECHNICAL, ExperienceLevel.MID,
+        "ML Engineer", None, None,
+    )
+    assert "[END_INTERVIEW]" in prompt
+
+
+# --- mock interview grader prompt ---------------------------------------------
+
+
+def test_mock_grader_prompt_includes_every_supplied_detail():
+    from app.api.routes.interviews import _build_mock_grader_prompt
+
+    prompt = _build_mock_grader_prompt(
+        InterviewType.TECHNICAL, ExperienceLevel.SENIOR,
+        "Data Scientist", "Acme", "Berlin",
+    )
+    for expected in ("Data Scientist", "Acme", "Berlin", "senior"):
+        assert expected in prompt
+
+
+def test_mock_grader_prompt_with_only_a_role_has_no_leftover_placeholders():
+    from app.api.routes.interviews import _build_mock_grader_prompt
+
+    prompt = _build_mock_grader_prompt(
+        InterviewType.HR, ExperienceLevel.JUNIOR,
+        "Data Scientist", None, None,
+    )
+    assert "Data Scientist" in prompt
+    assert "None" not in prompt
+
+
+def test_mock_grader_prompt_keeps_the_labels_the_parser_depends_on():
+    from app.api.routes.interviews import _build_mock_grader_prompt
+
+    prompt = _build_mock_grader_prompt(
+        InterviewType.TECHNICAL, ExperienceLevel.MID,
+        "ML Engineer", None, None,
+    )
+    assert "SCORE:" in prompt
+    assert "FEEDBACK:" in prompt
+
+
+def test_mock_grader_prompt_focuses_appropriately_for_interview_type():
+    from app.api.routes.interviews import _build_mock_grader_prompt
+
+    hr_prompt = _build_mock_grader_prompt(
+        InterviewType.HR, ExperienceLevel.MID,
+        "ML Engineer", None, None,
+    ).lower()
+    assert "behavioral" in hr_prompt or "communication" in hr_prompt
+
+    tech_prompt = _build_mock_grader_prompt(
+        InterviewType.TECHNICAL, ExperienceLevel.MID,
+        "ML Engineer", None, None,
+    ).lower()
+    assert "technical depth" in tech_prompt or "problem-solving" in tech_prompt
