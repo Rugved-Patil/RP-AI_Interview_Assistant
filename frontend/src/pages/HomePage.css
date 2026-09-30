@@ -1,86 +1,115 @@
 .home {
-  width: min(1040px, 100%);
+  width: min(960px, 100%);
   display: flex;
   flex-direction: column;
-  gap: 2.5rem;
+  gap: 2.75rem;
+  margin: 0 auto;
 }
 
-.home__lede {
+.home__header {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.home__title {
   font-family: var(--font-serif);
-  font-size: 1.4rem;
-  font-weight: 400;
+  font-size: clamp(1.5rem, 3.5vw, 1.95rem);
+  font-weight: 500;
   color: var(--ink);
   margin: 0;
-  text-align: center;
 }
 
-.home__modes {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 1.5rem;
-}
-
-.mode-tile {
-  display: block;
-  min-height: 220px;
-  border: 1px solid var(--rule);
-  border-radius: 10px;
-  padding: clamp(1.75rem, 4vw, 2.5rem);
-  text-decoration: none;
-  transition: border-color 0.15s ease;
-}
-
-/* The two tiles are deliberately not identical - one is a working feature,
-   the other isn't, and the treatment should say so before you even read
-   the copy. */
-.mode-tile--live {
-  background: var(--paper-card);
-  box-shadow: 0 10px 24px -18px rgba(35, 38, 43, 0.45);
-}
-
-.mode-tile--live:hover {
-  border-color: var(--ink);
-}
-
-.mode-tile--placeholder {
-  background: transparent;
-  border-style: dashed;
-}
-
-.mode-tile--placeholder:hover {
-  border-color: var(--ink-muted);
-}
-
-.mode-tile__eyebrow {
-  display: block;
+.home__subtitle {
   font-family: var(--font-mono);
-  font-size: 0.78rem;
+  font-size: 0.88rem;
   color: var(--ink-muted);
-  margin: 0 0 0.85rem;
+  margin: 0;
 }
 
-.mode-tile--live .mode-tile__eyebrow {
-  color: var(--ink-red);
+.home__section {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
 }
 
-.mode-tile__title {
+.home__section-header {
+  border-bottom: 1px solid var(--rule);
+  padding-bottom: 0.6rem;
+}
+
+.home__section-title {
   font-family: var(--font-serif);
+  font-size: 1.25rem;
   font-weight: 500;
-  font-size: 1.5rem;
   color: var(--ink);
-  margin: 0 0 0.75rem;
+  margin: 0 0 0.25rem;
 }
 
-.mode-tile__body {
+.home__section-desc {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--ink-muted);
+  margin: 0;
+}
+
+.home__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 1.25rem;
+}
+
+.mode-card {
+  display: flex;
+  flex-direction: column;
+  background: var(--paper-card);
+  border: 1px solid var(--rule);
+  border-radius: 8px;
+  padding: 1.5rem 1.75rem;
+  text-decoration: none;
+  box-shadow: 0 4px 16px -10px rgba(35, 38, 43, 0.35);
+  transition: transform 150ms ease, border-color 150ms ease, box-shadow 150ms ease;
+}
+
+.mode-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--ink);
+  box-shadow: 0 8px 24px -12px rgba(35, 38, 43, 0.45);
+}
+
+.mode-card__badge {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--ink-muted);
+  margin-bottom: 0.65rem;
+}
+
+.mode-card__badge--accent {
+  color: var(--ink-red);
+  font-weight: 600;
+}
+
+.mode-card__title {
   font-family: var(--font-serif);
-  font-size: 1rem;
-  line-height: 1.55;
+  font-size: 1.25rem;
+  font-weight: 500;
+  color: var(--ink);
+  margin: 0 0 0.5rem;
+}
+
+.mode-card__body {
+  font-family: var(--font-serif);
+  font-size: 0.95rem;
+  line-height: 1.5;
   color: var(--ink-muted);
   margin: 0;
 }
 
 @media (max-width: 640px) {
-  .home__modes {
+  .home__grid {
     grid-template-columns: 1fr;
   }
 }

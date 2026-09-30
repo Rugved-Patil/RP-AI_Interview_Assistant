@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import {
   API_BASE_URL,
   MAX_ANSWER_LENGTH,
@@ -62,8 +62,12 @@ type MockStage =
   | { name: 'error'; message: string }
 
 export function MockInterviewPage() {
+  const [searchParams] = useSearchParams()
+  const urlType: InterviewType = searchParams.get('type') === 'hr' ? 'hr' : 'technical'
+  const [overrideType, setOverrideType] = useState<InterviewType | null>(null)
+  const interviewType = overrideType ?? urlType
+
   const [stage, setStage] = useState<MockStage>({ name: 'setup' })
-  const [interviewType, setInterviewType] = useState<InterviewType>('technical')
   const [experienceLevel, setExperienceLevel] = useState<ExperienceLevel>('mid')
 
   const [activePreset, setActivePreset] = useState<ActivePresetState>(() =>
@@ -327,7 +331,9 @@ export function MockInterviewPage() {
       </Link>
 
       <div className="mock-card">
-        <p className="mock-card__eyebrow">Full Mock Interview</p>
+        <p className="mock-card__eyebrow">
+          Full Mock Interview · {interviewType === 'hr' ? 'HR & Behavioral' : 'Technical'}
+        </p>
 
         {stage.name === 'setup' && (
           <div className="mock-card__panel">
@@ -335,30 +341,24 @@ export function MockInterviewPage() {
 
             <div className="mock-form__group">
               <label className="mock-form__label">Interview Focus</label>
-              <div className="mock-form__options">
+              <div className="mock-form__segmented">
                 <button
                   type="button"
-                  className={`mock-form__option-btn ${
-                    interviewType === 'technical' ? 'mock-form__option-btn--selected' : ''
+                  className={`mock-form__segment-btn ${
+                    interviewType === 'technical' ? 'mock-form__segment-btn--selected' : ''
                   }`}
-                  onClick={() => setInterviewType('technical')}
+                  onClick={() => setOverrideType('technical')}
                 >
-                  <span className="mock-form__option-title">Technical Interview</span>
-                  <span className="mock-form__option-desc">
-                    Domain depth, systems, practical problem-solving
-                  </span>
+                  Technical
                 </button>
                 <button
                   type="button"
-                  className={`mock-form__option-btn ${
-                    interviewType === 'hr' ? 'mock-form__option-btn--selected' : ''
+                  className={`mock-form__segment-btn ${
+                    interviewType === 'hr' ? 'mock-form__segment-btn--selected' : ''
                   }`}
-                  onClick={() => setInterviewType('hr')}
+                  onClick={() => setOverrideType('hr')}
                 >
-                  <span className="mock-form__option-title">HR / Behavioral</span>
-                  <span className="mock-form__option-desc">
-                    Culture fit, motivation, interpersonal teamwork
-                  </span>
+                  HR & Behavioral
                 </button>
               </div>
             </div>

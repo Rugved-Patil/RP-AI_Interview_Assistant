@@ -1,5 +1,5 @@
 .behavioral-card {
-  width: min(640px, 100%);
+  width: min(560px, 100%);
   background: var(--paper);
   border: 1px solid var(--rule);
   border-radius: 10px;
@@ -19,35 +19,6 @@
   border-radius: 6px;
   padding: clamp(1.5rem, 4vw, 2.25rem);
   box-shadow: 0 10px 24px -18px rgba(35, 38, 43, 0.45);
-}
-
-.behavioral-card__star-hint {
-  background: var(--paper);
-  border: 1px solid var(--rule);
-  border-radius: 6px;
-  padding: 0.9rem 1rem;
-  margin: 0 0 1.5rem;
-}
-
-.behavioral-card__star-title {
-  font-family: var(--font-mono);
-  font-size: 0.82rem;
-  font-weight: 600;
-  color: var(--ink);
-  margin: 0 0 0.4rem;
-}
-
-.behavioral-card__star-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-  gap: 0.5rem;
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
-  color: var(--ink-muted);
-}
-
-.behavioral-card__star-item strong {
-  color: var(--ink-red);
 }
 
 .behavioral-card__question-header {
@@ -103,7 +74,7 @@
 
 .behavioral-card__textarea {
   width: 100%;
-  min-height: 11rem;
+  min-height: 10rem;
   resize: vertical;
   font-family: var(--font-serif);
   font-size: 1rem;

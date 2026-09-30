@@ -37,7 +37,6 @@ export function SavedReports() {
             mockReports,
             errorMessage: null,
           })
-          // If there are no mock reports but there are single reports, default to single
           if (mockReports.length === 0 && singleReports.length > 0) {
             setActiveTab('single')
           }
@@ -95,7 +94,7 @@ export function SavedReports() {
             }`}
             onClick={() => setActiveTab('single')}
           >
-            Technical Questions ({state.singleReports.length})
+            Single Questions ({state.singleReports.length})
           </button>
         </div>
       </div>
@@ -127,7 +126,7 @@ export function SavedReports() {
         <>
           {state.singleReports.length === 0 ? (
             <p className="saved-reports__meta">
-              No saved technical questions yet. Practice a technical question and save it to view it here.
+              No saved single questions yet. Complete a practice question and save its report to view it here.
             </p>
           ) : (
             <ul className="saved-reports__list">
@@ -186,7 +185,7 @@ function MockReportRow({
         <span className="report-row__score">{report.score}/10</span>
         <span className="report-row__title">
           <span className="report-row__badge">
-            {report.interview_type.toUpperCase()} • {report.experience_level.toUpperCase()}
+            {report.interview_type === 'hr' ? 'HR / Behavioral' : 'Technical'} • {report.experience_level.toUpperCase()}
           </span>
           <span className="report-row__role">{report.role}</span>
         </span>
@@ -196,30 +195,34 @@ function MockReportRow({
       {expanded && (
         <div className="report-row__detail">
           {context && (
-            <>
+            <div className="report-row__section">
               <p className="report-row__label">Target Role & Context</p>
               <p className="report-row__text">{context}</p>
-            </>
+            </div>
           )}
 
-          <p className="report-row__label">Holistic Feedback</p>
-          <p className="report-row__text">{report.feedback}</p>
+          <div className="report-row__section">
+            <p className="report-row__label">Holistic Feedback & Evaluation</p>
+            <p className="report-row__text">{report.feedback}</p>
+          </div>
 
-          <p className="report-row__label">
-            Full Transcript ({report.transcript.length} turns)
-          </p>
-          <div className="report-row__transcript">
-            {report.transcript.map((t, idx) => (
-              <div
-                key={idx}
-                className={`report-row__turn report-row__turn--${t.role}`}
-              >
-                <div className="report-row__turn-sender">
-                  {t.role === 'interviewer' ? 'AI Interviewer' : 'You'}
+          <div className="report-row__section">
+            <p className="report-row__label">
+              Full Conversation Transcript ({report.transcript.length} turns)
+            </p>
+            <div className="report-row__transcript">
+              {report.transcript.map((t, idx) => (
+                <div
+                  key={idx}
+                  className={`report-row__turn report-row__turn--${t.role}`}
+                >
+                  <div className="report-row__turn-sender">
+                    {t.role === 'interviewer' ? 'AI Interviewer' : 'You'}
+                  </div>
+                  <div className="report-row__turn-content">{t.content}</div>
                 </div>
-                <div className="report-row__turn-content">{t.content}</div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
 
           <div className="report-row__actions">
@@ -229,7 +232,7 @@ function MockReportRow({
                 className="report-row__delete"
                 onClick={() => setConfirming(true)}
               >
-                Delete
+                Delete report
               </button>
             ) : (
               <span className="report-row__confirm-group">
@@ -293,24 +296,40 @@ function ReportRow({
         aria-expanded={expanded}
       >
         <span className="report-row__score">{report.score}/10</span>
-        <span className="report-row__question">{report.question}</span>
+        <span className="report-row__title">
+          {report.role && <span className="report-row__role">{report.role} — </span>}
+          <span className="report-row__question">{report.question}</span>
+        </span>
         <span className="report-row__date">{formatDate(report.created_at)}</span>
       </button>
 
       {expanded && (
         <div className="report-row__detail">
           {context && (
-            <>
-              <p className="report-row__label">Graded for</p>
+            <div className="report-row__section">
+              <p className="report-row__label">Target Role & Context</p>
               <p className="report-row__text">{context}</p>
-            </>
+            </div>
           )}
-          <p className="report-row__label">Question</p>
-          <p className="report-row__text">{report.question}</p>
-          <p className="report-row__label">Your answer</p>
-          <p className="report-row__text">{report.answer}</p>
-          <p className="report-row__label">Feedback</p>
-          <p className="report-row__text">{report.feedback}</p>
+
+          <div className="report-row__section">
+            <p className="report-row__label">Question & Answer Transcript</p>
+            <div className="report-row__transcript">
+              <div className="report-row__turn report-row__turn--interviewer">
+                <div className="report-row__turn-sender">Interviewer Question</div>
+                <div className="report-row__turn-content">{report.question}</div>
+              </div>
+              <div className="report-row__turn report-row__turn--candidate">
+                <div className="report-row__turn-sender">Your Answer</div>
+                <div className="report-row__turn-content">{report.answer}</div>
+              </div>
+            </div>
+          </div>
+
+          <div className="report-row__section">
+            <p className="report-row__label">Feedback & Evaluation</p>
+            <p className="report-row__text">{report.feedback}</p>
+          </div>
 
           <div className="report-row__actions">
             {!confirming ? (
@@ -319,7 +338,7 @@ function ReportRow({
                 className="report-row__delete"
                 onClick={() => setConfirming(true)}
               >
-                Delete
+                Delete report
               </button>
             ) : (
               <span className="report-row__confirm-group">

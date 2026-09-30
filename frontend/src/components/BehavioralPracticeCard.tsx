@@ -53,7 +53,8 @@ export function BehavioralPracticeCard() {
     onTranscriptChange: (transcript) => {
       setStage((current) => {
         if (current.name !== 'question') return current
-        const newAnswer = (current.answer + ' ' + transcript).trim()
+        const separator = current.answer.length > 0 && !current.answer.endsWith(' ') ? ' ' : ''
+        const newAnswer = (current.answer + separator + transcript).trim()
         return {
           ...current,
           answer: newAnswer.slice(0, MAX_ANSWER_LENGTH),
@@ -102,7 +103,6 @@ export function BehavioralPracticeCard() {
         submitting: false,
         error: null,
       })
-      // Speak the generated question automatically if speech is enabled
       tts.speak(question)
     } catch (err) {
       setStage({ name: 'error', message: toMessage(err) })
@@ -111,7 +111,6 @@ export function BehavioralPracticeCard() {
 
   async function handleSubmit() {
     if (stage.name !== 'question') return
-    // Stop any ongoing speech
     stt.stopListening()
     tts.cancel()
 
@@ -152,36 +151,18 @@ export function BehavioralPracticeCard() {
 
   return (
     <div className="behavioral-card">
-      <p className="behavioral-card__eyebrow">Behavioral questions · STAR Method</p>
+      <p className="behavioral-card__eyebrow">Behavioral questions</p>
 
       {stage.name === 'idle' && (
         <div className="behavioral-card__panel">
           <ActivePresetBanner state={activePreset} />
-
-          <div className="behavioral-card__star-hint">
-            <div className="behavioral-card__star-title">Framework: The STAR Technique</div>
-            <div className="behavioral-card__star-grid">
-              <div className="behavioral-card__star-item">
-                <strong>Situation:</strong> Context & background
-              </div>
-              <div className="behavioral-card__star-item">
-                <strong>Task:</strong> Your goal & responsibility
-              </div>
-              <div className="behavioral-card__star-item">
-                <strong>Action:</strong> Steps you personally took
-              </div>
-              <div className="behavioral-card__star-item">
-                <strong>Result:</strong> Quantifiable outcomes & learnings
-              </div>
-            </div>
-          </div>
 
           <button
             className="behavioral-card__button"
             onClick={handleStart}
             disabled={activePreset.status !== 'loaded'}
           >
-            Start a behavioral question
+            Start a practice question
           </button>
         </div>
       )}
@@ -202,23 +183,6 @@ export function BehavioralPracticeCard() {
             )}
           </div>
 
-          <div className="behavioral-card__star-hint" style={{ margin: '1rem 0' }}>
-            <div className="behavioral-card__star-grid">
-              <div className="behavioral-card__star-item">
-                <strong>S:</strong> Set the context
-              </div>
-              <div className="behavioral-card__star-item">
-                <strong>T:</strong> State your task
-              </div>
-              <div className="behavioral-card__star-item">
-                <strong>A:</strong> Detail your actions
-              </div>
-              <div className="behavioral-card__star-item">
-                <strong>R:</strong> Share the result
-              </div>
-            </div>
-          </div>
-
           <div className="behavioral-card__textarea-wrapper">
             <label className="sr-only" htmlFor="behavioral-answer">
               Your answer
@@ -228,7 +192,7 @@ export function BehavioralPracticeCard() {
               className="behavioral-card__textarea"
               value={stage.answer}
               onChange={(event) => setStage({ ...stage, answer: event.target.value })}
-              placeholder="Structure your answer using Situation, Task, Action, and Result..."
+              placeholder="Type your answer here..."
               rows={8}
               maxLength={MAX_ANSWER_LENGTH}
               disabled={stage.submitting}
@@ -264,7 +228,7 @@ export function BehavioralPracticeCard() {
               onClick={handleSubmit}
               disabled={stage.submitting || stage.answer.trim().length === 0}
             >
-              {stage.submitting ? 'Grading with STAR Rubric…' : stage.error ? 'Retry grading' : 'Submit answer'}
+              {stage.submitting ? 'Grading…' : stage.error ? 'Retry grading' : 'Submit answer'}
             </button>
             {stage.error && (
               <button

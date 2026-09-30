@@ -4,33 +4,66 @@ import './HomePage.css'
 export function HomePage() {
   return (
     <div className="home">
-      <p className="home__lede">Pick a way to practice.</p>
+      <header className="home__header">
+        <h1 className="home__title">Select Your Practice Mode</h1>
+        <p className="home__subtitle">
+          Choose between rapid single-question drills or full end-to-end mock interviews.
+        </p>
+      </header>
 
-      <div className="home__modes">
-        <Link to="/practice" className="mode-tile mode-tile--live">
-          <span className="mode-tile__eyebrow">Ready now</span>
-          <h2 className="mode-tile__title">Technical questions</h2>
-          <p className="mode-tile__body">
-            Answer one technical question at a time, tailored to your role, and get graded right after.
+      <section className="home__section">
+        <div className="home__section-header">
+          <h2 className="home__section-title">Single Question Practice</h2>
+          <p className="home__section-desc">
+            Quick, focused practice sessions with instant evaluation and feedback after each question.
           </p>
-        </Link>
+        </div>
 
-        <Link to="/practice/behavioral" className="mode-tile mode-tile--live">
-          <span className="mode-tile__eyebrow">Ready now · STAR Rubric</span>
-          <h2 className="mode-tile__title">Behavioral questions</h2>
-          <p className="mode-tile__body">
-            Practice storytelling with open-ended behavioral questions and get scored on the STAR framework.
-          </p>
-        </Link>
+        <div className="home__grid">
+          <Link to="/practice" className="mode-card">
+            <span className="mode-card__badge">Single Question</span>
+            <h3 className="mode-card__title">Technical Questions</h3>
+            <p className="mode-card__body">
+              Answer role-specific technical and problem-solving questions tailored to your target preset.
+            </p>
+          </Link>
 
-        <Link to="/mock-interview" className="mode-tile mode-tile--live">
-          <span className="mode-tile__eyebrow">Ready now · Voice & Text</span>
-          <h2 className="mode-tile__title">Full mock interview</h2>
-          <p className="mode-tile__body">
-            A complete back-and-forth interview with follow-up questions, graded holistically at the end.
+          <Link to="/practice/behavioral" className="mode-card">
+            <span className="mode-card__badge">Single Question</span>
+            <h3 className="mode-card__title">Behavioral Questions</h3>
+            <p className="mode-card__body">
+              Practice open-ended questions assessing communication, leadership, and situational responses.
+            </p>
+          </Link>
+        </div>
+      </section>
+
+      <section className="home__section">
+        <div className="home__section-header">
+          <h2 className="home__section-title">Full Mock Interviews</h2>
+          <p className="home__section-desc">
+            Interactive multi-turn conversations with follow-up questions and holistic scoring at the end.
           </p>
-        </Link>
-      </div>
+        </div>
+
+        <div className="home__grid">
+          <Link to="/mock-interview?type=technical" className="mode-card">
+            <span className="mode-card__badge mode-card__badge--accent">Voice & Text</span>
+            <h3 className="mode-card__title">Technical Mock Interview</h3>
+            <p className="mode-card__body">
+              A comprehensive technical interview probing deep domain knowledge and system problem-solving.
+            </p>
+          </Link>
+
+          <Link to="/mock-interview?type=hr" className="mode-card">
+            <span className="mode-card__badge mode-card__badge--accent">Voice & Text</span>
+            <h3 className="mode-card__title">HR & Behavioral Mock</h3>
+            <p className="mode-card__body">
+              A complete interview exploring past experience, culture fit, teamwork, and decision-making.
+            </p>
+          </Link>
+        </div>
+      </section>
     </div>
   )
 }
