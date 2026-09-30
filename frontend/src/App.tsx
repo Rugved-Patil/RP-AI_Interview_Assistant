@@ -6,6 +6,7 @@ import { MockInterviewPage } from './pages/MockInterviewPage'
 import { PresetsPage } from './pages/PresetsPage'
 import { QuestionBankPage } from './pages/QuestionBankPage'
 import { SavedReportsPage } from './pages/SavedReportsPage'
+import { SettingsPage } from './pages/SettingsPage'
 import { SituationalPracticePage } from './pages/SituationalPracticePage'
 import { RightNavbar } from './components/RightNavbar'
 import './App.css'
@@ -52,6 +53,7 @@ function App() {
           <Route path="questions" element={<QuestionBankPage />} />
           <Route path="presets" element={<PresetsPage />} />
           <Route path="reports" element={<SavedReportsPage />} />
+          <Route path="settings" element={<SettingsPage />} />
         </Route>
       </Routes>
     </BrowserRouter>

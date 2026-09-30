@@ -1,3 +1,4 @@
+import { WarningIcon } from './Icons'
 import './UnsavedSessionModal.css'
 
 interface UnsavedSessionModalProps {
@@ -23,7 +24,9 @@ export function UnsavedSessionModal({
     <div className="unsaved-modal__backdrop" role="dialog" aria-modal="true">
       <div className="unsaved-modal__dialog">
         <div className="unsaved-modal__header">
-          <span className="unsaved-modal__icon">⚠️</span>
+          <span className="unsaved-modal__icon" aria-hidden="true">
+            <WarningIcon width={22} height={22} />
+          </span>
           <h3 className="unsaved-modal__title">Unsaved {sessionTitle}</h3>
         </div>
 

@@ -95,8 +95,8 @@ export function ScoreTrajectoryChart({ timeline }: ScoreTrajectoryChartProps) {
         >
           <defs>
             <linearGradient id="scoreAreaGradient" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#2563eb" stopOpacity="0.25" />
-              <stop offset="100%" stopColor="#2563eb" stopOpacity="0.0" />
+              <stop offset="0%" stopColor="#596044" stopOpacity="0.22" />
+              <stop offset="100%" stopColor="#596044" stopOpacity="0.0" />
             </linearGradient>
           </defs>
 

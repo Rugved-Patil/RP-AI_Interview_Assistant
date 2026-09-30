@@ -1,11 +1,21 @@
-import { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import { NavLink, useLocation } from 'react-router-dom'
+import {
+  HomeIcon,
+  AnalyticsIcon,
+  QuestionBankIcon,
+  PresetsIcon,
+  SavedReportsIcon,
+  SettingsIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
+} from './Icons'
 import './RightNavbar.css'
 
 interface NavItem {
   to: string
   label: string
-  icon: string
+  icon: React.ComponentType<{ width?: number; height?: number; className?: string }>
   exact?: boolean
 }
 
@@ -13,28 +23,33 @@ const NAV_ITEMS: NavItem[] = [
   {
     to: '/',
     label: 'Home',
-    icon: '🏠',
+    icon: HomeIcon,
     exact: true,
   },
   {
     to: '/analytics',
     label: 'Analytics & Progress',
-    icon: '📊',
+    icon: AnalyticsIcon,
   },
   {
     to: '/questions',
     label: 'Question Bank',
-    icon: '📚',
+    icon: QuestionBankIcon,
   },
   {
     to: '/presets',
     label: 'Interview Presets',
-    icon: '🏷️',
+    icon: PresetsIcon,
   },
   {
     to: '/reports',
     label: 'Saved Reports',
-    icon: '📁',
+    icon: SavedReportsIcon,
+  },
+  {
+    to: '/settings',
+    label: 'Settings',
+    icon: SettingsIcon,
   },
 ]
 
@@ -76,13 +91,16 @@ export function RightNavbar() {
           title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
           aria-expanded={!collapsed}
         >
-          <span className="right-nav__toggle-icon">{collapsed ? '«' : '»'}</span>
+          <span className="right-nav__toggle-icon" aria-hidden="true">
+            {collapsed ? <ChevronLeftIcon width={16} height={16} /> : <ChevronRightIcon width={16} height={16} />}
+          </span>
           {!collapsed && <span className="right-nav__toggle-text">Collapse Menu</span>}
         </button>
       </div>
 
       <nav className="right-nav__menu">
         {NAV_ITEMS.map((item) => {
+          const IconComponent = item.icon
           const isActive = item.exact
             ? location.pathname === item.to
             : location.pathname.startsWith(item.to)
@@ -96,7 +114,7 @@ export function RightNavbar() {
               title={collapsed ? item.label : undefined}
             >
               <span className="right-nav__link-icon" aria-hidden="true">
-                {item.icon}
+                <IconComponent width={18} height={18} />
               </span>
               {!collapsed && <span className="right-nav__link-label">{item.label}</span>}
               {collapsed && <span className="right-nav__tooltip">{item.label}</span>}

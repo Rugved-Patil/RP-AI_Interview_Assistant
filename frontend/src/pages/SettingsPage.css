@@ -1,0 +1,224 @@
+/* ==========================================================================
+   SettingsPage.css - Settings & Configuration Styling
+   Warm Linen & Olive Canvas Theme
+   ========================================================================== */
+
+.settings-page {
+  max-width: 800px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.settings-header {
+  margin-bottom: 2rem;
+  border-bottom: 1px solid var(--rule);
+  padding-bottom: 1rem;
+}
+
+.settings-title-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.settings-title-icon {
+  color: var(--olive-deep);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-top: 0.25rem;
+}
+
+.settings-title {
+  font-family: var(--font-serif);
+  font-size: 1.75rem;
+  font-weight: 600;
+  color: var(--ink);
+  margin: 0 0 0.35rem 0;
+}
+
+.settings-subtitle {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--ink-muted);
+  margin: 0;
+  line-height: 1.45;
+}
+
+.settings-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+}
+
+.settings-section {
+  background: var(--paper-card);
+  border: 1px solid var(--rule);
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 16px -10px rgba(48, 51, 41, 0.15);
+}
+
+.settings-section__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.25rem;
+  border-bottom: 1px solid var(--rule);
+  padding-bottom: 0.65rem;
+}
+
+.settings-section__title {
+  font-family: var(--font-serif);
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--ink);
+  margin: 0;
+}
+
+.settings-tag {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  background: var(--canvas);
+  color: var(--olive-deep);
+  border: 1px solid var(--rule);
+  padding: 0.2rem 0.55rem;
+  border-radius: 4px;
+}
+
+.settings-form-group {
+  margin-bottom: 1.25rem;
+}
+
+.settings-form-group:last-child {
+  margin-bottom: 0;
+}
+
+.settings-label {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--ink);
+  margin-bottom: 0.45rem;
+}
+
+.settings-input-mock {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--canvas);
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+  padding: 0.65rem 0.95rem;
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  color: var(--ink);
+}
+
+.settings-input-mock--disabled {
+  opacity: 0.75;
+  color: var(--ink-muted);
+}
+
+.settings-status-badge {
+  background-color: var(--olive-deep);
+  color: var(--text-light);
+  font-size: 0.68rem;
+  font-weight: 600;
+  padding: 0.15rem 0.5rem;
+  border-radius: 4px;
+  text-transform: uppercase;
+}
+
+.settings-toggle-mock {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--canvas);
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+  padding: 0.65rem 0.95rem;
+}
+
+.settings-toggle-label {
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  color: var(--ink);
+}
+
+.settings-toggle-switch {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.2rem 0.6rem;
+  border-radius: 4px;
+}
+
+.settings-toggle-switch--on {
+  background: var(--olive-deep);
+  color: var(--text-light);
+}
+
+.settings-hint {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--ink-muted);
+  margin: 0.35rem 0 0 0;
+}
+
+.settings-storage-card {
+  background: var(--canvas);
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+  padding: 0.85rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.storage-info-row {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+}
+
+.storage-info-label {
+  color: var(--ink-muted);
+}
+
+.storage-info-val {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.settings-actions-row {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.settings-btn {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  padding: 0.55rem 1rem;
+  border-radius: 6px;
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
+.settings-btn--secondary {
+  background: var(--olive-deep);
+  color: var(--text-light);
+  border: 1px solid var(--olive-deep);
+}
+
+.settings-btn--ghost {
+  background: transparent;
+  color: var(--ink-muted);
+  border: 1px solid var(--rule);
+}

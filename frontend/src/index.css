@@ -1,29 +1,32 @@
 /*
-  Design concept: an interview report on paper. The page background reads
-  as a manila folder (--paper); the practice card itself reads as a sheet
-  of bond paper sitting on top of it (--paper-card). The grading accent
-  (--ink-red) is a red-pen color, deliberately tied to "an answer being
-  marked" rather than a generic brand accent.
-
-  Two type families, two distinct jobs:
-    --font-serif  human-authored text: the app name, the lede, feedback prose.
-    --font-mono   system-authored text: the interview question itself (the
-                  "prompt on the card"), the score, and small meta labels.
-
-  This replaces Vite's default starter tokens (purple accent, dark-mode
-  variant, fixed 1126px #root) - those were template defaults, not a
-  choice made for this project.
+  Design concept: Linen & Olive Editorial Theme with subtle fabric weave.
+  Palette:
+    - Main Background: Warm Linen (#E8DDC8)
+    - Secondary Background: Oat / Canvas (#D8CBB3)
+    - Primary Olive: Deep Olive (#596044)
+    - Secondary Olive: Muted Sage (#7B8061)
+    - Dark Text: Olive Charcoal (#303329)
+    - Light Text: Warm Ivory (#F5F0E5)
+    - Accent: Terracotta Beige (#A4775C)
+    - Subtle Border: Natural Taupe (#B9AC94)
 */
 
 :root {
   color-scheme: light;
 
-  --paper: #ece4d0;
-  --paper-card: #fbf9f2;
-  --ink: #23262b;
-  --ink-muted: #6e6656;
-  --ink-red: #a6362a;
-  --rule: #d8cba9;
+  /* Theme Color Tokens */
+  --paper: #E8DDC8;              /* Warm Linen Main Background */
+  --paper-card: #F5F0E5;         /* Warm Ivory Card Surface */
+  --canvas: #D8CBB3;             /* Oat / Canvas Secondary Surface */
+  --ink: #303329;                /* Olive Charcoal Dark Text */
+  --ink-muted: #596044;          /* Deep Olive Subtext */
+  --ink-sage: #7B8061;           /* Muted Sage */
+  --olive-deep: #596044;         /* Deep Olive Primary */
+  --olive-sage: #7B8061;         /* Muted Sage Secondary */
+  --accent: #A4775C;             /* Terracotta Beige Accent */
+  --ink-red: #A4775C;            /* Terracotta Accent for Marks */
+  --rule: #B9AC94;               /* Natural Taupe Subtle Border */
+  --text-light: #F5F0E5;         /* Warm Ivory Light Text */
 
   --font-serif: 'Fraunces', 'Iowan Old Style', Georgia, serif;
   --font-mono: 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', Consolas, monospace;
@@ -41,7 +44,13 @@ body,
 
 body {
   margin: 0;
-  background: var(--paper);
+  background-color: var(--paper);
+  /* Tactile Linen & Fabric Canvas Texture */
+  background-image: 
+    radial-gradient(rgba(48, 51, 41, 0.04) 1px, transparent 0),
+    linear-gradient(to right, rgba(185, 172, 148, 0.15) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(185, 172, 148, 0.15) 1px, transparent 1px);
+  background-size: 24px 24px, 8px 8px, 8px 8px;
   color: var(--ink);
   font-family: var(--font-serif);
   -webkit-font-smoothing: antialiased;
