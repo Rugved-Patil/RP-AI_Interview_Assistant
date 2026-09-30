@@ -7,16 +7,17 @@ import { PresetsPage } from './pages/PresetsPage'
 import { QuestionBankPage } from './pages/QuestionBankPage'
 import { SavedReportsPage } from './pages/SavedReportsPage'
 import { SituationalPracticePage } from './pages/SituationalPracticePage'
+import { RightNavbar } from './components/RightNavbar'
 import './App.css'
 
 /**
- * Persistent shell around every route: header (with the app title and
- * nav links) stays put, `<Outlet />` swaps in whichever page matches the
- * current URL.
+ * Persistent shell around every route: header with the app title stays put,
+ * RightNavbar handles global navigation on the right side, and `<Outlet />`
+ * swaps in whichever page matches the current URL.
  */
 function Layout() {
   return (
-    <div className="page">
+    <div className="page page--with-sidebar">
       <header className="page__header">
         <Link
           to="/"
@@ -29,24 +30,11 @@ function Layout() {
         >
           RP-AI Interview Assistant
         </Link>
-        <nav className="page__nav">
-          <Link to="/analytics" className="page__nav-link">
-            Progress & analytics
-          </Link>
-          <Link to="/questions" className="page__nav-link">
-            Question bank
-          </Link>
-          <Link to="/presets" className="page__nav-link">
-            Interview presets
-          </Link>
-          <Link to="/reports" className="page__nav-link">
-            Saved reports
-          </Link>
-        </nav>
       </header>
       <main className="page__main">
         <Outlet />
       </main>
+      <RightNavbar />
     </div>
   )
 }

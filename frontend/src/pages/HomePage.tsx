@@ -64,33 +64,6 @@ export function HomePage() {
           </Link>
         </div>
       </section>
-
-      <section className="home__section">
-        <div className="home__section-header">
-          <h2 className="home__section-title">Preparation Insights & Tools</h2>
-          <p className="home__section-desc">
-            Track historical mastery trajectories, explore curated questions, and configure role presets.
-          </p>
-        </div>
-
-        <div className="home__grid">
-          <Link to="/analytics" className="mode-card">
-            <span className="mode-card__badge mode-card__badge--accent">Phase 4 Analytics</span>
-            <h3 className="mode-card__title">Progress & Analytics</h3>
-            <p className="mode-card__body">
-              Visual score trajectory (0–10), domain competency radar, weak-spot gap analysis, and delivery insights.
-            </p>
-          </Link>
-
-          <Link to="/questions" className="mode-card">
-            <span className="mode-card__badge">Question Library</span>
-            <h3 className="mode-card__title">Question Bank Explorer</h3>
-            <p className="mode-card__body">
-              Browse curated exemplar questions with sublinear TF-IDF + BM25 vector search and evaluation rubrics.
-            </p>
-          </Link>
-        </div>
-      </section>
     </div>
   )
 }

@@ -11,6 +11,7 @@ import {
 } from '../api/practiceApi'
 import type { PresetSummary } from '../api/practiceApi'
 import { getActivePresetId, setActivePresetId } from '../activePreset'
+import { UnsavedSessionModal } from './UnsavedSessionModal'
 import { useSpeechRecognition } from '../hooks/useSpeechRecognition'
 import { useSpeechSynthesis } from '../hooks/useSpeechSynthesis'
 import './BehavioralPracticeCard.css'
@@ -143,14 +144,67 @@ export function BehavioralPracticeCard() {
     }
   }
 
+  const [pendingExitAction, setPendingExitAction] = useState<(() => void) | null>(null)
+  const isUnsavedGraded = stage.name === 'graded' && stage.saveState !== 'saved'
+
+  // Warn on browser tab close/refresh if graded session is unsaved
+  useEffect(() => {
+    if (!isUnsavedGraded) return
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      e.preventDefault()
+    }
+    window.addEventListener('beforeunload', handleBeforeUnload)
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload)
+    }
+  }, [isUnsavedGraded])
+
+  const guardedExit = (action: () => void) => {
+    if (isUnsavedGraded) {
+      setPendingExitAction(() => action)
+    } else {
+      action()
+    }
+  }
+
+  const handleModalSaveAndProceed = async () => {
+    if (stage.name !== 'graded') return
+    setStage({ ...stage, saveState: 'saving' })
+    try {
+      await saveReport(stage.sessionId)
+      setStage((current) => (current.name === 'graded' ? { ...current, saveState: 'saved' } : current))
+      const action = pendingExitAction
+      setPendingExitAction(null)
+      if (action) action()
+    } catch {
+      setStage((current) => (current.name === 'graded' ? { ...current, saveState: 'error' } : current))
+      setPendingExitAction(null)
+    }
+  }
+
+  const handleModalDiscardAndProceed = () => {
+    const action = pendingExitAction
+    setPendingExitAction(null)
+    if (action) action()
+  }
+
   function handleStartOver() {
     stt.stopListening()
     tts.cancel()
-    setStage({ name: 'idle' })
+    guardedExit(() => setStage({ name: 'idle' }))
   }
 
   return (
     <div className="behavioral-card">
+      <UnsavedSessionModal
+        isOpen={pendingExitAction !== null}
+        isSaving={stage.name === 'graded' && stage.saveState === 'saving'}
+        sessionTitle="Behavioral Practice Question"
+        onSaveAndProceed={handleModalSaveAndProceed}
+        onDiscardAndProceed={handleModalDiscardAndProceed}
+        onCancel={() => setPendingExitAction(null)}
+      />
+
       <p className="behavioral-card__eyebrow">Behavioral questions</p>
 
       {stage.name === 'idle' && (

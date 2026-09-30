@@ -4,6 +4,11 @@
   flex-direction: column;
 }
 
+.page--with-sidebar {
+  padding-right: 64px; /* Offset for collapsed right navigation rail */
+  transition: padding-right 0.22s ease;
+}
+
 .page__header {
   display: flex;
   align-items: center;
@@ -18,27 +23,6 @@
   letter-spacing: 0.01em;
   color: var(--ink);
   text-decoration: none;
-}
-
-.page__nav {
-  display: flex;
-  gap: 0.6rem;
-}
-
-.page__nav-link {
-  font-family: var(--font-mono);
-  font-size: 0.78rem;
-  color: var(--ink-muted);
-  text-decoration: none;
-  border: 1px solid var(--rule);
-  border-radius: 999px;
-  padding: 0.4rem 0.9rem;
-  transition: border-color 0.15s ease, color 0.15s ease;
-}
-
-.page__nav-link:hover {
-  border-color: var(--ink);
-  color: var(--ink);
 }
 
 .page__main {

@@ -1,0 +1,155 @@
+/* ==========================================================================
+   RightNavbar.css - Collapsible / Expandable Right-Side Navigation Rail
+   ========================================================================== */
+
+.right-nav {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #fafaf9;
+  border-left: 1px solid #e7e5e4;
+  display: flex;
+  flex-direction: column;
+  z-index: 100;
+  transition: width 0.22s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.22s ease;
+  box-shadow: -2px 0 10px rgba(0, 0, 0, 0.03);
+}
+
+.right-nav--collapsed {
+  width: 60px;
+}
+
+.right-nav--expanded {
+  width: 220px;
+  box-shadow: -4px 0 20px rgba(0, 0, 0, 0.07);
+}
+
+.right-nav__header {
+  padding: 1.25rem 0.75rem 1rem;
+  border-bottom: 1px solid #f0eeeb;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.right-nav__toggle-btn {
+  background: transparent;
+  border: 1px solid #e7e5e4;
+  border-radius: 6px;
+  color: #57534e;
+  cursor: pointer;
+  padding: 0.45rem 0.6rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  font-family: inherit;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  transition: all 0.15s ease;
+}
+
+.right-nav__toggle-btn:hover {
+  background-color: #ffffff;
+  color: #1c1917;
+  border-color: #d6d3d1;
+}
+
+.right-nav__toggle-icon {
+  font-size: 1.1rem;
+  line-height: 1;
+  font-weight: 700;
+}
+
+.right-nav__toggle-text {
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.right-nav__menu {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding: 1rem 0.5rem;
+  flex: 1;
+}
+
+.right-nav__link {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.65rem 0.75rem;
+  border-radius: 8px;
+  text-decoration: none;
+  color: #57534e;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: all 0.15s ease;
+}
+
+.right-nav--collapsed .right-nav__link {
+  justify-content: center;
+  padding: 0.65rem 0;
+}
+
+.right-nav__link:hover {
+  background-color: #f5f5f4;
+  color: #1c1917;
+}
+
+.right-nav__link--active {
+  background-color: #ffffff;
+  color: #1c1917;
+  font-weight: 700;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  border: 1px solid #e7e5e4;
+}
+
+.right-nav__link-icon {
+  font-size: 1.15rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.right-nav__link-label {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Hover Tooltip in collapsed mode */
+.right-nav__tooltip {
+  position: absolute;
+  right: calc(100% + 10px);
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: #1c1917;
+  color: #ffffff;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.35rem 0.65rem;
+  border-radius: 4px;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.15s ease, visibility 0.15s ease;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+}
+
+.right-nav--collapsed .right-nav__link:hover .right-nav__tooltip {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Responsive adjustment for small screens */
+@media (max-width: 640px) {
+  .right-nav--expanded {
+    width: 100%;
+    max-width: 260px;
+  }
+}

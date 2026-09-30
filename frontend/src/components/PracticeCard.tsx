@@ -11,6 +11,7 @@ import {
 } from '../api/practiceApi'
 import type { PresetSummary } from '../api/practiceApi'
 import { getActivePresetId, setActivePresetId } from '../activePreset'
+import { UnsavedSessionModal } from './UnsavedSessionModal'
 import './PracticeCard.css'
 
 /**
@@ -148,8 +149,61 @@ export function PracticeCard() {
     }
   }
 
+  const [pendingExitAction, setPendingExitAction] = useState<(() => void) | null>(null)
+  const isUnsavedGraded = stage.name === 'graded' && stage.saveState !== 'saved'
+
+  // Warn on browser tab close/refresh if graded session is unsaved
+  useEffect(() => {
+    if (!isUnsavedGraded) return
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      e.preventDefault()
+    }
+    window.addEventListener('beforeunload', handleBeforeUnload)
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload)
+    }
+  }, [isUnsavedGraded])
+
+  const guardedExit = (action: () => void) => {
+    if (isUnsavedGraded) {
+      setPendingExitAction(() => action)
+    } else {
+      action()
+    }
+  }
+
+  const handleModalSaveAndProceed = async () => {
+    if (stage.name !== 'graded') return
+    setStage({ ...stage, saveState: 'saving' })
+    try {
+      await saveReport(stage.sessionId)
+      setStage((current) => (current.name === 'graded' ? { ...current, saveState: 'saved' } : current))
+      const action = pendingExitAction
+      setPendingExitAction(null)
+      if (action) action()
+    } catch {
+      setStage((current) => (current.name === 'graded' ? { ...current, saveState: 'error' } : current))
+      setPendingExitAction(null)
+    }
+  }
+
+  const handleModalDiscardAndProceed = () => {
+    const action = pendingExitAction
+    setPendingExitAction(null)
+    if (action) action()
+  }
+
   return (
     <div className="practice-card">
+      <UnsavedSessionModal
+        isOpen={pendingExitAction !== null}
+        isSaving={stage.name === 'graded' && stage.saveState === 'saving'}
+        sessionTitle="Technical Practice Question"
+        onSaveAndProceed={handleModalSaveAndProceed}
+        onDiscardAndProceed={handleModalDiscardAndProceed}
+        onCancel={() => setPendingExitAction(null)}
+      />
+
       <p className="practice-card__eyebrow">Technical questions</p>
 
       {stage.name === 'idle' && (
@@ -219,7 +273,10 @@ export function PracticeCard() {
             >
               {saveButtonLabel(stage.saveState)}
             </button>
-            <button className="practice-card__button" onClick={() => setStage({ name: 'idle' })}>
+            <button
+              className="practice-card__button"
+              onClick={() => guardedExit(() => setStage({ name: 'idle' }))}
+            >
               Start another question
             </button>
           </div>

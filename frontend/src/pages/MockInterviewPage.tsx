@@ -12,6 +12,7 @@ import {
 } from '../api/practiceApi'
 import type { PresetSummary } from '../api/practiceApi'
 import { getActivePresetId, setActivePresetId } from '../activePreset'
+import { UnsavedSessionModal } from '../components/UnsavedSessionModal'
 import { useSpeechRecognition } from '../hooks/useSpeechRecognition'
 import { useSpeechSynthesis } from '../hooks/useSpeechSynthesis'
 import './MockInterviewPage.css'
@@ -318,19 +319,78 @@ export function MockInterviewPage() {
     }
   }
 
+  const [pendingExitAction, setPendingExitAction] = useState<(() => void) | null>(null)
+  const isUnsavedGraded = stage.name === 'graded' && !stage.saved
+
+  // Warn if user attempts to refresh/close tab with an unsaved graded report
+  useEffect(() => {
+    if (!isUnsavedGraded) return
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      e.preventDefault()
+    }
+    window.addEventListener('beforeunload', handleBeforeUnload)
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload)
+    }
+  }, [isUnsavedGraded])
+
+  const guardedExit = (action: () => void) => {
+    if (isUnsavedGraded) {
+      setPendingExitAction(() => action)
+    } else {
+      action()
+    }
+  }
+
+  const handleModalSaveAndProceed = async () => {
+    if (stage.name !== 'graded') return
+    try {
+      setStage((prev) => (prev.name === 'graded' ? { ...prev, saving: true } : prev))
+      await saveInterviewReport(stage.sessionId)
+      setStage((prev) => (prev.name === 'graded' ? { ...prev, saving: false, saved: true } : prev))
+      const action = pendingExitAction
+      setPendingExitAction(null)
+      if (action) action()
+    } catch (err) {
+      setStage((prev) =>
+        prev.name === 'graded'
+          ? { ...prev, saving: false, saveError: toMessage(err) }
+          : prev,
+      )
+      setPendingExitAction(null)
+    }
+  }
+
+  const handleModalDiscardAndProceed = () => {
+    const action = pendingExitAction
+    setPendingExitAction(null)
+    if (action) action()
+  }
+
   return (
     <div className="page-section">
+      <UnsavedSessionModal
+        isOpen={pendingExitAction !== null}
+        isSaving={stage.name === 'graded' && Boolean(stage.saving)}
+        sessionTitle="Mock Interview Report"
+        onSaveAndProceed={handleModalSaveAndProceed}
+        onDiscardAndProceed={handleModalDiscardAndProceed}
+        onCancel={() => setPendingExitAction(null)}
+      />
+
       <button
         type="button"
         className="page-back"
         onClick={() => {
           stopListening()
           cancelSpeech()
-          if (window.history.length > 1) {
-            navigate(-1)
-          } else {
-            navigate('/')
-          }
+          guardedExit(() => {
+            if (window.history.length > 1) {
+              navigate(-1)
+            } else {
+              navigate('/')
+            }
+          })
         }}
         style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer' }}
       >
@@ -621,7 +681,7 @@ export function MockInterviewPage() {
               </button>
               <button
                 className="mock-card__button mock-card__button--ghost"
-                onClick={() => setStage({ name: 'setup' })}
+                onClick={() => guardedExit(() => setStage({ name: 'setup' }))}
               >
                 Start another interview
               </button>

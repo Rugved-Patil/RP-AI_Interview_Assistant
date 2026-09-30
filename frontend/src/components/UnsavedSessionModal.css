@@ -1,0 +1,134 @@
+/* ==========================================================================
+   UnsavedSessionModal.css - 2-Factor Unsaved Warning Dialog
+   ========================================================================== */
+
+.unsaved-modal__backdrop {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(28, 25, 23, 0.6);
+  backdrop-filter: blur(3px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+  padding: 1.5rem;
+}
+
+.unsaved-modal__dialog {
+  background: #ffffff;
+  border: 1px solid #e7e5e4;
+  border-radius: 12px;
+  max-width: 480px;
+  width: 100%;
+  padding: 1.75rem;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 10px 10px -5px rgba(0, 0, 0, 0.08);
+  animation: modalPopIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes modalPopIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.unsaved-modal__header {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  margin-bottom: 1rem;
+}
+
+.unsaved-modal__icon {
+  font-size: 1.5rem;
+}
+
+.unsaved-modal__title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1c1917;
+  margin: 0;
+}
+
+.unsaved-modal__body {
+  margin-bottom: 1.5rem;
+}
+
+.unsaved-modal__lead {
+  font-size: 0.9375rem;
+  color: #44403c;
+  margin: 0 0 0.85rem 0;
+  line-height: 1.45;
+}
+
+.unsaved-modal__warning-box {
+  background-color: #fff7ed;
+  border-left: 4px solid #ea580c;
+  border-radius: 4px;
+  padding: 0.85rem 1rem;
+}
+
+.unsaved-modal__warning-box p {
+  margin: 0;
+  font-size: 0.84rem;
+  line-height: 1.45;
+  color: #9a3412;
+}
+
+.unsaved-modal__actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.unsaved-modal__btn {
+  font-family: inherit;
+  font-size: 0.875rem;
+  font-weight: 600;
+  padding: 0.65rem 1rem;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  text-align: center;
+}
+
+.unsaved-modal__btn--primary {
+  background-color: #16a34a;
+  color: #ffffff;
+}
+
+.unsaved-modal__btn--primary:hover:not(:disabled) {
+  background-color: #15803d;
+}
+
+.unsaved-modal__btn--danger {
+  background-color: #fee2e2;
+  color: #991b1b;
+  border-color: #fecaca;
+}
+
+.unsaved-modal__btn--danger:hover:not(:disabled) {
+  background-color: #fecaca;
+  color: #7f1d1d;
+}
+
+.unsaved-modal__btn--ghost {
+  background-color: transparent;
+  color: #78716c;
+  border-color: #e7e5e4;
+}
+
+.unsaved-modal__btn--ghost:hover:not(:disabled) {
+  background-color: #f5f5f4;
+  color: #1c1917;
+}
+
+.unsaved-modal__btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
