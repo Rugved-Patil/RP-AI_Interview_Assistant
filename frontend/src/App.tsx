@@ -3,6 +3,7 @@ import { BehavioralPracticePage } from './pages/BehavioralPracticePage'
 import { HomePage } from './pages/HomePage'
 import { MockInterviewPage } from './pages/MockInterviewPage'
 import { PresetsPage } from './pages/PresetsPage'
+import { QuestionBankPage } from './pages/QuestionBankPage'
 import { SavedReportsPage } from './pages/SavedReportsPage'
 import { SituationalPracticePage } from './pages/SituationalPracticePage'
 import './App.css'
@@ -16,10 +17,21 @@ function Layout() {
   return (
     <div className="page">
       <header className="page__header">
-        <Link to="/" className="page__title">
+        <Link
+          to="/"
+          className="page__title"
+          onClick={() => {
+            if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+              window.speechSynthesis.cancel()
+            }
+          }}
+        >
           RP-AI Interview Assistant
         </Link>
         <nav className="page__nav">
+          <Link to="/questions" className="page__nav-link">
+            Question bank
+          </Link>
           <Link to="/presets" className="page__nav-link">
             Interview presets
           </Link>
@@ -44,6 +56,7 @@ function App() {
           <Route path="practice" element={<SituationalPracticePage />} />
           <Route path="practice/behavioral" element={<BehavioralPracticePage />} />
           <Route path="mock-interview" element={<MockInterviewPage />} />
+          <Route path="questions" element={<QuestionBankPage />} />
           <Route path="presets" element={<PresetsPage />} />
           <Route path="reports" element={<SavedReportsPage />} />
         </Route>

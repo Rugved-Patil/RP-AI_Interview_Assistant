@@ -48,15 +48,15 @@ export function HomePage() {
 
         <div className="home__grid">
           <Link to="/mock-interview?type=technical" className="mode-card">
-            <span className="mode-card__badge mode-card__badge--accent">Voice & Text</span>
+            <span className="mode-card__badge">Full Mock Interview</span>
             <h3 className="mode-card__title">Technical Mock Interview</h3>
             <p className="mode-card__body">
-              A comprehensive technical interview probing deep domain knowledge and system problem-solving.
+              A comprehensive technical interview probing deep domain knowledge, system design, and practical experience.
             </p>
           </Link>
 
           <Link to="/mock-interview?type=hr" className="mode-card">
-            <span className="mode-card__badge mode-card__badge--accent">Voice & Text</span>
+            <span className="mode-card__badge">Full Mock Interview</span>
             <h3 className="mode-card__title">HR & Behavioral Mock</h3>
             <p className="mode-card__body">
               A complete interview exploring past experience, culture fit, teamwork, and decision-making.

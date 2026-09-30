@@ -1,0 +1,292 @@
+[
+  {
+    "id": "swe-backend-001",
+    "question": "How would you design an idempotent API endpoint for processing financial payments or order placements? What mechanisms ensure safety against network retries and duplicate requests?",
+    "category": "technical",
+    "domain": "Software Engineering",
+    "tags": ["backend", "api-design", "idempotency", "distributed-systems", "databases"],
+    "difficulty": "mid",
+    "company_archetypes": ["fintech", "tech", "enterprise"],
+    "evaluation_criteria": "Look for idempotency keys (UUIDs) stored in Redis/database with TTL, unique transaction constraints, distributed locking (e.g. Redlock), two-phase commits or transactional outbox pattern, and returning cached responses for duplicate idempotency keys."
+  },
+  {
+    "id": "swe-backend-002",
+    "question": "Explain the trade-offs between database indexing strategies (B-Tree vs. Hash vs. LSM-Tree). When would an index degrade database performance rather than improve it?",
+    "category": "technical",
+    "domain": "Software Engineering",
+    "tags": ["backend", "databases", "indexing", "performance", "storage-engines"],
+    "difficulty": "mid",
+    "company_archetypes": ["tech", "enterprise", "faang"],
+    "evaluation_criteria": "Evaluates understanding of write amplification during inserts/updates, index maintenance overhead, index selectivity/cardinality, composite index column ordering, and storage engine mechanics (B-Tree in Postgres/MySQL vs LSM-tree in RocksDB/Cassandra for write-heavy workloads)."
+  },
+  {
+    "id": "swe-backend-003",
+    "question": "How do you mitigate the 'Thundering Herd' problem and Cache Penetration / Cache Breakdown in a high-traffic microservices backend using Redis?",
+    "category": "technical",
+    "domain": "Software Engineering",
+    "tags": ["backend", "caching", "redis", "concurrency", "distributed-systems"],
+    "difficulty": "senior",
+    "company_archetypes": ["tech", "faang", "startup"],
+    "evaluation_criteria": "Looks for mutex/distributed locking (SingleFlight / lock on miss), probabilistic early expiration (XFetch algorithm), Bloom filters for non-existent keys (cache penetration), jitter/randomized TTLs (cache avalanche), and fallback default values."
+  },
+  {
+    "id": "swe-backend-004",
+    "question": "In an asynchronous Python or Node.js backend, what causes event loop blocking and how do you profile and prevent CPU-bound tasks from starving I/O throughput?",
+    "category": "technical",
+    "domain": "Software Engineering",
+    "tags": ["backend", "concurrency", "async", "performance", "python", "nodejs"],
+    "difficulty": "senior",
+    "company_archetypes": ["tech", "startup"],
+    "evaluation_criteria": "Understanding of single-threaded event loops, non-blocking I/O vs synchronous CPU tasks (JSON parsing, regex, cryptography), thread pools / worker processes (ProcessPoolExecutor, worker threads), and profiling tools."
+  },
+  {
+    "id": "swe-backend-005",
+    "question": "Describe how database transaction isolation levels (Read Uncommitted, Read Committed, Repeatable Read, Serializable) prevent anomalies like dirty reads, non-repeatable reads, and phantom reads.",
+    "category": "technical",
+    "domain": "Software Engineering",
+    "tags": ["backend", "databases", "transactions", "acid", "sql"],
+    "difficulty": "mid",
+    "company_archetypes": ["enterprise", "fintech", "tech"],
+    "evaluation_criteria": "Clear explanation of ACID properties, Multi-Version Concurrency Control (MVCC), snapshot isolation, row-level locks vs predicate locks, and performance trade-offs of serialization."
+  },
+  {
+    "id": "fe-react-001",
+    "question": "How does the React Virtual DOM reconciliation algorithm work (Fiber architecture)? Under what circumstances can improper key usage cause rendering bugs or performance degradation in dynamic lists?",
+    "category": "technical",
+    "domain": "Frontend",
+    "tags": ["frontend", "react", "virtual-dom", "rendering", "javascript"],
+    "difficulty": "mid",
+    "company_archetypes": ["tech", "startup", "faang"],
+    "evaluation_criteria": "Looks for diffing heuristics (O(n) tree comparison, component type identity, persistent keys), Fiber unit-of-work scheduling, problems with array indexes as keys (state retention bugs, unnecessary DOM re-creation), and stable identifier generation."
+  },
+  {
+    "id": "fe-perf-002",
+    "question": "Walk through your strategy for diagnosing and improving Core Web Vitals (specifically LCP, INP, and CLS) in a modern client-heavy single-page web application.",
+    "category": "technical",
+    "domain": "Frontend",
+    "tags": ["frontend", "performance", "web-vitals", "optimization", "browser"],
+    "difficulty": "senior",
+    "company_archetypes": ["tech", "faang", "e-commerce"],
+    "evaluation_criteria": "LCP: resource prioritization, SSR/SSG, font preloading, CDN caching, image formats (WebP/AVIF). INP: breaking long tasks, yield to main thread (requestIdleCallback, startTransition), debouncing event listeners. CLS: explicit aspect ratios on media, reserve layout space for ads/skeletons, avoid injecting DOM above the fold."
+  },
+  {
+    "id": "fe-sec-003",
+    "question": "How do you protect a modern Single Page Application (SPA) against Cross-Site Scripting (XSS) and Cross-Site Request Forgery (CSRF)? Where should session tokens (JWT vs. HttpOnly cookies) be stored and why?",
+    "category": "technical",
+    "domain": "Frontend",
+    "tags": ["frontend", "security", "xss", "csrf", "auth", "cookies"],
+    "difficulty": "mid",
+    "company_archetypes": ["fintech", "enterprise", "tech"],
+    "evaluation_criteria": "Understands HttpOnly + Secure + SameSite=Strict/Lax cookies vs localStorage (vulnerable to XSS), Content Security Policy (CSP) headers, input sanitization/DOMPurify, anti-CSRF double-submit cookies or custom headers."
+  },
+  {
+    "id": "fe-state-004",
+    "question": "Compare modern frontend state management patterns: global stores (Redux/Zustand), atomic state (Jotai/Recoil), and server state management (TanStack Query / SWR). How do you decide which to use?",
+    "category": "technical",
+    "domain": "Frontend",
+    "tags": ["frontend", "react", "state-management", "architecture"],
+    "difficulty": "mid",
+    "company_archetypes": ["tech", "startup"],
+    "evaluation_criteria": "Distinguishing server cache state (caching, deduplication, invalidation, background refetching) from client UI state; avoiding over-centralized global stores for local component state; performance implications of re-renders and selectors."
+  },
+  {
+    "id": "ml-nlp-001",
+    "question": "Explain the self-attention mechanism in the Transformer architecture. How does scaled dot-product attention compute token relationships and why is the scaling factor sqrt(d_k) necessary?",
+    "category": "technical",
+    "domain": "Machine Learning",
+    "tags": ["ml", "nlp", "transformers", "deep-learning", "attention", "ai"],
+    "difficulty": "mid",
+    "company_archetypes": ["tech", "faang", "ai-startup"],
+    "evaluation_criteria": "Query, Key, Value matrix projections; attention score formula softmax(Q * K^T / sqrt(d_k)) * V; reason for scaling factor: large dot-products push softmax into regions with vanishing gradients; multi-head attention enabling attending to information from different representation subspaces."
+  },
+  {
+    "id": "ml-eval-002",
+    "question": "When evaluating an imbalanced classification model (e.g. fraud detection with 0.1% positive rate), why is ROC-AUC misleading, and how do Precision-Recall AUC, Cost-Sensitive Learning, and Focal Loss help?",
+    "category": "technical",
+    "domain": "Machine Learning",
+    "tags": ["ml", "evaluation", "classification", "metrics", "imbalanced-data"],
+    "difficulty": "mid",
+    "company_archetypes": ["fintech", "enterprise", "tech"],
+    "evaluation_criteria": "ROC-AUC uses False Positive Rate (FP / (FP+TN)), which remains tiny when True Negatives dominate; PR-AUC focuses on Precision (TP / (TP+FP)) and Recall (TP / (TP+FN)); threshold tuning based on business cost matrix; focal loss down-weighting easy negatives."
+  },
+  {
+    "id": "ml-genai-003",
+    "question": "In building an enterprise RAG (Retrieval-Augmented Generation) system, how do you solve chunk boundary loss, semantic retrieval degradation, and hallucination during LLM context synthesis?",
+    "category": "technical",
+    "domain": "Machine Learning",
+    "tags": ["ml", "rag", "llm", "embeddings", "vector-search", "genai"],
+    "difficulty": "senior",
+    "company_archetypes": ["tech", "ai-startup", "enterprise"],
+    "evaluation_criteria": "Chunking strategies (parent-child documents, semantic chunking, sliding windows with overlap); hybrid search (BM25 + dense vector embeddings with Reciprocal Rank Fusion); cross-encoder reranking; context trimming and citation grounding; guardrails and evaluation frameworks (e.g. RAGAS)."
+  },
+  {
+    "id": "ml-train-004",
+    "question": "What is the difference between Parameter-Efficient Fine-Tuning (PEFT/LoRA), full fine-tuning, and in-context learning? How does low-rank adaptation (LoRA) reduce GPU VRAM requirements mathematically?",
+    "category": "technical",
+    "domain": "Machine Learning",
+    "tags": ["ml", "llm", "fine-tuning", "lora", "deep-learning", "ai"],
+    "difficulty": "senior",
+    "company_archetypes": ["tech", "ai-startup", "faang"],
+    "evaluation_criteria": "Freezing base model weights W_0 (d x k) and introducing low-rank decomposition matrices B (d x r) and A (r x k) where r << min(d, k); saving memory on optimizer states (Adam momentum/variance) for frozen parameters; catastrophic forgetting mitigation and adapter merging."
+  },
+  {
+    "id": "ml-ds-005",
+    "question": "How do you detect and prevent data leakage and covariate shift in machine learning training and production deployment pipelines?",
+    "category": "technical",
+    "domain": "Machine Learning",
+    "tags": ["ml", "data-science", "mlops", "data-leakage", "feature-engineering"],
+    "difficulty": "mid",
+    "company_archetypes": ["enterprise", "fintech", "tech"],
+    "evaluation_criteria": "Target leakage, temporal leakage in time-series data; fitting transformers/scalers only on training fold inside cross-validation; feature store point-in-time correctness; statistical distribution drift monitoring (PSI, KS-test, Wasserstein distance)."
+  },
+  {
+    "id": "sd-dist-001",
+    "question": "Design a globally distributed URL shortening service (like Bitly) handling 100M new URLs created per month and 10B clicks per month. How do you generate unique short keys, handle caching, and ensure 99.99% availability?",
+    "category": "technical",
+    "domain": "System Design",
+    "tags": ["system-design", "distributed-systems", "scalability", "caching", "databases"],
+    "difficulty": "senior",
+    "company_archetypes": ["faang", "tech", "enterprise"],
+    "evaluation_criteria": "Base62 encoding, unique ID generation (distributed Snowflake ID generator vs Pre-generated key generator service vs counter), high read-to-write ratio (100:1) with Redis Cache-Aside, database sharding/replication, 301 vs 302 HTTP redirect trade-offs, analytics asynchronously queued via Kafka."
+  },
+  {
+    "id": "sd-dist-002",
+    "question": "Design a distributed API Rate Limiter supporting multi-tier throttling (e.g. 100 req/min per user, 10,000 req/sec cluster-wide). Compare Token Bucket, Leaky Bucket, and Sliding Window Log algorithms.",
+    "category": "technical",
+    "domain": "System Design",
+    "tags": ["system-design", "rate-limiting", "distributed-systems", "algorithms", "redis"],
+    "difficulty": "senior",
+    "company_archetypes": ["tech", "faang", "fintech"],
+    "evaluation_criteria": "Detailed trade-offs of Token Bucket vs Sliding Window Counter; distributed state synchronization using Redis Lua scripts to avoid race conditions; handling distributed clock skew; tiering at API gateway level vs client SDK fallback with HTTP 429 Retry-After headers."
+  },
+  {
+    "id": "sd-dist-003",
+    "question": "Design a real-time messaging and chat application (like WhatsApp or Slack) that supports 1-on-1 messaging, group chats with hundreds of users, and reliable message delivery with read receipts.",
+    "category": "technical",
+    "domain": "System Design",
+    "tags": ["system-design", "websockets", "messaging", "pubsub", "scalability"],
+    "difficulty": "senior",
+    "company_archetypes": ["faang", "tech", "startup"],
+    "evaluation_criteria": "Persistent connections (WebSocket / gRPC bidirectional streaming), connection gateway session routing via Redis pub/sub or service registry, message ordering with sequential message IDs, offline message storage and push notifications, group fan-out strategies (fan-out on write vs fan-out on read)."
+  },
+  {
+    "id": "sd-dist-004",
+    "question": "Explain the CAP theorem and PACELC theorem. In what scenarios would you choose an AP (Available / Partition-tolerant) architecture over a CP (Consistent / Partition-tolerant) architecture in production?",
+    "category": "technical",
+    "domain": "System Design",
+    "tags": ["system-design", "distributed-systems", "cap-theorem", "databases", "consistency"],
+    "difficulty": "mid",
+    "company_archetypes": ["enterprise", "tech", "fintech"],
+    "evaluation_criteria": "CAP definitions under network partitions; PACELC extension for normal latency/consistency trade-offs (e.g. DynamoDB vs Spanner); concrete examples: e-commerce shopping cart (AP) vs banking financial ledger (CP); eventual consistency models and conflict resolution (CRDTs, vector clocks)."
+  },
+  {
+    "id": "dsa-algo-001",
+    "question": "How does a Hash Table resolve hash collisions under the hood (Chaining vs Open Addressing / Linear Probing)? What factors dictate when a hash table dynamically resizes, and what is the amortized time complexity?",
+    "category": "technical",
+    "domain": "Data Structures & Algorithms",
+    "tags": ["dsa", "algorithms", "hash-table", "data-structures", "complexity"],
+    "difficulty": "junior",
+    "company_archetypes": ["tech", "faang", "enterprise"],
+    "evaluation_criteria": "Load factor threshold (typically 0.7-0.75), rehashing all keys into a doubled bucket array, O(1) average lookup vs O(n) worst-case collision degradation, tombstone markers in open addressing, worst-case DoS vulnerability with crafted hash collisions."
+  },
+  {
+    "id": "dsa-algo-002",
+    "question": "Explain the mechanics and design of an LRU (Least Recently Used) Cache that achieves O(1) Get and O(1) Put operations. Which combined data structures make this possible?",
+    "category": "technical",
+    "domain": "Data Structures & Algorithms",
+    "tags": ["dsa", "lru-cache", "hash-map", "linked-list", "algorithms"],
+    "difficulty": "mid",
+    "company_archetypes": ["tech", "faang", "startup"],
+    "evaluation_criteria": "Combination of a Hash Map (O(1) key-to-node pointer lookup) and a Doubly Linked List (O(1) node removal and insertion to head/tail); eviction of the tail node on capacity overflow; concurrency considerations (read/write locks)."
+  },
+  {
+    "id": "dsa-algo-003",
+    "question": "When approaching dynamic programming problems, how do you identify the optimal substructure and overlapping subproblems? Compare Top-Down (Memoization) with Bottom-Up (Tabulation) regarding space and call-stack limits.",
+    "category": "technical",
+    "domain": "Data Structures & Algorithms",
+    "tags": ["dsa", "dynamic-programming", "algorithms", "recursion", "complexity"],
+    "difficulty": "mid",
+    "company_archetypes": ["tech", "faang"],
+    "evaluation_criteria": "Defining state variables and state transition recurrence relation; recursion stack depth overhead vs cache locality in bottom-up arrays; space optimization (e.g. rolling array variables reducing O(n) space to O(1))."
+  },
+  {
+    "id": "devops-infra-001",
+    "question": "In a Kubernetes production cluster, what happens step-by-step when a pod receives a SIGTERM signal during a rolling deployment? How do you prevent dropped active connections using readiness probes and preStop hooks?",
+    "category": "technical",
+    "domain": "DevOps & Cloud",
+    "tags": ["devops", "kubernetes", "containers", "cloud", "reliability"],
+    "difficulty": "senior",
+    "company_archetypes": ["tech", "enterprise", "fintech"],
+    "evaluation_criteria": "Kubelet marking pod Terminating and removing from Service Endpoints asynchronously while sending SIGTERM; race condition where iptables/kube-proxy hasn't updated yet; using preStop sleep hook (e.g. sleep 5-10s) to allow existing traffic to finish; terminationGracePeriodSeconds tuning; graceful HTTP server shutdown."
+  },
+  {
+    "id": "devops-infra-002",
+    "question": "Compare Canary Deployments, Blue-Green Deployments, and Rolling Updates. How do you automate rollback triggers based on Prometheus error budget or latency SLI metrics?",
+    "category": "technical",
+    "domain": "DevOps & Cloud",
+    "tags": ["devops", "ci-cd", "deployments", "monitoring", "sre"],
+    "difficulty": "mid",
+    "company_archetypes": ["tech", "enterprise", "startup"],
+    "evaluation_criteria": "Traffic splitting at service mesh / ingress (e.g. Argo Rollouts / Flagger / Istio); monitoring HTTP 5xx error rate and p99 latency deltas; automated progressive step weighting (10% -> 25% -> 50% -> 100%) with immediate automated rollback on threshold breach."
+  },
+  {
+    "id": "behav-star-001",
+    "question": "Tell me about a time when you were faced with an ambiguous or poorly specified technical requirement. How did you break down the problem, align stakeholders, and deliver results?",
+    "category": "behavioral",
+    "domain": "Behavioral",
+    "tags": ["behavioral", "leadership", "ambiguity", "ownership", "star-method"],
+    "difficulty": "mid",
+    "company_archetypes": ["tech", "startup", "faang", "enterprise"],
+    "evaluation_criteria": "STAR methodology: Specific situation context, proactive initiative in interviewing users/stakeholders, drafting RFC/design doc with clear options and trade-offs, iterative MVP validation, and measurable impact."
+  },
+  {
+    "id": "behav-star-002",
+    "question": "Describe a situation where you had a significant technical disagreement with a team member or senior engineer regarding architecture or design. How did you navigate the conflict and reach a resolution?",
+    "category": "behavioral",
+    "domain": "Behavioral",
+    "tags": ["behavioral", "conflict-resolution", "collaboration", "teamwork", "star-method"],
+    "difficulty": "mid",
+    "company_archetypes": ["tech", "faang", "enterprise"],
+    "evaluation_criteria": "STAR structure: Focus on objective criteria (benchmarks, constraints, user impact) rather than ego; active listening to other perspectives; building consensus through prototyping or spikes; committed alignment once a decision was made (disagree and commit)."
+  },
+  {
+    "id": "behav-star-003",
+    "question": "Give an example of a project or production deployment that went wrong or failed to meet expectations. What was your personal accountability, what did you learn, and what preventive systems did you implement?",
+    "category": "behavioral",
+    "domain": "Behavioral",
+    "tags": ["behavioral", "failure", "ownership", "post-mortem", "reliability", "star-method"],
+    "difficulty": "senior",
+    "company_archetypes": ["tech", "faang", "startup", "enterprise"],
+    "evaluation_criteria": "STAR structure: Genuine ownership without blaming teammates; blameless post-mortem root cause analysis (5 Whys); concrete corrective actions (automated test suites, lint checks, alerting, runbooks) preventing future recurrence."
+  },
+  {
+    "id": "behav-star-004",
+    "question": "Tell me about a time you had to explain a complex technical concept or architecture to a non-technical stakeholder or client to gain their buy-in. How did you adjust your communication?",
+    "category": "behavioral",
+    "domain": "Behavioral",
+    "tags": ["behavioral", "communication", "stakeholder-management", "star-method"],
+    "difficulty": "junior",
+    "company_archetypes": ["enterprise", "consulting", "fintech", "startup"],
+    "evaluation_criteria": "STAR structure: Avoiding deep jargon and using relatable business analogies; tying technical trade-offs directly to business value, costs, timeline, and risk; checking for understanding and facilitating collaborative questions."
+  },
+  {
+    "id": "behav-star-005",
+    "question": "Describe a time when you had to prioritize between delivering a feature quickly under a tight deadline and taking the time to refactor tech debt or write thorough tests. How did you make that trade-off?",
+    "category": "behavioral",
+    "domain": "Behavioral",
+    "tags": ["behavioral", "prioritization", "tech-debt", "decision-making", "star-method"],
+    "difficulty": "senior",
+    "company_archetypes": ["startup", "tech", "enterprise"],
+    "evaluation_criteria": "STAR structure: Transparent communication of business risk with product managers; defining tactical vs strategic debt; creating follow-up tickets with explicit timeline commitments; adding critical path automated safety nets."
+  },
+  {
+    "id": "behav-star-006",
+    "question": "Tell me about a project where you took the initiative to improve an existing process, tool, or codebase without being explicitly asked by your manager. What drove you and what was the outcome?",
+    "category": "behavioral",
+    "domain": "Behavioral",
+    "tags": ["behavioral", "proactivity", "ownership", "continuous-improvement", "star-method"],
+    "difficulty": "junior",
+    "company_archetypes": ["tech", "startup", "faang"],
+    "evaluation_criteria": "STAR structure: Identifying team pain points (e.g. slow CI build times, flaky tests, lack of documentation); creating a working POC on own initiative; measurable productivity improvement for the whole team."
+  }
+]

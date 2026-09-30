@@ -22,6 +22,7 @@ from __future__ import annotations
 
 from fastapi import APIRouter, HTTPException
 
+from app.core.config import get_settings
 from app.schemas.session import (
     CreateSessionRequest,
     CreateSessionResponse,
@@ -29,6 +30,7 @@ from app.schemas.session import (
     SubmitAnswerResponse,
 )
 from app.services.llm import LLMProviderError, LLMRole, Message, Role, get_provider
+from app.services.rag import format_grounding_block, get_rag_retriever
 from app.services.session_store import create_session, get_session
 
 router = APIRouter(prefix="/sessions", tags=["sessions"])
@@ -51,9 +53,8 @@ def _build_interviewer_prompt(role: str, company: str | None, location: str | No
     knowledge or problem-solving, not "coding" - so it still makes sense for
     a role that isn't software-related.
 
-    Deliberately separate from the grading prompt in grading.py (scope doc
-    Section 7.2: interviewer vs. grading personas are distinct prompts,
-    iterated on empirically - this is a first pass, not a final version).
+    Phase 3: When RAG is enabled, retrieves relevant exemplar questions from
+    the curated question bank to ground question generation.
     """
     persona = f"You are a technical interviewer for a {role} role"
     if company:
@@ -68,6 +69,20 @@ def _build_interviewer_prompt(role: str, company: str | None, location: str | No
         "questions, do not number them, do not add preamble, explanation, or "
         "commentary. Reply with nothing but the question itself."
     )
+
+    settings = get_settings()
+    if settings.rag_enabled:
+        retriever = get_rag_retriever()
+        exemplars = retriever.retrieve(
+            query=role,
+            category="technical",
+            role=role,
+            company=company,
+            top_k=settings.rag_top_k,
+        )
+        if exemplars:
+            persona += format_grounding_block(exemplars)
+
     return persona
 
 
@@ -75,6 +90,8 @@ def _build_behavioral_interviewer_prompt(role: str, company: str | None, locatio
     """
     Builds the behavioral interviewer persona prompt around role/company/location.
     Generates a single open-ended behavioral question (e.g. STAR prompt).
+
+    Phase 3: When RAG is enabled, retrieves relevant behavioral exemplars to ground question generation.
     """
     persona = f"You are a behavioral interviewer conducting an interview for a {role} role"
     if company:
@@ -90,6 +107,20 @@ def _build_behavioral_interviewer_prompt(role: str, company: str | None, locatio
         "Do not ask multiple questions, do not number them, do not add preamble, explanation, or "
         "commentary. Reply with nothing but the question itself."
     )
+
+    settings = get_settings()
+    if settings.rag_enabled:
+        retriever = get_rag_retriever()
+        exemplars = retriever.retrieve(
+            query=role,
+            category="behavioral",
+            role=role,
+            company=company,
+            top_k=settings.rag_top_k,
+        )
+        if exemplars:
+            persona += format_grounding_block(exemplars)
+
     return persona
 
 

@@ -55,6 +55,12 @@ class Settings(BaseSettings):
     # user explicitly hits "Save this report".
     database_url: str = "sqlite:///./interview_reports.db"
 
+    # --- Local RAG Pipeline & Question Bank (Phase 3) -------------------------
+    # When enabled, retrieves relevant exemplar questions from the local curated
+    # question bank to ground interviewer question generation with industry standards.
+    rag_enabled: bool = True
+    rag_top_k: int = 3
+
 
 @lru_cache
 def get_settings() -> Settings:

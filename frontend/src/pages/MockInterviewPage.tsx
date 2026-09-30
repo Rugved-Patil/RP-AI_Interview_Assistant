@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { Link, useSearchParams } from 'react-router-dom'
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import {
   API_BASE_URL,
   MAX_ANSWER_LENGTH,
@@ -62,6 +62,7 @@ type MockStage =
   | { name: 'error'; message: string }
 
 export function MockInterviewPage() {
+  const navigate = useNavigate()
   const [searchParams] = useSearchParams()
   const urlType: InterviewType = searchParams.get('type') === 'hr' ? 'hr' : 'technical'
   const [overrideType, setOverrideType] = useState<InterviewType | null>(null)
@@ -319,16 +320,22 @@ export function MockInterviewPage() {
 
   return (
     <div className="page-section">
-      <Link
-        to="/"
+      <button
+        type="button"
         className="page-back"
         onClick={() => {
           stopListening()
           cancelSpeech()
+          if (window.history.length > 1) {
+            navigate(-1)
+          } else {
+            navigate('/')
+          }
         }}
+        style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer' }}
       >
-        ← All practice modes
-      </Link>
+        ← Back
+      </button>
 
       <div className="mock-card">
         <p className="mock-card__eyebrow">

@@ -29,6 +29,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from app.api.routes.grading import GradeParseError, _parse_grade
+from app.core.config import get_settings
 from app.db.base import get_db
 from app.db.models import SavedInterviewReport
 from app.schemas.interview import (
@@ -53,6 +54,7 @@ from app.services.interview_store import (
     get_interview,
 )
 from app.services.llm import LLMProviderError, LLMRole, Message, Role, get_provider
+from app.services.rag import format_grounding_block, get_rag_retriever
 
 logger = logging.getLogger(__name__)
 
@@ -86,6 +88,9 @@ def _build_mock_interviewer_prompt(
     the session at creation time and resent with every turn along with the
     growing transcript (scope doc Section 3.5).
 
+    Phase 3: When RAG is enabled, retrieves relevant exemplar questions from
+    the curated question bank to ground interviewer dialogue.
+
     Deliberately separate from:
       - the single-question prompt in sessions.py (different mode)
       - the holistic grading prompt that will grade the full transcript
@@ -113,7 +118,7 @@ def _build_mock_interviewer_prompt(
 
     persona += f". The candidate has {experience_level.value}-level experience."
 
-    return (
+    prompt_body = (
         f"{persona}\n\n"
         f"{focus}\n\n"
         "Conduct a natural, professional interview. Ask ONE question at a time. "
@@ -130,6 +135,24 @@ def _build_mock_interviewer_prompt(
         "very end of your reply. Do not use [END_INTERVIEW] in your opening "
         "question."
     )
+
+    settings = get_settings()
+    if settings.rag_enabled:
+        retriever = get_rag_retriever()
+        category_filter = "behavioral" if interview_type is InterviewType.HR else "technical"
+        difficulty_filter = experience_level.value if experience_level.value in ("junior", "mid", "senior", "lead") else None
+        exemplars = retriever.retrieve(
+            query=role,
+            category=category_filter,  # type: ignore[arg-type]
+            difficulty=difficulty_filter,  # type: ignore[arg-type]
+            role=role,
+            company=company,
+            top_k=settings.rag_top_k,
+        )
+        if exemplars:
+            prompt_body += format_grounding_block(exemplars)
+
+    return prompt_body
 
 
 def _build_mock_grader_prompt(

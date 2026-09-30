@@ -276,3 +276,104 @@ export function deleteInterviewReport(reportId: number): Promise<DeleteInterview
     method: 'DELETE',
   }).then(parseOrThrow<DeleteInterviewReportResponse>)
 }
+
+// --- Question Bank & Local RAG (Phase 3) -------------------------------------
+
+export interface QuestionDoc {
+  id: string
+  question: string
+  category: 'technical' | 'behavioral'
+  domain: string
+  tags: string[]
+  difficulty: 'junior' | 'mid' | 'senior' | 'lead'
+  company_archetypes?: string[]
+  evaluation_criteria?: string | null
+}
+
+export interface RetrievedQuestion {
+  id: string
+  question: string
+  category: string
+  domain: string
+  tags: string[]
+  difficulty: string
+  score: number
+  matched_tags: string[]
+  evaluation_criteria?: string | null
+}
+
+export interface QuestionListResponse {
+  total: number
+  items: QuestionDoc[]
+}
+
+export interface DomainStatItem {
+  domain: string
+  count: number
+  categories: string[]
+}
+
+export interface QuestionBankStats {
+  total_questions: number
+  domains: DomainStatItem[]
+  tags: string[]
+  difficulties: string[]
+  categories: string[]
+}
+
+export interface RAGSearchRequest {
+  query: string
+  category?: 'technical' | 'behavioral'
+  domain?: string
+  difficulty?: 'junior' | 'mid' | 'senior' | 'lead'
+  role?: string
+  company?: string
+  top_k?: number
+}
+
+export interface RAGSearchResponse {
+  query: string
+  total_found: number
+  retrieved_questions: RetrievedQuestion[]
+  grounding_snippet?: string | null
+}
+
+export interface QuestionFilters {
+  category?: 'technical' | 'behavioral'
+  domain?: string
+  difficulty?: 'junior' | 'mid' | 'senior' | 'lead'
+  tag?: string
+  search?: string
+  limit?: number
+  offset?: number
+}
+
+export function listQuestionBank(filters?: QuestionFilters): Promise<QuestionListResponse> {
+  const params = new URLSearchParams()
+  if (filters?.category) params.append('category', filters.category)
+  if (filters?.domain) params.append('domain', filters.domain)
+  if (filters?.difficulty) params.append('difficulty', filters.difficulty)
+  if (filters?.tag) params.append('tag', filters.tag)
+  if (filters?.search) params.append('search', filters.search)
+  if (filters?.limit) params.append('limit', String(filters.limit))
+  if (filters?.offset) params.append('offset', String(filters.offset))
+
+  const queryString = params.toString() ? `?${params.toString()}` : ''
+  return fetch(`${API_BASE_URL}/questions${queryString}`).then(parseOrThrow<QuestionListResponse>)
+}
+
+export function getQuestionBankStats(): Promise<QuestionBankStats> {
+  return fetch(`${API_BASE_URL}/questions/domains`).then(parseOrThrow<QuestionBankStats>)
+}
+
+export function searchRAG(body: RAGSearchRequest): Promise<RAGSearchResponse> {
+  return fetch(`${API_BASE_URL}/questions/search`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  }).then(parseOrThrow<RAGSearchResponse>)
+}
+
+export function getQuestionById(id: string): Promise<QuestionDoc> {
+  return fetch(`${API_BASE_URL}/questions/${id}`).then(parseOrThrow<QuestionDoc>)
+}
