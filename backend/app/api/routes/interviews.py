@@ -169,37 +169,68 @@ def _build_mock_grader_prompt(
     from the full transcript, using a separate 'grading' prompt distinct from the
     'interviewer' prompt used during the conversation."
 
-    Calibrates expectations to the specific role, experience level, and
-    HR vs Technical interview focus.
+    Enforces evidence-based evaluation, calibrated scoring (0-10), strict depth
+    assessment, explicit recognition of unverified skills, and structured feedback.
     """
-    context = f"a {role} role"
+    context = f"Target Role: {role}\nExperience Level: {experience_level.value}"
     if company:
-        context += f" at {company}"
+        context += f"\nTarget Company: {company}"
     if location:
-        context += f" (location: {location})"
-    context += f" with {experience_level.value}-level experience expectations"
+        context += f"\nLocation: {location}"
 
     if interview_type is InterviewType.HR:
-        focus = (
-            "Evaluate the candidate holistically on communication skills, behavioral fit, "
-            "clarity, structure (such as STAR method), motivation, and interpersonal effectiveness. "
-            "Consider whether answers showed genuine reflection, self-awareness, and team collaboration."
+        domain_guidelines = (
+            "EVALUATION CRITERIA (BEHAVIORAL / HR FOCUS):\n"
+            "- Communication & Structure: Assess clarity, conciseness, and use of structured storytelling (e.g., STAR method: Situation, Task, Action, Result).\n"
+            "- Behavioral Competence: Look for demonstrated ownership, conflict resolution, collaboration, adaptability, leadership, and self-awareness.\n"
+            "- Evidence vs. Generic Claims: Credit specific actions taken and measurable outcomes rather than vague assertions or generic buzzwords."
         )
     else:
-        focus = (
-            "Evaluate the candidate holistically on technical depth, problem-solving ability, "
-            "system thinking, conceptual accuracy, and handling of technical nuances. "
-            "Consider whether answers demonstrated hands-on mastery appropriate for their level."
+        domain_guidelines = (
+            "EVALUATION CRITERIA (TECHNICAL FOCUS):\n"
+            "- Conceptual Accuracy & Correctness: Identify factual errors, flawed assumptions, or misapplied concepts. Do not penalize reasonable simplifications that do not affect core correctness.\n"
+            "- Depth & Technical Reasoning: Distinguish between merely naming buzzwords (e.g., FSDP, FlashAttention, RoPE, Kubernetes, RAG) and demonstrating genuine mastery (explaining how/why it works, trade-offs, edge cases, and limitations).\n"
+            "- Problem-Solving & Architecture: Assess ability to reason through architectural decisions, system constraints, trade-offs, and practical failure modes."
         )
 
     return (
-        f"You are an expert interviewer and evaluator reviewing a complete mock interview transcript for {context}.\n\n"
-        f"{focus}\n\n"
-        f"Evaluate the candidate's performance across the entire conversation. "
-        f"Calibrate your assessment to what is realistic and expected for a {experience_level.value}-level candidate.\n\n"
-        "Reply with EXACTLY this format and nothing else:\n"
+        "You are an expert, objective, and calibrated interview evaluator assessing a complete mock interview transcript.\n\n"
+        f"{context}\n\n"
+        f"{domain_guidelines}\n\n"
+        "CORE EVALUATION PRINCIPLES:\n"
+        "1. Evidence Over Inference: Only award credit for competencies and knowledge explicitly demonstrated in the candidate's answers. Do not assume unstated skills or hands-on mastery without concrete evidence.\n"
+        "2. Level Calibration: Evaluate expectations relative to the candidate's stated experience level (Fresher / Mid-Level / Senior / Lead). Do not demand senior-level architecture depth from a fresher, but do NOT inflate scores or award unearned credit simply because the candidate is junior.\n"
+        "3. Resist Generic Praise & Inflation: Avoid buzzword praise (e.g., 'exceptional', 'outstanding', 'industry-grade', 'expert-level') unless the transcript provides rigorous evidence justifying it. High scores (9-10) are reserved for exceptional mastery, trade-off analysis, and precision.\n"
+        "4. Scope & Unverified Skills: Clearly distinguish between skills that were tested vs. skills not evaluated in this conversation (e.g., live coding, hands-on debugging, production incident response, or database optimization if not asked).\n"
+        "5. Evidence-Backed Findings: Every strength and area for improvement MUST cite specific examples, concepts, or statements from the candidate's answers. Do not hallucinate or fabricate quotes.\n\n"
+        "SCORING RUBRIC (0 to 10 Scale):\n"
+        "- 10 (Exceptional): Flawless or near-flawless mastery for their level; insightful trade-off analysis, practical depth, nuance, and clear communication.\n"
+        "- 9 (Excellent): Consistently strong across all questions; deep conceptual understanding and clear reasoning, well above standard expectations.\n"
+        "- 8 (Strong): Solid competence; correct explanations with sound reasoning; minor omissions or slight lack of deeper trade-offs.\n"
+        "- 7 (Good): Generally competent and mostly correct; meets standard expectations for the level, but remains somewhat high-level or misses deeper nuances.\n"
+        "- 6 (Adequate): Basic understanding shown, but noticeable gaps, shallow reasoning, or missed key aspects of questions.\n"
+        "- 5 (Mixed): Uneven performance; some valid points mixed with notable errors, vague generalities, or conceptual ambiguity.\n"
+        "- 3-4 (Weak): Frequent misunderstandings, incorrect claims, or inability to answer core technical/behavioral requirements.\n"
+        "- 1-2 (Very Weak): Severe lack of relevant knowledge, major inaccuracies, or incoherent answers.\n"
+        "- 0 (Inadequate): No meaningful attempt or completely irrelevant responses.\n\n"
+        "REQUIRED OUTPUT FORMAT:\n"
+        "Respond with EXACTLY the following format and nothing else:\n\n"
         "SCORE: <an integer from 0 to 10>\n"
-        "FEEDBACK: <detailed, structured, and constructive feedback highlighting overall strengths and specific areas for improvement across the interview>"
+        "FEEDBACK:\n"
+        "### Overall Impression\n"
+        "<2-4 sentences summarizing candidate's demonstrated performance calibrated to their target role and level>\n\n"
+        "### Key Strengths\n"
+        "- <Strength 1 referencing specific evidence from answers>\n"
+        "- <Strength 2 referencing specific evidence from answers>\n"
+        "- <Strength 3 referencing specific evidence from answers>\n\n"
+        "### Areas for Improvement\n"
+        "- <Area 1 referencing specific gaps, errors, or shallow explanations from answers>\n"
+        "- <Area 2 referencing specific gaps, errors, or shallow explanations from answers>\n\n"
+        "### Skills Not Fully Verified\n"
+        "- <Skill or domain area not tested or only touched superficially in this interview format>\n\n"
+        "### Recommended Preparation\n"
+        "- <Actionable preparation item 1 targeting identified gaps>\n"
+        "- <Actionable preparation item 2 targeting identified gaps>"
     )
 
 
