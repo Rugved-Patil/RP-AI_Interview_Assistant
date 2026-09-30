@@ -1,0 +1,351 @@
+/* ==========================================================================
+   AnalyticsPage.css (Phase 4: Advanced Analytics & Progress Tracking)
+   ========================================================================== */
+
+.analytics-page {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 1.5rem 1rem 3rem 1rem;
+}
+
+.page-back {
+  font-family: inherit;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: #57534e;
+  margin-bottom: 1rem;
+  display: inline-block;
+  transition: color 0.15s ease;
+}
+
+.page-back:hover {
+  color: #1c1917;
+  text-decoration: underline;
+}
+
+.analytics-header {
+  margin-bottom: 1.5rem;
+}
+
+.analytics-title {
+  font-size: 1.75rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: #1c1917;
+  margin: 0 0 0.5rem 0;
+}
+
+.analytics-subtitle {
+  font-size: 1rem;
+  color: #57534e;
+  margin: 0;
+  line-height: 1.5;
+  max-width: 720px;
+}
+
+/* --------------------------------------------------------------------------
+   Filter Control Bar
+   -------------------------------------------------------------------------- */
+.analytics-filter-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+  background-color: #fafaf9;
+  border: 1px solid #e7e5e4;
+  border-radius: 8px;
+  padding: 0.75rem 1.25rem;
+  margin-bottom: 1.75rem;
+}
+
+.filter-group {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.filter-label {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #78716c;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.filter-buttons {
+  display: flex;
+  gap: 0.35rem;
+  background-color: #e7e5e4;
+  padding: 0.2rem;
+  border-radius: 6px;
+}
+
+.filter-btn {
+  font-family: inherit;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  padding: 0.35rem 0.75rem;
+  border-radius: 4px;
+  border: none;
+  background: transparent;
+  color: #57534e;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.filter-btn:hover {
+  color: #1c1917;
+}
+
+.filter-btn--active {
+  background-color: #ffffff;
+  color: #1c1917;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+}
+
+/* --------------------------------------------------------------------------
+   Loading & Error States
+   -------------------------------------------------------------------------- */
+.analytics-loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 1.5rem;
+  color: #78716c;
+  gap: 1rem;
+}
+
+.analytics-spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid #e7e5e4;
+  border-top-color: #2563eb;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.analytics-error-banner {
+  background-color: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #991b1b;
+  padding: 1rem 1.25rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+}
+
+/* --------------------------------------------------------------------------
+   Empty State
+   -------------------------------------------------------------------------- */
+.analytics-empty-state {
+  background: #ffffff;
+  border: 1px dashed #d6d3d1;
+  border-radius: 12px;
+  padding: 3.5rem 2rem;
+  text-align: center;
+  max-width: 600px;
+  margin: 2rem auto;
+}
+
+.empty-state-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.empty-state-title {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: #1c1917;
+  margin: 0 0 0.75rem 0;
+}
+
+.empty-state-text {
+  font-size: 0.9375rem;
+  color: #57534e;
+  line-height: 1.5;
+  margin: 0 0 1.75rem 0;
+}
+
+.empty-state-actions {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.empty-cta {
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-decoration: none;
+  padding: 0.65rem 1.25rem;
+  border-radius: 6px;
+  transition: all 0.15s ease;
+}
+
+.empty-cta--primary {
+  background-color: #1c1917;
+  color: #ffffff;
+}
+
+.empty-cta--primary:hover {
+  background-color: #292524;
+}
+
+.empty-cta--secondary {
+  background-color: #ffffff;
+  color: #1c1917;
+  border: 1px solid #d6d3d1;
+}
+
+.empty-cta--secondary:hover {
+  background-color: #f5f5f4;
+}
+
+/* --------------------------------------------------------------------------
+   Dashboard Grid & Stat Cards
+   -------------------------------------------------------------------------- */
+.analytics-dashboard-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.summary-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+}
+
+@media (max-width: 900px) {
+  .summary-cards-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 500px) {
+  .summary-cards-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.stat-card {
+  background: #ffffff;
+  border: 1px solid #e7e5e4;
+  border-radius: 8px;
+  padding: 1.25rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.stat-card__eyebrow {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #78716c;
+  margin-bottom: 0.25rem;
+}
+
+.stat-card__val-row {
+  display: flex;
+  align-items: baseline;
+  gap: 0.35rem;
+  margin: 0.25rem 0 0.35rem 0;
+}
+
+.stat-card__main-val {
+  font-size: 1.85rem;
+  font-weight: 800;
+  color: #1c1917;
+  line-height: 1;
+}
+
+.stat-card__main-val--score {
+  color: #2563eb;
+}
+
+.trend-up {
+  color: #16a34a;
+}
+
+.trend-down {
+  color: #dc2626;
+}
+
+.stat-card__unit {
+  font-size: 0.8125rem;
+  color: #78716c;
+}
+
+.stat-card__subtext {
+  font-size: 0.75rem;
+  color: #78716c;
+  margin-top: 0.25rem;
+}
+
+.stat-card__domains-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin-top: 0.25rem;
+}
+
+.domain-pill {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.75rem;
+  padding: 0.2rem 0.45rem;
+  border-radius: 4px;
+}
+
+.domain-pill--strength {
+  background-color: #f0fdf4;
+  color: #166534;
+  border: 1px solid #bbf7d0;
+}
+
+.domain-pill--focus {
+  background-color: #fff7ed;
+  color: #9a3412;
+  border: 1px solid #ffedd5;
+}
+
+.domain-pill__label {
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 0.6875rem;
+}
+
+.domain-pill__name {
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Layout Sections */
+.dashboard-section {
+  width: 100%;
+}
+
+.dashboard-two-col {
+  display: grid;
+  grid-template-columns: 3fr 2fr;
+  gap: 1.5rem;
+}
+
+@media (max-width: 800px) {
+  .dashboard-two-col {
+    grid-template-columns: 1fr;
+  }
+}

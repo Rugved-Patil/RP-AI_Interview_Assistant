@@ -377,3 +377,108 @@ export function searchRAG(body: RAGSearchRequest): Promise<RAGSearchResponse> {
 export function getQuestionById(id: string): Promise<QuestionDoc> {
   return fetch(`${API_BASE_URL}/questions/${id}`).then(parseOrThrow<QuestionDoc>)
 }
+
+// --- Analytics & Progress Tracking (Phase 4) --------------------------------
+
+export interface AnalyticsSummary {
+  total_sessions: number
+  total_single_drills: number
+  total_mock_interviews: number
+  average_score: number
+  highest_score: number | null
+  lowest_score: number | null
+  recent_average: number | null
+  score_trend: number
+  single_average: number | null
+  mock_average: number | null
+  top_strength_domain: string | null
+  focus_domain: string | null
+}
+
+export interface ScoreDataPoint {
+  id: number
+  session_id: string
+  date: string
+  session_type: 'single_technical' | 'single_behavioral' | 'mock_technical' | 'mock_hr'
+  session_type_label: string
+  role: string | null
+  company: string | null
+  score: number
+  feedback_excerpt: string
+  word_count: number
+}
+
+export interface DomainBreakdown {
+  domain: string
+  category: 'technical' | 'behavioral' | 'general'
+  sessions_count: number
+  average_score: number
+  min_score: number
+  max_score: number
+  status: 'Strong' | 'Competent' | 'Needs Practice'
+}
+
+export interface ScoreDistribution {
+  mastered: number
+  proficient: number
+  developing: number
+  needs_work: number
+}
+
+export interface WeakSpotItem {
+  domain: string
+  topic: string
+  average_score: number
+  occurrences: number
+  reasons: string[]
+}
+
+export interface CommunicationInsights {
+  avg_word_count: number
+  conciseness_status: 'Concise' | 'Balanced' | 'Verbose' | 'Not Enough Data'
+  total_words_spoken_or_typed: number
+  common_strength_keywords: string[]
+  common_growth_keywords: string[]
+}
+
+export interface RecommendedDrill {
+  question_id: string
+  question: string
+  domain: string
+  category: string
+  difficulty: string
+  tags: string[]
+  reason: string
+}
+
+export interface AnalyticsDashboardResponse {
+  summary: AnalyticsSummary
+  timeline: ScoreDataPoint[]
+  domains: DomainBreakdown[]
+  score_distribution: ScoreDistribution
+  weak_spots: WeakSpotItem[]
+  communication: CommunicationInsights
+  recommended_drills: RecommendedDrill[]
+}
+
+export interface AnalyticsFilters {
+  timeframe?: number
+  session_type?: 'all' | 'mock' | 'single'
+}
+
+export function getAnalytics(filters?: AnalyticsFilters): Promise<AnalyticsDashboardResponse> {
+  const params = new URLSearchParams()
+  if (filters?.timeframe) params.append('timeframe', String(filters.timeframe))
+  if (filters?.session_type && filters.session_type !== 'all') {
+    params.append('session_type', filters.session_type)
+  }
+
+  const queryString = params.toString() ? `?${params.toString()}` : ''
+  return fetch(`${API_BASE_URL}/analytics${queryString}`).then(
+    parseOrThrow<AnalyticsDashboardResponse>,
+  )
+}
+
+export function getAnalyticsSummary(): Promise<AnalyticsSummary> {
+  return fetch(`${API_BASE_URL}/analytics/summary`).then(parseOrThrow<AnalyticsSummary>)
+}
