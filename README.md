@@ -71,7 +71,7 @@ Everything runs locally on your machine with a **\$0 budget** using free-tier LL
 | **Retrieval Engine** | Pure Python TF-IDF + BM25 Vector Store | Offline local RAG ($0 cost, no external vector DB) |
 | **Persistence** | SQLite via SQLAlchemy | Opt-in report storage and preset management |
 | **Voice I/O** | Web Speech API | Client-side STT dictation and TTS synthesis |
-| **Testing** | pytest, pytest-asyncio (211 tests) | 100% backend test suite with fake LLM providers |
+| **Testing** | pytest, pytest-asyncio (222 tests) | 100% backend test suite with fake LLM providers |
 
 ---
 
@@ -200,15 +200,40 @@ RP-AI_Interview_Assistant/
 
 ## Getting Started
 
-### Prerequisites
-- **Python 3.11+**
-- **Node.js 20.19+, 22.13+, or 24+**
-- Free API keys from [Groq Console](https://console.groq.com) and [Google AI Studio](https://aistudio.google.com)
+### ⚡ One-Command Instant Launch (Recommended)
+
+Start both the FastAPI backend and Vite frontend with a single command from the project root:
+
+```bash
+./run.sh                  # macOS / Linux
+# OR
+python start.py           # Windows / macOS / Linux
+```
+
+- **Local UI**: [http://localhost:5173](http://localhost:5173)
+- **API Docs**: [http://localhost:8000/docs](http://localhost:8000/docs)
 
 ---
 
-### Backend Setup
+### 🌐 Live Public Sharing (`--share`)
 
+Want to share your live practice platform with a friend, mentor, or family member anywhere in the world without deploying to the cloud?
+
+```bash
+./run.sh --share          # macOS / Linux
+# OR
+python start.py --share   # Cross-platform
+```
+
+- Generates an instant, secure public HTTPS tunnel (via Cloudflare or Localtunnel).
+- Anyone with the link can access and practice directly in their browser.
+- All sessions and reports they complete are saved directly to your local machine's database and update your live Analytics and Saved Reports repository!
+
+---
+
+### Manual Setup (Alternative)
+
+#### Backend Setup:
 1. Navigate to the backend directory and set up a virtual environment:
    ```bash
    cd backend
@@ -231,14 +256,9 @@ RP-AI_Interview_Assistant/
    ```bash
    uvicorn app.main:app --reload --port 8000
    ```
-   The API will be available at `http://localhost:8000`. Interactive OpenAPI documentation is at `http://localhost:8000/docs`.
 
----
-
-### Frontend Setup
-
+#### Frontend Setup:
 In a separate terminal:
-
 1. Navigate to the frontend directory:
    ```bash
    cd frontend
@@ -257,10 +277,11 @@ In a separate terminal:
 
 1. **Preset Setup**: When you first open the app, the Home page will prompt you to set up your primary interview preset (Target Role, Company, Location, and Seniority).
 2. **Practice Single Drills**: Select **Technical Questions** or **Behavioral (STAR)** on the Home page to practice focused questions with instant feedback. Use the mic button for voice dictation or the speaker button to listen to questions.
-3. **Run a Full Mock Interview**: Navigate to **Full Mock Interview**, choose your track (*Technical* or *Behavioral/HR*), select the domain and number of questions, and practice realistic conversational turn-taking.
-4. **Review Holistic Diagnostics**: Once an interview concludes, review your overall score, 5-dimensional breakdown, specific strengths, actionable growth areas, and transcript citations.
-5. **Track Progress**: Inspect your **Analytics** page to monitor your score trajectories and domain competency breakdown.
-6. **Customize**: Open **Settings** to choose from 8 linen themes and configure your preferred natural voice.
+3. **Interactive Coding Sandbox**: Navigate to **Live Coding Sandbox** to solve algorithm challenges, run unit test suites in real-time, get instant Big-O analysis & AI grading, and save your coding score to analytics.
+4. **Run a Full Mock Interview**: Navigate to **Full Mock Interview**, choose your track (*Technical* or *Behavioral/HR*), select the domain and number of questions, and practice realistic conversational turn-taking.
+5. **Review Holistic Diagnostics**: Once an interview concludes, review your overall score, 5-dimensional breakdown, specific strengths, actionable growth areas, and transcript citations.
+6. **Track Progress**: Inspect your **Analytics** page to monitor your score trajectories and domain competency breakdown.
+7. **Customize**: Open **Settings** to choose from 8 linen themes and configure your preferred natural voice.
 
 ---
 
@@ -273,7 +294,7 @@ The backend test suite covers all API routes, RAG vector retrieval, prompt gener
 cd backend
 pytest -v
 ```
-*(All 211 tests passing)*
+*(All 222 tests passing)*
 
 ### Frontend Verification
 Verify TypeScript types and ESLint conformance:

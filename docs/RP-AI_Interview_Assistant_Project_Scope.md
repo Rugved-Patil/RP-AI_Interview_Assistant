@@ -96,7 +96,8 @@ Both practice formats support browser-native voice interaction (STT speech recog
 | **RAG Engine** | Pure Python TF-IDF + BM25 Vector Store | Offline, zero-dependency, $0 cost |
 | **Database** | SQLite via SQLAlchemy ORM | Lightweight, zero-config local persistence |
 | **Voice I/O** | Web Speech API | Client-side STT dictation and TTS playback |
-| **Testing** | pytest, pytest-asyncio (211 tests) | Complete backend test coverage with mock providers |
+| **Testing** | pytest, pytest-asyncio (222 tests) | Complete backend test coverage with mock providers |
+| **DevOps & Sharing** | One-Command Launcher (`./run.sh` / `start.py`), Remote HTTPS Tunneling (`--share`) | Frictionless single-command local boot and remote zero-config live peer testing |
 
 ---
 
