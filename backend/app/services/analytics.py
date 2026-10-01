@@ -333,13 +333,13 @@ def compute_analytics(
     # Weak-Spots Detection (Competency Gap Analysis)
     weak_spots: list[WeakSpotItem] = []
     for d in domains_list:
-        if d.average_score < 7.5 or d.status == "Needs Practice":
+        if d.average_score < 8.0 or d.status == "Needs Practice" or d.min_score <= 7:
             reasons = []
-            if d.average_score < 6.0:
-                reasons.append("Frequent technical inaccuracies or incomplete solutions")
-            if d.min_score <= 5:
-                reasons.append("Score dips observed on high-difficulty questions")
-            reasons.append("Needs deeper trade-off comparisons and concrete examples")
+            if d.average_score < 6.5:
+                reasons.append("Frequent technical inaccuracies or incomplete explanations")
+            if d.min_score <= 7:
+                reasons.append(f"Score variance detected (min score {d.min_score}/10)")
+            reasons.append("Needs deeper trade-off comparisons and concrete metrics")
             weak_spots.append(
                 WeakSpotItem(
                     domain=d.domain,
@@ -405,6 +405,19 @@ def compute_analytics(
     )
 
 
+RAG_DOMAIN_MAP: dict[str, str] = {
+    "Machine Learning & AI": "Machine Learning",
+    "Machine Learning": "Machine Learning",
+    "Behavioral & HR": "Behavioral",
+    "Behavioral": "Behavioral",
+    "Frontend": "Frontend",
+    "DevOps & Cloud": "DevOps & Cloud",
+    "System Design": "System Design",
+    "Data Structures & Algorithms": "Data Structures & Algorithms",
+    "Software Engineering": "Software Engineering",
+}
+
+
 def _generate_recommended_drills(
     weak_spots: list[WeakSpotItem],
     all_domains: list[DomainBreakdown],
@@ -414,22 +427,28 @@ def _generate_recommended_drills(
     recommendations: list[RecommendedDrill] = []
     seen_ids: set[str] = set()
 
-    # If we have detected weak spots, target them first
-    target_domains = [w.domain for w in weak_spots]
-    if not target_domains and all_domains:
-        # If user is high performing everywhere, pick the lowest domain or standard mix
-        target_domains = [all_domains[-1].domain]
+    # Collect domains to target
+    target_domains: list[str] = []
+    if weak_spots:
+        target_domains.extend(w.domain for w in weak_spots)
+    if all_domains:
+        for d in sorted(all_domains, key=lambda x: x.average_score):
+            if d.domain not in target_domains:
+                target_domains.append(d.domain)
 
     if not target_domains:
-        # Default starter domains
         target_domains = ["Software Engineering", "Behavioral & HR", "System Design"]
 
-    for d_name in target_domains[:3]:
+    for d_name in target_domains[:4]:
+        mapped_domain = RAG_DOMAIN_MAP.get(d_name, d_name)
         results = retriever.retrieve(
             query=d_name,
-            domain=d_name if d_name in ["Software Engineering", "Frontend", "Machine Learning & AI", "System Design", "DevOps & Cloud", "Data Structures & Algorithms", "Behavioral & HR"] else None,
-            top_k=2,
+            domain=mapped_domain if mapped_domain in ["Software Engineering", "Frontend", "Machine Learning", "System Design", "DevOps & Cloud", "Data Structures & Algorithms", "Behavioral"] else None,
+            top_k=3,
         )
+        if not results:
+            results = retriever.retrieve(query=d_name, top_k=3)
+
         for r in results:
             if r.id not in seen_ids:
                 seen_ids.add(r.id)
@@ -444,5 +463,26 @@ def _generate_recommended_drills(
                         reason=f"Targets {d_name} competency enhancement",
                     )
                 )
+
+    # Backfill if fewer than 4 recommendations
+    if len(recommendations) < 4:
+        for backup_d in ["System Design", "Software Engineering", "Behavioral"]:
+            if len(recommendations) >= 6:
+                break
+            results = retriever.retrieve(query=backup_d, domain=backup_d, top_k=2)
+            for r in results:
+                if r.id not in seen_ids and len(recommendations) < 6:
+                    seen_ids.add(r.id)
+                    recommendations.append(
+                        RecommendedDrill(
+                            question_id=r.id,
+                            question=r.question,
+                            domain=r.domain,
+                            category=r.category,
+                            difficulty=r.difficulty,
+                            tags=r.tags,
+                            reason=f"Recommended {backup_d} practice",
+                        )
+                    )
 
     return recommendations[:6]

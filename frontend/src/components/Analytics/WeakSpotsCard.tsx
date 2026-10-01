@@ -114,7 +114,15 @@ export function WeakSpotsCard({ weakSpots, recommendedDrills }: WeakSpotsCardPro
                 )}
 
                 <div className="drill-actions">
-                  <Link to={practiceUrl} className="drill-action-btn drill-action-btn--primary">
+                  <Link
+                    to={practiceUrl}
+                    state={{
+                      directQuestion: drill.question,
+                      domain: drill.domain,
+                      difficulty: drill.difficulty,
+                    }}
+                    className="drill-action-btn drill-action-btn--primary"
+                  >
                     Practice Drill →
                   </Link>
                   <Link

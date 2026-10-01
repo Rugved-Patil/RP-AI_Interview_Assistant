@@ -6,11 +6,14 @@ import {
   exportDataJSON,
   getSettingsConfig,
   importDataBackup,
+  listInterviewReports,
+  listReports,
   type ImportDataRequest,
   type SettingsConfigResponse,
   type VerifyConnectionsResponse,
   verifyEngineConnections,
 } from '../api/practiceApi'
+import { exportAllReportsToPDF } from '../pdfExport'
 import {
   CheckIcon,
   DownloadIcon,
@@ -212,12 +215,15 @@ export function SettingsPage() {
     }, 40)
   }
 
+  const [exportingPDF, setExportingPDF] = useState(false)
+
   const handleVerifyEngines = async () => {
     try {
       setVerifying(true)
       setVerifyResult(null)
       const res = await verifyEngineConnections()
       setVerifyResult(res)
+      await loadConfig()
       if (res.all_ok) {
         showToast('All engine connections verified successfully.')
       } else {
@@ -227,6 +233,28 @@ export function SettingsPage() {
       showToast(`Connection verification failed: ${err instanceof Error ? err.message : String(err)}`, 'error')
     } finally {
       setVerifying(false)
+    }
+  }
+
+  const handleExportPDF = async () => {
+    try {
+      setExportingPDF(true)
+      const [singleReports, mockReports] = await Promise.all([
+        listReports(),
+        listInterviewReports(),
+      ])
+
+      if (singleReports.length === 0 && mockReports.length === 0) {
+        showToast('No saved interview reports found to export.', 'error')
+        return
+      }
+
+      exportAllReportsToPDF(singleReports, mockReports)
+      showToast('Formatted PDF report dossier generated. Print/Save dialog opened.')
+    } catch (err) {
+      showToast(`PDF export failed: ${err instanceof Error ? err.message : String(err)}`, 'error')
+    } finally {
+      setExportingPDF(false)
     }
   }
 
@@ -712,10 +740,20 @@ export function SettingsPage() {
             <button
               type="button"
               className="settings-btn settings-btn--primary"
+              onClick={handleExportPDF}
+              disabled={exportingPDF}
+            >
+              <DownloadIcon width={16} height={16} />
+              {exportingPDF ? 'Preparing PDF…' : 'Export All Reports (PDF)'}
+            </button>
+
+            <button
+              type="button"
+              className="settings-btn settings-btn--secondary"
               onClick={handleExportJSON}
             >
               <DownloadIcon width={16} height={16} />
-              Export Full Backup (JSON)
+              Export Backup (JSON)
             </button>
 
             <button

@@ -126,33 +126,36 @@ def _build_behavioral_interviewer_prompt(role: str, company: str | None, locatio
 
 @router.post("/situational", response_model=CreateSessionResponse)
 async def start_situational_session(body: CreateSessionRequest) -> CreateSessionResponse:
-    """Generates a single practice question via the INTERVIEWER provider and opens a session for it."""
-    provider = get_provider(LLMRole.INTERVIEWER)
-    system_prompt = _build_interviewer_prompt(body.role, body.company, body.location)
+    """Generates or uses a targeted practice question and opens a session for it."""
+    if body.question and body.question.strip():
+        question = body.question.strip()
+    else:
+        provider = get_provider(LLMRole.INTERVIEWER)
+        system_prompt = _build_interviewer_prompt(body.role, body.company, body.location)
 
-    try:
-        response = await provider.generate(
-            [Message(role=Role.SYSTEM, content=system_prompt)],
-            temperature=0.9,
-            # Generous headroom: gpt-oss-20b is a reasoning model that can
-            # burn tokens on internal chain-of-thought before writing the
-            # visible question (see groq_provider.py's docstring) - too low
-            # a limit here silently returns empty text, not an error.
-            max_tokens=400,
-        )
-    except LLMProviderError as exc:
-        raise HTTPException(
-            status_code=502, detail=f"Interviewer provider failed: {exc}"
-        ) from exc
+        try:
+            response = await provider.generate(
+                [Message(role=Role.SYSTEM, content=system_prompt)],
+                temperature=0.9,
+                # Generous headroom: gpt-oss-20b is a reasoning model that can
+                # burn tokens on internal chain-of-thought before writing the
+                # visible question (see groq_provider.py's docstring) - too low
+                # a limit here silently returns empty text, not an error.
+                max_tokens=400,
+            )
+        except LLMProviderError as exc:
+            raise HTTPException(
+                status_code=502, detail=f"Interviewer provider failed: {exc}"
+            ) from exc
 
-    question = response.text.strip()
-    if not question:
-        # Belt-and-suspenders: if a future model swap reintroduces the
-        # empty-response issue, fail loudly here instead of opening a
-        # session with a blank question.
-        raise HTTPException(
-            status_code=502, detail="Interviewer provider returned an empty question."
-        )
+        question = response.text.strip()
+        if not question:
+            # Belt-and-suspenders: if a future model swap reintroduces the
+            # empty-response issue, fail loudly here instead of opening a
+            # session with a blank question.
+            raise HTTPException(
+                status_code=502, detail="Interviewer provider returned an empty question."
+            )
 
     session = create_session(
         question=question,
@@ -166,26 +169,29 @@ async def start_situational_session(body: CreateSessionRequest) -> CreateSession
 
 @router.post("/behavioral", response_model=CreateSessionResponse)
 async def start_behavioral_session(body: CreateSessionRequest) -> CreateSessionResponse:
-    """Generates a single behavioral question via the INTERVIEWER provider and opens a session for it."""
-    provider = get_provider(LLMRole.INTERVIEWER)
-    system_prompt = _build_behavioral_interviewer_prompt(body.role, body.company, body.location)
+    """Generates or uses a targeted behavioral question and opens a session for it."""
+    if body.question and body.question.strip():
+        question = body.question.strip()
+    else:
+        provider = get_provider(LLMRole.INTERVIEWER)
+        system_prompt = _build_behavioral_interviewer_prompt(body.role, body.company, body.location)
 
-    try:
-        response = await provider.generate(
-            [Message(role=Role.SYSTEM, content=system_prompt)],
-            temperature=0.9,
-            max_tokens=400,
-        )
-    except LLMProviderError as exc:
-        raise HTTPException(
-            status_code=502, detail=f"Interviewer provider failed: {exc}"
-        ) from exc
+        try:
+            response = await provider.generate(
+                [Message(role=Role.SYSTEM, content=system_prompt)],
+                temperature=0.9,
+                max_tokens=400,
+            )
+        except LLMProviderError as exc:
+            raise HTTPException(
+                status_code=502, detail=f"Interviewer provider failed: {exc}"
+            ) from exc
 
-    question = response.text.strip()
-    if not question:
-        raise HTTPException(
-            status_code=502, detail="Interviewer provider returned an empty question."
-        )
+        question = response.text.strip()
+        if not question:
+            raise HTTPException(
+                status_code=502, detail="Interviewer provider returned an empty question."
+            )
 
     session = create_session(
         question=question,

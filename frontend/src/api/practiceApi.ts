@@ -24,6 +24,7 @@ export interface StartSessionRequest {
   role: string
   company?: string
   location?: string
+  question?: string
 }
 
 export interface StartSessionResponse {

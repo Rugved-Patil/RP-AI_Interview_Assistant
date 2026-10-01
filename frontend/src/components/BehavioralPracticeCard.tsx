@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import {
   API_BASE_URL,
   MAX_ANSWER_LENGTH,
@@ -44,6 +44,14 @@ type ActivePresetState =
   | { status: 'error'; message: string }
 
 export function BehavioralPracticeCard() {
+  const location = useLocation()
+  const navState = (location.state || {}) as {
+    directQuestion?: string
+    domain?: string
+    difficulty?: string
+  }
+  const directQuestion = navState.directQuestion
+
   const [stage, setStage] = useState<Stage>({ name: 'idle' })
   const [activePreset, setActivePreset] = useState<ActivePresetState>(() =>
     getActivePresetId() === null ? { status: 'none' } : { status: 'loading' },
@@ -90,13 +98,16 @@ export function BehavioralPracticeCard() {
   }, [])
 
   async function handleStart() {
-    if (activePreset.status !== 'loaded') return
-    const { role, company, location } = activePreset.preset
+    const role = activePreset.status === 'loaded' ? activePreset.preset.role : 'Candidate'
+    const company = activePreset.status === 'loaded' ? activePreset.preset.company : undefined
+    const loc = activePreset.status === 'loaded' ? activePreset.preset.location : undefined
+
     try {
       const { session_id, question } = await startBehavioralSession({
         role,
         company: company ?? undefined,
-        location: location ?? undefined,
+        location: loc ?? undefined,
+        question: directQuestion,
       })
       setStage({
         name: 'question',
@@ -212,14 +223,24 @@ export function BehavioralPracticeCard() {
 
       {stage.name === 'idle' && (
         <div className="behavioral-card__panel">
-          <ActivePresetBanner state={activePreset} />
+          {directQuestion ? (
+            <div className="targeted-drill-banner">
+              <div className="targeted-drill-header">
+                <span className="targeted-drill-tag">🎯 Targeted Weak-Spot Drill</span>
+                {navState.domain && <span className="targeted-drill-domain">{navState.domain}</span>}
+              </div>
+              <p className="targeted-drill-question">&ldquo;{directQuestion}&rdquo;</p>
+            </div>
+          ) : (
+            <ActivePresetBanner state={activePreset} />
+          )}
 
           <button
             className="behavioral-card__button"
             onClick={handleStart}
-            disabled={activePreset.status !== 'loaded'}
+            disabled={activePreset.status !== 'loaded' && !directQuestion}
           >
-            Start a practice question
+            {directQuestion ? 'Start Targeted Drill' : 'Start a behavioral question'}
           </button>
         </div>
       )}

@@ -12,14 +12,28 @@ Why this exists instead of just calling os.getenv() everywhere:
   dependency system if you want to inject it into routes later.
 """
 
+import os
 from functools import lru_cache
+from pathlib import Path
+from typing import Any
 
+from pydantic import AliasChoices, Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+_CONFIG_DIR = Path(__file__).resolve().parent
+_BACKEND_DIR = _CONFIG_DIR.parent.parent
+_ROOT_DIR = _BACKEND_DIR.parent
+
+_ENV_FILES = [
+    ".env",
+    str(_BACKEND_DIR / ".env"),
+    str(_ROOT_DIR / ".env"),
+]
 
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
-        env_file=".env",
+        env_file=_ENV_FILES,
         env_file_encoding="utf-8",
         extra="ignore",  # ignore unrelated env vars instead of erroring
     )
@@ -28,40 +42,45 @@ class Settings(BaseSettings):
     environment: str = "development"
 
     # --- LLM provider credentials -------------------------------------------------
-    # Populated from .env (see .env.example). Never hardcode real keys here,
-    # and .env itself must stay out of git (already covered by your .gitignore).
-    groq_api_key: str = ""
-    gemini_api_key: str = ""
+    # Populated from .env or os.environ.
+    groq_api_key: str = Field(
+        default="",
+        validation_alias=AliasChoices("GROQ_API_KEY", "groq_api_key"),
+    )
+    gemini_api_key: str = Field(
+        default="",
+        validation_alias=AliasChoices(
+            "GEMINI_API_KEY", "gemini_api_key", "GOOGLE_API_KEY", "google_api_key"
+        ),
+    )
 
     # --- LLM provider models ----------------------------------------------------
-    # Both of these have already been bumped once this session as older
-    # models got deprecated/moved off the free tier - that's the norm here,
-    # not the exception. If you hit a 404 "model not found" again, check
-    # https://console.groq.com/docs/models or
-    # https://ai.google.dev/gemini-api/docs/models for the current list and
-    # update these two defaults (or override via .env with GROQ_MODEL= /
-    # GEMINI_MODEL= instead of editing code).
     groq_model: str = "openai/gpt-oss-20b"
     gemini_model: str = "gemini-3.6-flash"
 
     # --- CORS -----------------------------------------------------------------
-    # The Vite dev server's default origin, so the React frontend (Phase 1
-    # onward) is allowed to call this API from the browser during local dev.
     frontend_origin: str = "http://localhost:5173"
 
     # --- Persistence -----------------------------------------------------------
-    # SQLite file lives inside backend/ by default. Per scope doc Section 3.6,
-    # nothing is written here automatically - this only gets touched when the
-    # user explicitly hits "Save this report".
-    database_url: str = "sqlite:///./interview_reports.db"
+    database_url: str = Field(
+        default=f"sqlite:///{_BACKEND_DIR / 'interview_reports.db'}",
+        validation_alias=AliasChoices("DATABASE_URL", "database_url"),
+    )
 
     # --- Local RAG Pipeline & Question Bank (Phase 3) -------------------------
-    # When enabled, retrieves relevant exemplar questions from the local curated
-    # question bank to ground interviewer question generation with industry standards.
     rag_enabled: bool = True
     rag_top_k: int = 3
+
+    def model_post_init(self, __context: Any) -> None:
+        if not self.gemini_api_key:
+            self.gemini_api_key = (
+                os.environ.get("GEMINI_API_KEY") or os.environ.get("GOOGLE_API_KEY") or ""
+            )
+        if not self.groq_api_key:
+            self.groq_api_key = os.environ.get("GROQ_API_KEY") or ""
 
 
 @lru_cache
 def get_settings() -> Settings:
     return Settings()
+

@@ -20,6 +20,30 @@ def test_start_returns_a_session_id_and_the_stripped_question(client, providers)
     assert session_store.get_session(body["session_id"]) is not None
 
 
+def test_start_with_direct_question_skips_llm_generation(client, providers):
+    response = client.post(
+        "/sessions/situational",
+        json={"role": "Backend Engineer", "question": "Design a URL shortening service like Bitly."},
+    )
+    assert response.status_code == 200
+    body = response.json()
+    assert body["question"] == "Design a URL shortening service like Bitly."
+    # LLM was not invoked because direct targeted question was provided
+    assert len(providers.interviewer.calls) == 0
+
+
+def test_start_behavioral_with_direct_question_skips_llm_generation(client, providers):
+    response = client.post(
+        "/sessions/behavioral",
+        json={"role": "Engineering Manager", "question": "Tell me about a time you handled a critical outage."},
+    )
+    assert response.status_code == 200
+    body = response.json()
+    assert body["question"] == "Tell me about a time you handled a critical outage."
+    assert len(providers.interviewer.calls) == 0
+
+
+
 def test_interviewer_is_called_once_with_a_system_prompt_naming_the_role(client, providers):
     client.post("/sessions/situational", json={"role": "ML Engineer"})
 

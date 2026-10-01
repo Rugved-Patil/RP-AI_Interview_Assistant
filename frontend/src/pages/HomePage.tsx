@@ -1,6 +1,11 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { createPreset, listPresets } from '../api/practiceApi'
+import {
+  createPreset,
+  getAnalytics,
+  listPresets,
+  type AnalyticsDashboardResponse,
+} from '../api/practiceApi'
 import { setActivePresetId } from '../activePreset'
 import { PresetsIcon } from '../components/Icons'
 import './HomePage.css'
@@ -8,6 +13,7 @@ import './HomePage.css'
 export function HomePage() {
   const [presetsLoading, setPresetsLoading] = useState(true)
   const [presetsCount, setPresetsCount] = useState<number | null>(null)
+  const [analytics, setAnalytics] = useState<AnalyticsDashboardResponse | null>(null)
 
   // Quick setup form state
   const [quickRole, setQuickRole] = useState('')
@@ -33,6 +39,18 @@ export function HomePage() {
           setPresetsLoading(false)
         }
       })
+
+    // Load analytics to check for 5+ completed mocks milestone
+    getAnalytics()
+      .then((data) => {
+        if (!cancelled) {
+          setAnalytics(data)
+        }
+      })
+      .catch((err) => {
+        console.warn('Analytics fetch on home:', err)
+      })
+
     return () => {
       cancelled = true
     }
@@ -209,6 +227,95 @@ export function HomePage() {
           </Link>
         </div>
       </section>
+
+      {/* Recommended Practice Section - Unlocked after completing & saving 5 full mocks */}
+      {analytics &&
+        analytics.summary.total_mock_interviews >= 5 &&
+        analytics.recommended_drills &&
+        analytics.recommended_drills.length > 0 && (
+          <section className="home__section home__recommended-section" aria-labelledby="recommended-practice-title">
+            <div className="home__section-header">
+              <div className="home__recommended-badge-row">
+                <span className="home__recommended-pill">Targeted Recommendations</span>
+                <span className="home__recommended-threshold-tag">
+                  Personalized · {analytics.summary.total_mock_interviews} Completed Mocks Analyzed
+                </span>
+              </div>
+              <h2 id="recommended-practice-title" className="home__section-title">
+                Recommended Weak-Spot Practice
+              </h2>
+              <p className="home__section-desc">
+                Based on diagnostic evaluations across your saved mock interviews, here are targeted questions recommended to strengthen your identified growth areas.
+              </p>
+            </div>
+
+            {analytics.weak_spots && analytics.weak_spots.length > 0 && (
+              <div className="home__weak-spots-summary">
+                <span className="home__weak-spots-label">Focus Areas:</span>
+                <div className="home__weak-spots-pills">
+                  {analytics.weak_spots.map((ws) => (
+                    <span key={ws.domain} className="home__weak-spot-pill">
+                      <strong>{ws.domain}</strong> (avg {ws.average_score.toFixed(1)}/10)
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <div className="home__recommended-grid">
+              {analytics.recommended_drills.slice(0, 4).map((drill) => {
+                const isBehavioral = drill.category.toLowerCase() === 'behavioral'
+                const practiceUrl = isBehavioral ? '/practice/behavioral' : '/practice'
+
+                return (
+                  <div key={drill.question_id} className="home__recommended-card">
+                    <div className="home__rec-card-top">
+                      <div className="home__rec-badges">
+                        <span className="home__rec-domain">{drill.domain}</span>
+                        <span className={`home__rec-diff home__rec-diff--${drill.difficulty.toLowerCase()}`}>
+                          {drill.difficulty}
+                        </span>
+                      </div>
+                      <span className="home__rec-reason">{drill.reason}</span>
+                    </div>
+
+                    <p className="home__rec-question">&ldquo;{drill.question}&rdquo;</p>
+
+                    {drill.tags && drill.tags.length > 0 && (
+                      <div className="home__rec-tags">
+                        {drill.tags.slice(0, 4).map((tag) => (
+                          <span key={tag} className="home__rec-tag">
+                            #{tag}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+
+                    <div className="home__rec-actions">
+                      <Link
+                        to={practiceUrl}
+                        state={{
+                          directQuestion: drill.question,
+                          domain: drill.domain,
+                          difficulty: drill.difficulty,
+                        }}
+                        className="home__rec-btn home__rec-btn--primary"
+                      >
+                        Start Targeted Drill →
+                      </Link>
+                      <Link
+                        to={`/questions?search=${encodeURIComponent(drill.question.slice(0, 40))}`}
+                        className="home__rec-btn home__rec-btn--secondary"
+                      >
+                        View Rubric
+                      </Link>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          </section>
+        )}
     </div>
   )
 }

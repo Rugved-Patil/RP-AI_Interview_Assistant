@@ -58,6 +58,50 @@
   flex-shrink: 0;
 }
 
+.targeted-drill-banner {
+  background: var(--paper-warm, rgba(120, 100, 70, 0.06));
+  border: 1px solid var(--olive-deep, #4a5d4e);
+  border-radius: 8px;
+  padding: 1rem 1.15rem;
+  margin-bottom: 1.5rem;
+}
+
+.targeted-drill-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.targeted-drill-tag {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--olive-deep, #4a5d4e);
+}
+
+.targeted-drill-domain {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  padding: 0.15rem 0.5rem;
+  background: var(--paper);
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  color: var(--ink-muted);
+}
+
+.targeted-drill-question {
+  font-family: var(--font-serif);
+  font-size: 1.05rem;
+  line-height: 1.45;
+  color: var(--ink);
+  margin: 0;
+}
+
 .practice-card__preset-change:hover {
   text-decoration: underline;
 }
