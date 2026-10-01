@@ -144,3 +144,40 @@ def test_grade_code_offline_fallback(client: TestClient):
     assert "space_complexity" in data
     assert "detailed_markdown" in data
     assert len(data["detailed_markdown"]) > 20
+
+
+def test_save_coding_report_and_verify_in_reports_and_analytics(client: TestClient):
+    payload = {
+        "problem_id": "two-sum",
+        "problem_title": "Two Sum",
+        "domain": "Data Structures & Algorithms",
+        "code": "def two_sum(nums, target):\n    lookup = {}\n    for i, x in enumerate(nums):\n        if target - x in lookup:\n            return [lookup[target - x], i]\n        lookup[x] = i\n    return []\n",
+        "language": "python",
+        "score": 9,
+        "time_complexity": "O(n)",
+        "space_complexity": "O(n)",
+        "feedback_markdown": "Optimal hash table solution with O(n) time complexity.",
+        "role": "Software Engineer",
+        "company": "Coding Sandbox",
+    }
+    save_res = client.post("/sandbox/save", json=payload)
+    assert save_res.status_code == 200
+    save_data = save_res.json()
+    assert save_data["saved"] is True
+    assert save_data["id"] > 0
+    assert "coding-two-sum" in save_data["session_id"]
+
+    # Verify report is present in /reports
+    reports_res = client.get("/reports")
+    assert reports_res.status_code == 200
+    reports = reports_res.json()
+    assert any(r["session_id"] == save_data["session_id"] for r in reports)
+
+    # Verify analytics includes the saved coding report
+    analytics_res = client.get("/analytics")
+    assert analytics_res.status_code == 200
+    analytics = analytics_res.json()
+    assert analytics["summary"]["total_single_drills"] >= 1
+
+
+

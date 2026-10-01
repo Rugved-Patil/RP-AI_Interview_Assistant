@@ -104,3 +104,18 @@ class GradeCodeResponse(BaseModel):
     edge_cases_feedback: str
     recommended_improvements: list[str] = Field(default_factory=list)
     detailed_markdown: str
+
+
+class SaveCodingReportRequest(BaseModel):
+    problem_id: str
+    problem_title: str
+    domain: str
+    code: str
+    language: SupportedLanguage = SupportedLanguage.PYTHON
+    score: int  # 0 - 10
+    time_complexity: str
+    space_complexity: str
+    feedback_markdown: str
+    role: str | None = "Software Engineer"
+    company: str | None = "Coding Sandbox"
+

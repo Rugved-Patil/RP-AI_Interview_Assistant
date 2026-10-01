@@ -719,3 +719,26 @@ export function gradeCodingSubmission(body: GradeCodeRequest): Promise<GradeCode
     body: JSON.stringify(body),
   }).then(parseOrThrow<GradeCodeResponse>)
 }
+
+export interface SaveCodingReportRequest {
+
+  problem_id: string
+  problem_title: string
+  domain: string
+  code: string
+  language: SupportedLanguage
+  score: number
+  time_complexity: string
+  space_complexity: string
+  feedback_markdown: string
+  role?: string | null
+  company?: string | null
+}
+
+export function saveCodingReport(body: SaveCodingReportRequest): Promise<SaveReportResponse> {
+  return fetch(`${API_BASE_URL}/sandbox/save`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  }).then(parseOrThrow<SaveReportResponse>)
+}

@@ -796,6 +796,54 @@
   color: var(--ink);
 }
 
+.sandbox-assessment-save-wrap {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+}
+
+.sandbox-btn--save {
+  background: var(--canvas);
+  border-color: var(--rule);
+  color: var(--olive-deep);
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.5rem 0.9rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.sandbox-btn--save:hover:not(:disabled) {
+  background: var(--paper-card);
+  border-color: var(--olive-deep);
+  transform: translateY(-1px);
+}
+
+.sandbox-saved-badge-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  background: rgba(85, 138, 98, 0.12);
+  border: 1px solid rgba(85, 138, 98, 0.35);
+  color: #2b6d41;
+  font-family: var(--font-sans);
+  font-size: 0.82rem;
+  font-weight: 700;
+  padding: 0.45rem 0.85rem;
+  border-radius: 6px;
+  text-decoration: none;
+  transition: all 0.15s ease;
+}
+
+.sandbox-saved-badge-link:hover {
+  background: rgba(85, 138, 98, 0.2);
+  text-decoration: none;
+}
+
+
 .sandbox-assessment-feedback-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));

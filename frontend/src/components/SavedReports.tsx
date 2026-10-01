@@ -480,6 +480,8 @@ function ReportRow({
     }
   }
 
+  const isCoding = report.session_id.startsWith('coding-') || report.company === 'Coding Sandbox'
+
   return (
     <li className={`report-row ${expanded ? 'report-row--expanded' : ''}`}>
       <button
@@ -489,7 +491,11 @@ function ReportRow({
         aria-expanded={expanded}
       >
         <span className="report-row__score">{report.score}/10</span>
-        <span className="report-row__badge report-row__badge--single">Single Drill</span>
+        {isCoding ? (
+          <span className="report-row__badge report-row__badge--coding">Coding</span>
+        ) : (
+          <span className="report-row__badge report-row__badge--single">Single Drill</span>
+        )}
         <span
           className="report-row__primary-info"
           title={report.role ? `${report.role} · ${report.question}` : report.question}
@@ -519,18 +525,23 @@ function ReportRow({
           )}
 
           <div className="report-row__section">
-            <p className="report-row__label">Question &amp; Candidate Response</p>
+            <p className="report-row__label">{isCoding ? 'Challenge & Code Submission' : 'Question & Candidate Response'}</p>
             <div className="report-row__transcript">
               <div className="report-row__turn report-row__turn--interviewer">
-                <div className="report-row__turn-sender">Drill Question</div>
+                <div className="report-row__turn-sender">{isCoding ? 'Coding Problem' : 'Drill Question'}</div>
                 <div className="report-row__turn-content">{report.question}</div>
               </div>
               <div className="report-row__turn report-row__turn--candidate">
-                <div className="report-row__turn-sender">Your Response</div>
-                <div className="report-row__turn-content">{report.answer}</div>
+                <div className="report-row__turn-sender">{isCoding ? `Code Submission (${report.location || 'Code'})` : 'Your Response'}</div>
+                {isCoding ? (
+                  <pre className="report-row__code-content"><code>{report.answer}</code></pre>
+                ) : (
+                  <div className="report-row__turn-content">{report.answer}</div>
+                )}
               </div>
             </div>
           </div>
+
 
           <div className="report-row__section">
             <p className="report-row__label">Feedback &amp; Evaluation</p>

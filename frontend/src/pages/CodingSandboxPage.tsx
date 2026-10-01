@@ -1,10 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
+import { useParams, useNavigate, Link } from 'react-router-dom'
 import {
   getCodingProblem,
   gradeCodingSubmission,
   listCodingProblems,
   runCodeInSandbox,
+  saveCodingReport,
   type CodingProblem,
   type CodingProblemSummary,
   type GradeCodeResponse,
@@ -15,9 +16,11 @@ import { FormattedFeedback } from '../components/FormattedFeedback'
 import {
   CodeIcon,
   PlayIcon,
+  SavedReportsIcon,
   SparklesIcon,
 } from '../components/Icons'
 import './CodingSandboxPage.css'
+
 
 export function CodingSandboxPage() {
   const { problemId } = useParams<{ problemId?: string }>()
@@ -49,7 +52,10 @@ export function CodingSandboxPage() {
   const [customInput, setCustomInput] = useState('')
   const [runResult, setRunResult] = useState<RunCodeResponse | null>(null)
   const [gradeResult, setGradeResult] = useState<GradeCodeResponse | null>(null)
+  const [isSaving, setIsSaving] = useState(false)
+  const [isSaved, setIsSaved] = useState(false)
   const [errorBanner, setErrorBanner] = useState<string | null>(null)
+
 
   // Fetch problem catalog on mount
   useEffect(() => {
@@ -227,6 +233,7 @@ export function CodingSandboxPage() {
       })
 
       setGradeResult(assessment)
+      setIsSaved(false)
       setActiveTab('assessment')
     } catch (err) {
       setErrorBanner(err instanceof Error ? err.message : 'AI assessment failed')
@@ -234,6 +241,35 @@ export function CodingSandboxPage() {
       setIsGrading(false)
     }
   }
+
+  // Save graded assessment to Saved Reports & Analytics
+  const handleSaveAssessment = async () => {
+    if (!currentProblem || !gradeResult || isSaving || isSaved) return
+    setIsSaving(true)
+    setErrorBanner(null)
+
+    try {
+      await saveCodingReport({
+        problem_id: currentProblem.id,
+        problem_title: currentProblem.title,
+        domain: currentProblem.domain,
+        code,
+        language,
+        score: gradeResult.score,
+        time_complexity: gradeResult.time_complexity,
+        space_complexity: gradeResult.space_complexity,
+        feedback_markdown: gradeResult.detailed_markdown || gradeResult.correctness_assessment,
+        role: currentProblem.domain,
+        company: 'Coding Sandbox',
+      })
+      setIsSaved(true)
+    } catch (err) {
+      setErrorBanner(err instanceof Error ? err.message : 'Failed to save coding report')
+    } finally {
+      setIsSaving(false)
+    }
+  }
+
 
   // Line count for gutter
   const lineCount = Math.max(1, code.split('\n').length)
@@ -632,7 +668,26 @@ export function CodingSandboxPage() {
                         </span>
                       </div>
                     </div>
+                    <div className="sandbox-assessment-save-wrap">
+                      {isSaved ? (
+                        <Link to="/reports" className="sandbox-saved-badge-link" title="View in Saved Reports">
+                          <SavedReportsIcon width={16} height={16} />
+                          <span>✓ Saved to Reports</span>
+                        </Link>
+                      ) : (
+                        <button
+                          type="button"
+                          className="sandbox-btn sandbox-btn--save"
+                          onClick={handleSaveAssessment}
+                          disabled={isSaving}
+                        >
+                          <SavedReportsIcon width={16} height={16} />
+                          <span>{isSaving ? 'Saving Grade…' : 'Save Grade to Reports'}</span>
+                        </button>
+                      )}
+                    </div>
                   </div>
+
 
                   <div className="sandbox-assessment-feedback-grid">
                     <div className="sandbox-feedback-card">
