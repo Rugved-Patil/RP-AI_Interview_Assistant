@@ -14,6 +14,7 @@ import { getActivePresetId, setActivePresetId } from '../activePreset'
 import { UnsavedSessionModal } from './UnsavedSessionModal'
 import { useSpeechRecognition } from '../hooks/useSpeechRecognition'
 import { useSpeechSynthesis } from '../hooks/useSpeechSynthesis'
+import { MicIcon, SpeakerIcon, StopIcon } from './Icons'
 import './BehavioralPracticeCard.css'
 
 type Stage =
@@ -47,7 +48,7 @@ export function BehavioralPracticeCard() {
     getActivePresetId() === null ? { status: 'none' } : { status: 'loading' },
   )
 
-  // Speech hooks for voice interaction
+  // Speech hooks for voice interaction (TTS & STT)
   const tts = useSpeechSynthesis()
 
   const stt = useSpeechRecognition({
@@ -104,6 +105,7 @@ export function BehavioralPracticeCard() {
         submitting: false,
         error: null,
       })
+      // Speak the generated behavioral question
       tts.speak(question)
     } catch (err) {
       setStage({ name: 'error', message: toMessage(err) })
@@ -205,7 +207,7 @@ export function BehavioralPracticeCard() {
         onCancel={() => setPendingExitAction(null)}
       />
 
-      <p className="behavioral-card__eyebrow">Behavioral questions</p>
+      <p className="behavioral-card__eyebrow">Behavioral questions (STAR Method)</p>
 
       {stage.name === 'idle' && (
         <div className="behavioral-card__panel">
@@ -230,9 +232,10 @@ export function BehavioralPracticeCard() {
                 type="button"
                 className={`behavioral-card__voice-btn ${tts.isSpeaking ? 'behavioral-card__voice-btn--active' : ''}`}
                 onClick={() => (tts.isSpeaking ? tts.cancel() : tts.speak(stage.question))}
-                title="Listen to question"
+                title={tts.isSpeaking ? 'Stop audio' : 'Listen to question'}
+                aria-label={tts.isSpeaking ? 'Stop audio' : 'Listen to question'}
               >
-                {tts.isSpeaking ? '⏹ Stop Audio' : '🔊 Listen'}
+                {tts.isSpeaking ? <StopIcon width={13} height={13} /> : <SpeakerIcon width={15} height={15} />}
               </button>
             )}
           </div>
@@ -246,14 +249,14 @@ export function BehavioralPracticeCard() {
               className="behavioral-card__textarea"
               value={stage.answer}
               onChange={(event) => setStage({ ...stage, answer: event.target.value })}
-              placeholder="Type your answer here..."
+              placeholder="Structure your answer using the STAR method: Situation, Task, Action, and Result..."
               rows={8}
               maxLength={MAX_ANSWER_LENGTH}
               disabled={stage.submitting}
             />
 
             <div className="behavioral-card__input-toolbar">
-              <div>
+              <div className="behavioral-card__mic-container">
                 {stt.isSupported && (
                   <button
                     type="button"
@@ -262,13 +265,23 @@ export function BehavioralPracticeCard() {
                     }`}
                     onClick={stt.toggleListening}
                     disabled={stage.submitting}
+                    title={stt.isListening ? 'Stop dictating' : 'Dictate answer with microphone'}
+                    aria-label={stt.isListening ? 'Stop dictating' : 'Dictate answer with microphone'}
                   >
-                    {stt.isListening ? '🔴 Stop Dictating' : '🎙 Dictate Answer'}
+                    <MicIcon width={16} height={16} />
                   </button>
                 )}
-                {stt.error && <span style={{ color: 'var(--ink-red)', marginLeft: '0.5rem' }}>{stt.error}</span>}
+                {stt.isListening && (
+                  <span className="behavioral-card__stt-live">
+                    <span className="behavioral-card__pulse-dot" />
+                    <span>Recording…</span>
+                  </span>
+                )}
+                {stt.error && (
+                  <span className="behavioral-card__stt-error">{stt.error}</span>
+                )}
               </div>
-              <div>
+              <div className="behavioral-card__char-counter">
                 {stage.answer.length} / {MAX_ANSWER_LENGTH} chars
               </div>
             </div>
@@ -300,7 +313,24 @@ export function BehavioralPracticeCard() {
       {stage.name === 'graded' && (
         <div className="behavioral-card__panel">
           <ScoreMark score={stage.score} />
-          <p className="behavioral-card__feedback">{stage.feedback}</p>
+
+          <div className="behavioral-card__feedback-header">
+            <div className="behavioral-card__feedback-top">
+              <span className="behavioral-card__feedback-label">Diagnostic Feedback</span>
+              {tts.isSupported && (
+                <button
+                  type="button"
+                  className={`behavioral-card__voice-btn ${tts.isSpeaking ? 'behavioral-card__voice-btn--active' : ''}`}
+                  onClick={() => (tts.isSpeaking ? tts.cancel() : tts.speak(stage.feedback))}
+                  title={tts.isSpeaking ? 'Stop feedback audio' : 'Listen to feedback'}
+                  aria-label={tts.isSpeaking ? 'Stop feedback audio' : 'Listen to feedback'}
+                >
+                  {tts.isSpeaking ? <StopIcon width={13} height={13} /> : <SpeakerIcon width={14} height={14} />}
+                </button>
+              )}
+            </div>
+            <p className="behavioral-card__feedback">{stage.feedback}</p>
+          </div>
 
           <div className="behavioral-card__actions">
             <button
@@ -310,7 +340,13 @@ export function BehavioralPracticeCard() {
             >
               {saveButtonLabel(stage.saveState)}
             </button>
-            <button className="behavioral-card__button" onClick={handleStartOver}>
+            <button
+              className="behavioral-card__button"
+              onClick={() => guardedExit(() => {
+                tts.cancel()
+                setStage({ name: 'idle' })
+              })}
+            >
               Start another question
             </button>
           </div>

@@ -1,5 +1,5 @@
 .practice-card {
-  width: min(560px, 100%);
+  width: min(620px, 100%);
   background: var(--paper);
   border: 1px solid var(--rule);
   border-radius: 10px;
@@ -11,6 +11,8 @@
   font-family: var(--font-mono);
   font-size: 0.78rem;
   color: var(--ink-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 .practice-card__panel {
@@ -60,18 +62,61 @@
   text-decoration: underline;
 }
 
+.practice-card__question-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
 .practice-card__question {
   font-family: var(--font-mono);
   font-size: 1.02rem;
   line-height: 1.6;
   color: var(--ink);
-  margin: 0 0 1.5rem;
+  margin: 0;
   white-space: pre-wrap;
+  flex: 1;
+}
+
+.practice-card__voice-btn {
+  background: var(--paper);
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  color: var(--ink);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 150ms ease;
+}
+
+.practice-card__voice-btn:hover:not(:disabled) {
+  background: var(--canvas);
+  border-color: var(--olive-deep);
+  color: var(--olive-deep);
+}
+
+.practice-card__voice-btn--active {
+  background: rgba(184, 51, 42, 0.1);
+  border-color: var(--ink-red);
+  color: var(--ink-red);
+}
+
+.practice-card__textarea-wrapper {
+  position: relative;
+  margin-top: 1rem;
+  margin-bottom: 1.25rem;
 }
 
 .practice-card__textarea {
   width: 100%;
-  min-height: 9rem;
+  min-height: 9.5rem;
   resize: vertical;
   font-family: var(--font-serif);
   font-size: 1rem;
@@ -81,7 +126,7 @@
   border: none;
   border-top: 1px solid var(--rule);
   padding: 0.9rem 0 0;
-  margin-bottom: 1.5rem;
+  box-sizing: border-box;
 }
 
 .practice-card__textarea:focus {
@@ -90,6 +135,83 @@
 }
 
 .practice-card__textarea::placeholder {
+  color: var(--ink-muted);
+}
+
+.practice-card__input-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 0.5rem;
+  border-top: 1px dashed var(--rule);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--ink-muted);
+}
+
+.practice-card__mic-container {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.practice-card__mic-btn {
+  background: var(--paper);
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  color: var(--ink);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 150ms ease;
+  flex-shrink: 0;
+}
+
+.practice-card__mic-btn:hover:not(:disabled) {
+  background: var(--canvas);
+  border-color: var(--olive-deep);
+  color: var(--olive-deep);
+}
+
+.practice-card__mic-btn--listening {
+  background: var(--ink-red);
+  border-color: var(--ink-red);
+  color: #ffffff;
+  animation: pulse-mic 1.5s infinite;
+}
+
+.practice-card__mic-btn--listening:hover:not(:disabled) {
+  background: #962820;
+  color: #ffffff;
+}
+
+.practice-card__stt-live {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: var(--ink-red);
+  font-size: 0.72rem;
+}
+
+.practice-card__pulse-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--ink-red);
+  flex-shrink: 0;
+  animation: mic-pulse 1.2s infinite ease-in-out;
+}
+
+.practice-card__stt-error {
+  color: var(--ink-red);
+  font-size: 0.75rem;
+}
+
+.practice-card__char-counter {
   color: var(--ink-muted);
 }
 
@@ -135,12 +257,35 @@
   flex-wrap: wrap;
 }
 
+.practice-card__feedback-header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  margin: 0 0 1.75rem;
+}
+
+.practice-card__feedback-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.practice-card__feedback-label {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--ink-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
 .practice-card__feedback {
   font-family: var(--font-serif);
   font-size: 1.05rem;
   line-height: 1.65;
   color: var(--ink);
-  margin: 0 0 1.75rem;
+  margin: 0;
+  white-space: pre-wrap;
 }
 
 .practice-card__error {

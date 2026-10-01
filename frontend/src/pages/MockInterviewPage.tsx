@@ -15,6 +15,7 @@ import { getActivePresetId, setActivePresetId } from '../activePreset'
 import { UnsavedSessionModal } from '../components/UnsavedSessionModal'
 import { useSpeechRecognition } from '../hooks/useSpeechRecognition'
 import { useSpeechSynthesis } from '../hooks/useSpeechSynthesis'
+import { MicIcon, SpeakerIcon, SpeakerOffIcon, StopIcon } from '../components/Icons'
 import './MockInterviewPage.css'
 
 interface MessageTurn {
@@ -481,7 +482,7 @@ export function MockInterviewPage() {
                     title={isMuted ? 'Unmute AI Voice' : 'Mute AI Voice'}
                     aria-label={isMuted ? 'Unmute AI Voice' : 'Mute AI Voice'}
                   >
-                    {isMuted ? '🔇 Voice: Off' : '🔊 Voice: On'}
+                    {isMuted ? <SpeakerOffIcon width={15} height={15} /> : <SpeakerIcon width={15} height={15} />}
                   </button>
                 )}
               </div>
@@ -512,10 +513,10 @@ export function MockInterviewPage() {
                         type="button"
                         className="mock-voice__replay-btn"
                         onClick={() => speak(msg.content)}
-                        title="Replay question audio"
-                        aria-label="Replay question audio"
+                        title="Replay audio"
+                        aria-label="Replay audio"
                       >
-                        🔊 Replay
+                        <SpeakerIcon width={13} height={13} />
                       </button>
                     )}
                   </div>
@@ -539,45 +540,52 @@ export function MockInterviewPage() {
 
             {stage.name === 'in_progress' && (
               <div className="mock-chat__input-area">
-                <label htmlFor="mock-answer" className="sr-only">
-                  Your answer
-                </label>
-                <textarea
-                  id="mock-answer"
-                  className="mock-chat__textarea"
-                  value={stage.currentAnswer}
-                  onChange={(e) =>
-                    setStage({ ...stage, currentAnswer: e.target.value })
-                  }
-                  placeholder={
-                    isListening
-                      ? 'Listening... Speak your answer now (click microphone or send when finished)'
-                      : 'Type your response to the interviewer...'
-                  }
-                  rows={4}
-                  maxLength={MAX_ANSWER_LENGTH}
-                  disabled={stage.submitting}
-                />
+                <div className="mock-chat__textarea-wrapper">
+                  <label htmlFor="mock-answer" className="sr-only">
+                    Your answer
+                  </label>
+                  <textarea
+                    id="mock-answer"
+                    className="mock-chat__textarea"
+                    value={stage.currentAnswer}
+                    onChange={(e) =>
+                      setStage({ ...stage, currentAnswer: e.target.value })
+                    }
+                    placeholder={
+                      isListening
+                        ? 'Listening… Speak your response'
+                        : 'Type your response to the interviewer...'
+                    }
+                    rows={4}
+                    maxLength={MAX_ANSWER_LENGTH}
+                    disabled={stage.submitting}
+                  />
 
-                {isListening && (
-                  <div className="mock-voice__listening-badge">
-                    <span className="mock-voice__pulse-dot" aria-hidden="true" />
-                    <span>Microphone active — speaking will transcribe into the box above</span>
-                  </div>
-                )}
+                  {isListening && (
+                    <div className="mock-voice__listening-badge">
+                      <span className="mock-voice__pulse-dot" aria-hidden="true" />
+                      <span>Recording…</span>
+                    </div>
+                  )}
 
-                {isAiSpeaking && (
-                  <div className="mock-voice__speaking-badge">
-                    <span>🔊 AI Interviewer is speaking…</span>
-                    <button
-                      type="button"
-                      className="mock-voice__stop-speech-btn"
-                      onClick={cancelSpeech}
-                    >
-                      Stop audio
-                    </button>
-                  </div>
-                )}
+                  {isAiSpeaking && (
+                    <div className="mock-voice__speaking-badge">
+                      <div className="mock-voice__speaking-indicator">
+                        <SpeakerIcon width={13} height={13} />
+                        <span>Speaking…</span>
+                      </div>
+                      <button
+                        type="button"
+                        className="mock-voice__stop-speech-btn"
+                        onClick={cancelSpeech}
+                        title="Stop audio"
+                        aria-label="Stop audio"
+                      >
+                        <StopIcon width={12} height={12} />
+                      </button>
+                    </div>
+                  )}
+                </div>
 
                 {sttError && <p className="mock-card__error">{sttError}</p>}
                 {stage.error && <p className="mock-card__error">{stage.error}</p>}
@@ -586,7 +594,7 @@ export function MockInterviewPage() {
                   {isSttSupported && (
                     <button
                       type="button"
-                      className={`mock-card__button mock-voice__mic-btn ${
+                      className={`mock-voice__mic-btn ${
                         isListening ? 'mock-voice__mic-btn--listening' : ''
                       }`}
                       onClick={() => {
@@ -594,14 +602,15 @@ export function MockInterviewPage() {
                         toggleListening()
                       }}
                       disabled={stage.submitting}
-                      title={isListening ? 'Stop recording' : 'Dictate answer with microphone'}
+                      title={isListening ? 'Stop recording' : 'Dictate response'}
+                      aria-label={isListening ? 'Stop recording' : 'Dictate response'}
                     >
-                      {isListening ? '⏹ Stop dictation' : '🎙 Speak answer'}
+                      <MicIcon width={16} height={16} />
                     </button>
                   )}
 
                   <button
-                    className="mock-card__button"
+                    className="mock-card__button mock-chat__send-btn"
                     onClick={handleSubmitAnswer}
                     disabled={stage.submitting || stage.currentAnswer.trim().length === 0}
                   >

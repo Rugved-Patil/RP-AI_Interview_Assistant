@@ -12,17 +12,13 @@ import {
 import type { PresetSummary } from '../api/practiceApi'
 import { getActivePresetId, setActivePresetId } from '../activePreset'
 import { UnsavedSessionModal } from './UnsavedSessionModal'
+import { useSpeechRecognition } from '../hooks/useSpeechRecognition'
+import { useSpeechSynthesis } from '../hooks/useSpeechSynthesis'
+import { MicIcon, SpeakerIcon, StopIcon } from './Icons'
 import './PracticeCard.css'
 
 /**
  * A discriminated union models the four stages of one practice attempt.
- * `question` carries its own `error` so a failed grading attempt keeps the
- * user on the question with their typed answer intact, instead of dropping
- * them into the generic `error` stage (which can only restart from scratch).
- * `graded` also carries `sessionId` (needed to call the save endpoint)
- * and `saveState` - the opt-in save action is a sub-state of being
- * graded, not a separate stage, since you're still looking at the same
- * panel.
  */
 type Stage =
   | { name: 'idle' }
@@ -43,12 +39,6 @@ type Stage =
     }
   | { name: 'error'; message: string }
 
-/**
- * Which interview preset the technical question gets built from. Resolved
- * from activePreset.ts's localStorage pointer, fetched fresh on every mount
- * (i.e. every time this page is navigated to) so a change made on the
- * Presets page is always picked up.
- */
 type ActivePresetState =
   | { status: 'loading' }
   | { status: 'none' }
@@ -57,13 +47,26 @@ type ActivePresetState =
 
 export function PracticeCard() {
   const [stage, setStage] = useState<Stage>({ name: 'idle' })
-  // Lazy initial state: whether a preset id is stored is knowable
-  // synchronously (it's a localStorage read), so "none" is decided here
-  // instead of by calling setState inside the effect below - that's what
-  // the react-hooks/set-state-in-effect lint rule objects to.
   const [activePreset, setActivePreset] = useState<ActivePresetState>(() =>
     getActivePresetId() === null ? { status: 'none' } : { status: 'loading' },
   )
+
+  // Speech hooks for voice interaction (TTS & STT)
+  const tts = useSpeechSynthesis()
+
+  const stt = useSpeechRecognition({
+    onTranscriptChange: (transcript) => {
+      setStage((current) => {
+        if (current.name !== 'question') return current
+        const separator = current.answer.length > 0 && !current.answer.endsWith(' ') ? ' ' : ''
+        const newAnswer = (current.answer + separator + transcript).trim()
+        return {
+          ...current,
+          answer: newAnswer.slice(0, MAX_ANSWER_LENGTH),
+        }
+      })
+    },
+  })
 
   useEffect(() => {
     let cancelled = false
@@ -75,9 +78,6 @@ export function PracticeCard() {
         })
         .catch((err) => {
           if (cancelled) return
-          // A 404 here means the active preset was deleted from another
-          // page/tab since this pointer was saved - clear the stale
-          // pointer instead of showing a permanent error for it.
           if (err instanceof Error && err.message.includes('(404)')) {
             setActivePresetId(null)
             setActivePreset({ status: 'none' })
@@ -108,6 +108,8 @@ export function PracticeCard() {
         submitting: false,
         error: null,
       })
+      // Speak the generated question
+      tts.speak(question)
     } catch (err) {
       setStage({ name: 'error', message: toMessage(err) })
     }
@@ -115,11 +117,12 @@ export function PracticeCard() {
 
   async function handleSubmit() {
     if (stage.name !== 'question') return
+    stt.stopListening()
+    tts.cancel()
+
     const { sessionId, answer } = stage
     setStage({ ...stage, submitting: true, error: null })
     try {
-      // Re-sending the answer on a retry is harmless: the backend just
-      // overwrites session.answer with the same text (or the edited text).
       await submitAnswer(sessionId, answer)
       const grade = await gradeSession(sessionId)
       setStage({
@@ -130,9 +133,6 @@ export function PracticeCard() {
         saveState: 'unsaved',
       })
     } catch (err) {
-      // Stay on the question with the typed answer preserved, so a failed
-      // grade (e.g. a free-tier rate limit) costs the user a retry click,
-      // not their whole answer.
       setStage({ ...stage, submitting: false, error: toMessage(err) })
     }
   }
@@ -193,6 +193,12 @@ export function PracticeCard() {
     if (action) action()
   }
 
+  function handleStartOver() {
+    stt.stopListening()
+    tts.cancel()
+    guardedExit(() => setStage({ name: 'idle' }))
+  }
+
   return (
     <div className="practice-card">
       <UnsavedSessionModal
@@ -221,21 +227,67 @@ export function PracticeCard() {
 
       {stage.name === 'question' && (
         <div className="practice-card__panel">
-          <p className="practice-card__question">{stage.question}</p>
+          <div className="practice-card__question-header">
+            <p className="practice-card__question">{stage.question}</p>
+            {tts.isSupported && (
+              <button
+                type="button"
+                className={`practice-card__voice-btn ${tts.isSpeaking ? 'practice-card__voice-btn--active' : ''}`}
+                onClick={() => (tts.isSpeaking ? tts.cancel() : tts.speak(stage.question))}
+                title={tts.isSpeaking ? 'Stop audio' : 'Listen to question'}
+                aria-label={tts.isSpeaking ? 'Stop audio' : 'Listen to question'}
+              >
+                {tts.isSpeaking ? <StopIcon width={13} height={13} /> : <SpeakerIcon width={15} height={15} />}
+              </button>
+            )}
+          </div>
 
-          <label className="sr-only" htmlFor="answer">
-            Your answer
-          </label>
-          <textarea
-            id="answer"
-            className="practice-card__textarea"
-            value={stage.answer}
-            onChange={(event) => setStage({ ...stage, answer: event.target.value })}
-            placeholder="Type your answer here..."
-            rows={8}
-            maxLength={MAX_ANSWER_LENGTH}
-            disabled={stage.submitting}
-          />
+          <div className="practice-card__textarea-wrapper">
+            <label className="sr-only" htmlFor="answer">
+              Your answer
+            </label>
+            <textarea
+              id="answer"
+              className="practice-card__textarea"
+              value={stage.answer}
+              onChange={(event) => setStage({ ...stage, answer: event.target.value })}
+              placeholder="Type or dictate your answer here..."
+              rows={8}
+              maxLength={MAX_ANSWER_LENGTH}
+              disabled={stage.submitting}
+            />
+
+            <div className="practice-card__input-toolbar">
+              <div className="practice-card__mic-container">
+                {stt.isSupported && (
+                  <button
+                    type="button"
+                    className={`practice-card__mic-btn ${
+                      stt.isListening ? 'practice-card__mic-btn--listening' : ''
+                    }`}
+                    onClick={stt.toggleListening}
+                    disabled={stage.submitting}
+                    title={stt.isListening ? 'Stop dictating' : 'Dictate answer with microphone'}
+                    aria-label={stt.isListening ? 'Stop dictating' : 'Dictate answer with microphone'}
+                  >
+                    <MicIcon width={16} height={16} />
+                  </button>
+                )}
+                {stt.isListening && (
+                  <span className="practice-card__stt-live">
+                    <span className="practice-card__pulse-dot" />
+                    <span>Recording…</span>
+                  </span>
+                )}
+                {stt.error && (
+                  <span className="practice-card__stt-error">{stt.error}</span>
+                )}
+              </div>
+              <div className="practice-card__char-counter">
+                {stage.answer.length} / {MAX_ANSWER_LENGTH} chars
+              </div>
+            </div>
+          </div>
 
           {stage.error && <p className="practice-card__error">{stage.error}</p>}
 
@@ -250,7 +302,7 @@ export function PracticeCard() {
             {stage.error && (
               <button
                 className="practice-card__button practice-card__button--ghost"
-                onClick={() => setStage({ name: 'idle' })}
+                onClick={handleStartOver}
                 disabled={stage.submitting}
               >
                 Start over
@@ -263,7 +315,24 @@ export function PracticeCard() {
       {stage.name === 'graded' && (
         <div className="practice-card__panel">
           <ScoreMark score={stage.score} />
-          <p className="practice-card__feedback">{stage.feedback}</p>
+          
+          <div className="practice-card__feedback-header">
+            <div className="practice-card__feedback-top">
+              <span className="practice-card__feedback-label">Diagnostic Feedback</span>
+              {tts.isSupported && (
+                <button
+                  type="button"
+                  className={`practice-card__voice-btn ${tts.isSpeaking ? 'practice-card__voice-btn--active' : ''}`}
+                  onClick={() => (tts.isSpeaking ? tts.cancel() : tts.speak(stage.feedback))}
+                  title={tts.isSpeaking ? 'Stop feedback audio' : 'Listen to feedback'}
+                  aria-label={tts.isSpeaking ? 'Stop feedback audio' : 'Listen to feedback'}
+                >
+                  {tts.isSpeaking ? <StopIcon width={13} height={13} /> : <SpeakerIcon width={14} height={14} />}
+                </button>
+              )}
+            </div>
+            <p className="practice-card__feedback">{stage.feedback}</p>
+          </div>
 
           <div className="practice-card__actions">
             <button
@@ -275,7 +344,10 @@ export function PracticeCard() {
             </button>
             <button
               className="practice-card__button"
-              onClick={() => guardedExit(() => setStage({ name: 'idle' }))}
+              onClick={() => guardedExit(() => {
+                tts.cancel()
+                setStage({ name: 'idle' })
+              })}
             >
               Start another question
             </button>

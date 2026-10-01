@@ -1,5 +1,5 @@
 .behavioral-card {
-  width: min(560px, 100%);
+  width: min(620px, 100%);
   background: var(--paper);
   border: 1px solid var(--rule);
   border-radius: 10px;
@@ -11,6 +11,8 @@
   font-family: var(--font-mono);
   font-size: 0.78rem;
   color: var(--ink-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 .behavioral-card__panel {
@@ -40,28 +42,29 @@
 }
 
 .behavioral-card__voice-btn {
-  background: transparent;
+  background: var(--paper);
   border: 1px solid var(--rule);
-  border-radius: 4px;
-  padding: 0.35rem 0.65rem;
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
+  border-radius: 6px;
+  width: 32px;
+  height: 32px;
+  padding: 0;
   color: var(--ink);
   cursor: pointer;
   display: inline-flex;
   align-items: center;
-  gap: 0.35rem;
+  justify-content: center;
   flex-shrink: 0;
   transition: all 150ms ease;
 }
 
 .behavioral-card__voice-btn:hover:not(:disabled) {
-  background: var(--paper);
-  border-color: var(--ink);
+  background: var(--canvas);
+  border-color: var(--olive-deep);
+  color: var(--olive-deep);
 }
 
 .behavioral-card__voice-btn--active {
-  background: rgba(180, 40, 40, 0.1);
+  background: rgba(184, 51, 42, 0.1);
   border-color: var(--ink-red);
   color: var(--ink-red);
 }
@@ -84,6 +87,7 @@
   border: none;
   border-top: 1px solid var(--rule);
   padding: 0.9rem 0 0;
+  box-sizing: border-box;
 }
 
 .behavioral-card__textarea:focus {
@@ -106,37 +110,70 @@
   color: var(--ink-muted);
 }
 
+.behavioral-card__mic-container {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
 .behavioral-card__mic-btn {
-  background: transparent;
+  background: var(--paper);
   border: 1px solid var(--rule);
-  border-radius: 4px;
-  padding: 0.35rem 0.75rem;
-  font-family: var(--font-mono);
-  font-size: 0.78rem;
+  border-radius: 6px;
+  width: 34px;
+  height: 34px;
+  padding: 0;
   color: var(--ink);
   cursor: pointer;
   display: inline-flex;
   align-items: center;
-  gap: 0.4rem;
+  justify-content: center;
   transition: all 150ms ease;
+  flex-shrink: 0;
 }
 
 .behavioral-card__mic-btn:hover:not(:disabled) {
-  background: var(--paper);
-  border-color: var(--ink);
+  background: var(--canvas);
+  border-color: var(--olive-deep);
+  color: var(--olive-deep);
 }
 
 .behavioral-card__mic-btn--listening {
-  background: #fdf0ef;
+  background: var(--ink-red);
   border-color: var(--ink-red);
-  color: var(--ink-red);
+  color: #ffffff;
   animation: pulse-mic 1.5s infinite;
 }
 
-@keyframes pulse-mic {
-  0% { box-shadow: 0 0 0 0 rgba(180, 40, 40, 0.4); }
-  70% { box-shadow: 0 0 0 6px rgba(180, 40, 40, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(180, 40, 40, 0); }
+.behavioral-card__mic-btn--listening:hover:not(:disabled) {
+  background: #962820;
+  color: #ffffff;
+}
+
+.behavioral-card__stt-live {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: var(--ink-red);
+  font-size: 0.72rem;
+}
+
+.behavioral-card__pulse-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--ink-red);
+  flex-shrink: 0;
+  animation: mic-pulse 1.2s infinite ease-in-out;
+}
+
+.behavioral-card__stt-error {
+  color: var(--ink-red);
+  font-size: 0.75rem;
+}
+
+.behavioral-card__char-counter {
+  color: var(--ink-muted);
 }
 
 .behavioral-card__preset-banner {
@@ -210,7 +247,28 @@
   display: flex;
   gap: 0.75rem;
   flex-wrap: wrap;
-  margin-top: 1rem;
+}
+
+.behavioral-card__feedback-header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  margin: 0 0 1.75rem;
+}
+
+.behavioral-card__feedback-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.behavioral-card__feedback-label {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--ink-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 .behavioral-card__feedback {
@@ -218,7 +276,7 @@
   font-size: 1.05rem;
   line-height: 1.65;
   color: var(--ink);
-  margin: 0 0 1.75rem;
+  margin: 0;
   white-space: pre-wrap;
 }
 
