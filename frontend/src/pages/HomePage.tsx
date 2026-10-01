@@ -198,6 +198,14 @@ export function HomePage() {
               Practice open-ended questions assessing communication, leadership, and situational responses.
             </p>
           </Link>
+
+          <Link to="/sandbox" className="mode-card">
+            <span className="mode-card__badge">Live Sandbox</span>
+            <h3 className="mode-card__title">Interactive Live Coding</h3>
+            <p className="mode-card__body">
+              Solve algorithmic and system coding problems with real-time test execution and AI diagnostic code reviews.
+            </p>
+          </Link>
         </div>
       </section>
 

@@ -4,6 +4,7 @@ import {
   HomeIcon,
   AnalyticsIcon,
   QuestionBankIcon,
+  CodeIcon,
   PresetsIcon,
   SavedReportsIcon,
   SettingsIcon,
@@ -25,6 +26,11 @@ const NAV_ITEMS: NavItem[] = [
     label: 'Home',
     icon: HomeIcon,
     exact: true,
+  },
+  {
+    to: '/sandbox',
+    label: 'Coding Sandbox',
+    icon: CodeIcon,
   },
   {
     to: '/analytics',

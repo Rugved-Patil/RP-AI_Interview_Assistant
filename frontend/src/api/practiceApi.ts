@@ -596,3 +596,126 @@ export function clearDataStore(body: ClearDataRequest): Promise<ClearDataRespons
     body: JSON.stringify(body),
   }).then(parseOrThrow<ClearDataResponse>)
 }
+
+/* =========================================================================
+   Live Coding Sandbox Types & Endpoints
+   ========================================================================= */
+
+export type SupportedLanguage = 'python' | 'javascript'
+
+export interface SandboxTestCase {
+  id: number
+  input_data: string
+  expected_output: string
+  description?: string | null
+  is_hidden?: boolean
+}
+
+export interface SandboxTestResult {
+  test_case_id: number
+  passed: boolean
+  input_data: string
+  expected_output: string
+  actual_output?: string | null
+  execution_time_ms: number
+  error?: string | null
+}
+
+export interface SandboxExampleCase {
+  input: string
+  output: string
+  explanation?: string | null
+}
+
+export interface CodingProblemSummary {
+  id: string
+  title: string
+  domain: string
+  difficulty: 'junior' | 'mid' | 'senior' | 'lead' | string
+  tags: string[]
+  description_snippet: string
+  test_cases_count: number
+}
+
+export interface CodingProblem {
+  id: string
+  title: string
+  domain: string
+  difficulty: 'junior' | 'mid' | 'senior' | 'lead' | string
+  tags: string[]
+  description: string
+  constraints: string[]
+  examples: SandboxExampleCase[]
+  starter_code: Record<string, string>
+  test_cases: SandboxTestCase[]
+  entry_function?: string | null
+}
+
+export interface RunCodeRequest {
+  code: string
+  language: SupportedLanguage
+  test_cases: SandboxTestCase[]
+  custom_input?: string | null
+  entry_function?: string | null
+}
+
+export interface RunCodeResponse {
+  success: boolean
+  stdout: string
+  stderr: string
+  results: SandboxTestResult[]
+  all_passed: boolean
+  passed_count: number
+  total_count: number
+  total_execution_time_ms: number
+  error?: string | null
+}
+
+export interface GradeCodeRequest {
+  problem_id?: string | null
+  problem_title: string
+  code: string
+  language: SupportedLanguage
+  test_results: SandboxTestResult[]
+  role?: string | null
+  experience_level?: string | null
+}
+
+export interface GradeCodeResponse {
+  score: number
+  time_complexity: string
+  space_complexity: string
+  correctness_assessment: string
+  code_quality_feedback: string
+  edge_cases_feedback: string
+  recommended_improvements: string[]
+  detailed_markdown: string
+}
+
+export function listCodingProblems(domain?: string, difficulty?: string): Promise<CodingProblemSummary[]> {
+  const params = new URLSearchParams()
+  if (domain && domain !== 'all') params.set('domain', domain)
+  if (difficulty && difficulty !== 'all') params.set('difficulty', difficulty)
+  const qs = params.toString() ? `?${params.toString()}` : ''
+  return fetch(`${API_BASE_URL}/sandbox/problems${qs}`).then(parseOrThrow<CodingProblemSummary[]>)
+}
+
+export function getCodingProblem(id: string): Promise<CodingProblem> {
+  return fetch(`${API_BASE_URL}/sandbox/problems/${encodeURIComponent(id)}`).then(parseOrThrow<CodingProblem>)
+}
+
+export function runCodeInSandbox(body: RunCodeRequest): Promise<RunCodeResponse> {
+  return fetch(`${API_BASE_URL}/sandbox/run`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  }).then(parseOrThrow<RunCodeResponse>)
+}
+
+export function gradeCodingSubmission(body: GradeCodeRequest): Promise<GradeCodeResponse> {
+  return fetch(`${API_BASE_URL}/sandbox/grade`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  }).then(parseOrThrow<GradeCodeResponse>)
+}

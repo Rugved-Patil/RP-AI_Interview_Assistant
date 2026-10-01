@@ -21,6 +21,7 @@ from app.api.routes import (
     presets,
     questions,
     reports,
+    sandbox,
     sessions,
     settings as settings_routes,
 )
@@ -56,6 +57,7 @@ app.include_router(presets.router)
 app.include_router(questions.router)
 app.include_router(analytics.router)
 app.include_router(settings_routes.router)
+app.include_router(sandbox.router)
 
 
 @app.get("/")
