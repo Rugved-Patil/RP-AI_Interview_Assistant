@@ -16,6 +16,7 @@ import { UnsavedSessionModal } from '../components/UnsavedSessionModal'
 import { useSpeechRecognition } from '../hooks/useSpeechRecognition'
 import { useSpeechSynthesis } from '../hooks/useSpeechSynthesis'
 import { MicIcon, SpeakerIcon, SpeakerOffIcon, StopIcon } from '../components/Icons'
+import { FormattedFeedback } from '../components/FormattedFeedback'
 import './MockInterviewPage.css'
 
 interface MessageTurn {
@@ -659,7 +660,7 @@ export function MockInterviewPage() {
             {stage.dimensions && <DimensionsBreakdown dimensions={stage.dimensions} />}
 
             <h2 className="mock-graded__title">Holistic Feedback</h2>
-            <p className="mock-graded__feedback">{stage.feedback}</p>
+            <FormattedFeedback content={stage.feedback} className="mock-graded__feedback" />
 
             <details className="mock-graded__transcript-details">
               <summary className="mock-graded__transcript-summary">

@@ -15,6 +15,7 @@ import { UnsavedSessionModal } from './UnsavedSessionModal'
 import { useSpeechRecognition } from '../hooks/useSpeechRecognition'
 import { useSpeechSynthesis } from '../hooks/useSpeechSynthesis'
 import { MicIcon, SpeakerIcon, StopIcon } from './Icons'
+import { FormattedFeedback } from './FormattedFeedback'
 import './BehavioralPracticeCard.css'
 
 type Stage =
@@ -329,7 +330,7 @@ export function BehavioralPracticeCard() {
                 </button>
               )}
             </div>
-            <p className="behavioral-card__feedback">{stage.feedback}</p>
+            <FormattedFeedback content={stage.feedback} className="behavioral-card__feedback" />
           </div>
 
           <div className="behavioral-card__actions">

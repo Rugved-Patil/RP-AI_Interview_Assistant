@@ -7,6 +7,7 @@ import {
 } from '../api/practiceApi'
 import type { ReportSummary, SavedInterviewReportSummary } from '../api/practiceApi'
 import { FilterIcon } from './Icons'
+import { FormattedFeedback } from './FormattedFeedback'
 import './SavedReports.css'
 
 export type UnifiedReport =
@@ -395,7 +396,7 @@ function MockReportRow({
 
           <div className="report-row__section">
             <p className="report-row__label">Diagnostic Feedback &amp; Assessment</p>
-            <p className="report-row__text">{report.feedback}</p>
+            <FormattedFeedback content={report.feedback} className="report-row__text" />
           </div>
 
           <div className="report-row__section">
@@ -533,7 +534,7 @@ function ReportRow({
 
           <div className="report-row__section">
             <p className="report-row__label">Feedback &amp; Evaluation</p>
-            <p className="report-row__text">{report.feedback}</p>
+            <FormattedFeedback content={report.feedback} className="report-row__text" />
           </div>
 
           <div className="report-row__actions">

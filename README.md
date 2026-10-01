@@ -1,37 +1,113 @@
 # RP-AI Interview Assistant
 
-An AI-powered mock interview practice app. Pick a role, get a technical interview question written for it, answer in your own words, and get graded by an LLM with a 0–10 score and specific feedback. Optionally save the report for later. Everything runs locally against free-tier LLM APIs — no paid services.
+An AI-powered interview practice platform built for high-signal technical and behavioral interview preparation. Practice full multi-turn conversational mock interviews or targeted single drills, grounded in industry-standard questions via an offline local RAG engine, with instant 5-dimensional diagnostic grading, lifetime progress analytics, voice interaction, and customizable presets.
 
-This is a self-directed learning project (AI coding tools + prompt engineering), built and documented as a CV portfolio piece. Full design rationale and decision history lives in [`RP-AI_Interview_Assistant_Project_Scope.md`](./docs/RP-AI_Interview_Assistant_Project_Scope.md).
+Everything runs locally on your machine with a **\$0 budget** using free-tier LLM APIs (Groq for real-time conversational turns, Google Gemini for deep holistic grading) and a lightweight local vector store.
 
-> **Status: v0.1.0.** Phase 1 (technical-question practice with presets and saved reports) is complete. The full mock interview and voice mode are planned for v1.0.0.
+> **Current Status: v0.5.0 Release**  
+> Complete implementation of Multi-Turn Mock Interviews (Technical & Behavioral), Single Practice Drills (Technical & STAR), Grounded Offline RAG Question Bank, 5-Dimensional Evidence-Based Diagnostic Grader, Lifetime Analytics, Unified Saved Reports, Native Voice (STT/TTS), and the Organic Linen & Olive Design System.
 
-## Features (current — Phase 1, v0.1.0)
+---
 
-- **Technical questions:** get one AI-generated technical question tailored to your role (and optionally a company and location), answer it in the text box, and get graded right away with a 0–10 score and written feedback. The grader is told the same role/company/location, so the bar it applies fits the role rather than being generic.
-- **Interview presets:** save role / company / location combinations, choose which one is active, and edit or delete them on a dedicated Presets page. Only the role is required.
-- **Opt-in save:** nothing is stored unless you click "Save this report". Saved reports keep the question, your answer, the score, the feedback, and the role/company/location it was graded against. Browse them most recent first, and delete any you no longer want.
-- Text-based only for now. Voice input/output, a full multi-turn mock interview, and a Behavioral mode are planned (see the [Roadmap](#roadmap)).
+## Key Features (v0.5.0)
 
-## How it works
+### 1. Full Multi-Turn Mock Interviews
+- **Conversational Simulation**: Dynamic, multi-turn interview dialogues with natural follow-ups and candidate-driven progression.
+- **Track Branching**: Dedicated **Technical** (with domain selection like SWE, ML/AI, Backend, Frontend, System Design) and **Behavioral/HR** tracks.
+- **Seniority & Context Calibration**: Adapts question depth and rubric stringency according to candidate seniority (*Fresher, Mid-Level, Senior, Lead*), target company, and location.
+- **Full Transcript Preservation**: Running conversational turns held server-side for end-to-end evaluation.
 
-1. You choose an active interview preset. The backend asks the **interviewer** LLM (Groq) for one technical question, using a prompt built from that preset.
-2. Your answer is held in memory for the life of that practice attempt.
-3. The **grader** LLM (Gemini) scores it with a separate grading prompt, also built from the preset. If the grader's reply can't be parsed, the request fails with a clear error and you can retry — the app never invents a score.
-4. Only if you click "Save this report" does anything get written to disk (SQLite).
+### 2. Single-Question Practice Drills
+- **Technical Questions Drill**: Instant, single-question technical drills tailored to your preset with immediate feedback and scoring.
+- **Behavioral (STAR) Drill**: Specialized behavioral questions evaluated against the **STAR** (Situation, Task, Action, Result) methodology.
 
-Both LLM calls go through a provider-agnostic wrapper with shared retry-with-backoff for transient errors such as free-tier rate limits, so providers can be swapped without touching the routes.
+### 3. Local RAG Retrieval Engine & Question Bank
+- **Curated Exemplar Bank**: 100+ vetted industry questions across 7 core domains (Backend, Frontend, ML/AI, System Design, DSA, DevOps/Cloud, Behavioral).
+- **Pure Python Vector Store**: Built-in TF-IDF + BM25 hybrid retrieval engine with n-gram tokenization and $L_2$-normalized cosine similarity.
+- **Zero Hallucination Grounding**: Contextually grounds the interviewer LLM with exemplar blueprints to generate realistic, high-depth interview questions without external vector database dependencies.
+- **Question Bank Explorer**: Interactive UI to search, filter by domain/difficulty, and inspect grading rubrics.
+
+### 4. 5-Dimensional Diagnostic Assessment Engine
+- **Evidence-Based Grading**: Evaluates responses strictly on transcript evidence, citing exact strengths, gaps, and actionable improvements rather than generic praise.
+- **5 Calibrated Dimensions (0–10 each)**:
+  - **Technical Correctness**: Factual precision and technical validity.
+  - **Depth of Knowledge**: Understanding of underlying mechanisms, trade-offs, and edge cases.
+  - **Problem Solving**: Systematic decomposition, constraint evaluation, and adaptive reasoning.
+  - **Communication**: Clarity, structure, conciseness, and professional coherence.
+  - **Practical Readiness**: Production-level thinking, operational considerations, and architecture viability.
+- **Seniority-Aware Bar**: Calibrated expectations tailored to your selected experience level.
+
+### 5. Lifetime Analytics & Progress Tracking
+- **Summary Metrics**: Lifetime interview counts, overall average score, practice time, top demonstrated competencies, and recommended focus areas.
+- **Score Trajectory & Domain Radar**: Interactive visual breakdown of performance trends across domains and diagnostic dimensions.
+- **Unified & Filterable Views**: View combined analytics or isolate Full Mock Interviews vs. Single Practice Drills.
+
+### 6. Unified Saved Reports Repository
+- **Comprehensive History**: Opt-in persistence for all practice sessions and mock interviews.
+- **Smart Prioritized Search**: Search keywords across roles, companies, scores, feedback, and verbatim transcripts.
+- **Multi-Criteria Filter Drawer**: Filter reports by drill type, target role, company, and minimum score.
+- **Two-Step Safe Deletion**: Safe deletion confirmation with instant UI updates.
+
+### 7. Native Voice Interface (Speech-to-Text & Text-to-Speech)
+- **STT Dictation**: Browser-native voice input via the Web Speech API with live visual feedback.
+- **Natural TTS Playback**: Natural voice synthesis for interviewer questions and feedback with audio wave indicators and cancellation controls.
+- **Minimalist Controls**: Modern SVG icon-first controls designed for distraction-free practice.
+
+### 8. Organic Linen & Olive Design System
+- **Tactile Aesthetic**: Realistic woven fabric canvas texture with 8 switchable theme palettes (*Warm Linen, Sage Botanical, Forest Moss, Terracotta Sand, Slate Minimal, Deep Navy, Nocturne Olive, Espresso Roast*).
+- **Responsive Navigation**: Collapsible right-hand drawer navigation with clean icon and label states.
+- **Smart Onboarding**: Contextual preset onboarding banner on the Home page when starting fresh.
+
+---
 
 ## Tech Stack
 
-| Layer | Choice |
-|---|---|
-| Backend | Python, FastAPI |
-| Frontend | React + TypeScript (Vite) |
-| Interviewer LLM | Groq (free tier) |
-| Grading LLM | Google Gemini (free tier) |
-| Persistence | SQLite via SQLAlchemy |
-| Testing | pytest, with fake LLM providers and an in-memory database |
+| Layer | Technology | Details |
+|---|---|---|
+| **Backend** | Python 3.11+, FastAPI, Pydantic v2 | High-performance asynchronous REST API |
+| **Frontend** | React 19, TypeScript, Vite | Modern component architecture, React Router v7 |
+| **Interviewer LLM** | Groq (`openai/gpt-oss-20b` or Llama 3) | Low-latency conversational turn generation |
+| **Grading LLM** | Google Gemini (`gemini-3.6-flash`) | Large-context holistic diagnostic evaluation |
+| **Retrieval Engine** | Pure Python TF-IDF + BM25 Vector Store | Offline local RAG ($0 cost, no external vector DB) |
+| **Persistence** | SQLite via SQLAlchemy | Opt-in report storage and preset management |
+| **Voice I/O** | Web Speech API | Client-side STT dictation and TTS synthesis |
+| **Testing** | pytest, pytest-asyncio (211 tests) | 100% backend test suite with fake LLM providers |
+
+---
+
+## Project Architecture
+
+```text
+┌────────────────────────────────────────────────────────┐
+│               Frontend (React + TypeScript)            │
+│  - Multi-Turn Mock & Single Practice Drills (Tech/STAR)│
+│  - Question Bank Explorer & RAG Search                 │
+│  - Lifetime Analytics & Score Trajectory               │
+│  - Unified Reports Drawer & Filter Modal               │
+│  - Web Speech API (STT Voice Input / TTS Playback)     │
+│  - Theme Engine (8 Palettes + Linen Canvas Texture)    │
+└───────────────────────────┬────────────────────────────┘
+                            │ HTTP / JSON
+                            ▼
+┌────────────────────────────────────────────────────────┐
+│                  Backend (FastAPI)                     │
+│  ├── API Routes: sessions, interviews, grading,       │
+│  │               reports, presets, questions, analytics │
+│  ├── In-Memory Stores: Technical & Mock Sessions       │
+│  ├── Local Offline RAG Engine (TF-IDF / BM25)          │
+│  ├── Provider-Agnostic LLM Wrapper & Retry Backoff     │
+│  └── SQLite Database (SQLAlchemy ORM)                  │
+└──────────────┬──────────────────────────┬──────────────┘
+               │                          │
+               ▼                          ▼
+┌──────────────────────────────┐  ┌──────────────────────┐
+│       LLM Providers          │  │ SQLite Local Storage │
+│ - Groq: Real-time turn engine│  │ - Saved Reports      │
+│ - Gemini: Diagnostic grader  │  │ - Interview Presets  │
+└──────────────────────────────┘  └──────────────────────┘
+```
+
+---
 
 ## Project Structure
 
@@ -40,157 +116,201 @@ RP-AI_Interview_Assistant/
 ├── backend/
 │   ├── app/
 │   │   ├── api/routes/
+│   │   │   ├── analytics.py          # GET /analytics/summary, /analytics/timeline, etc.
+│   │   │   ├── grading.py            # POST /sessions/{id}/grade, /interviews/{id}/grade
 │   │   │   ├── health.py             # GET /health
-│   │   │   ├── sessions.py           # POST /sessions/situational, POST /sessions/{id}/answer
-│   │   │   ├── grading.py            # POST /sessions/{id}/grade
-│   │   │   ├── reports.py            # POST /sessions/{id}/save, GET /reports, DELETE /reports/{id}
-│   │   │   └── presets.py            # POST/GET /presets, GET/PUT/DELETE /presets/{id}
+│   │   │   ├── interviews.py         # POST /interviews/start, /interviews/{id}/respond
+│   │   │   ├── presets.py            # CRUD /presets
+│   │   │   ├── questions.py          # GET /questions (curated bank explorer)
+│   │   │   ├── reports.py            # CRUD /reports with multi-filter query support
+│   │   │   ├── sessions.py           # Single-drill session management (Tech & STAR)
+│   │   │   └── settings.py           # GET /settings, PUT /settings/theme
 │   │   ├── core/
-│   │   │   └── config.py             # env-driven settings (API keys, model names, CORS origin)
+│   │   │   └── config.py             # Centralized settings & model declarations
+│   │   ├── data/
+│   │   │   └── question_bank.json    # Curated exemplar questions & rubrics
 │   │   ├── db/
-│   │   │   ├── base.py               # SQLAlchemy engine/session, Base, init_db()
+│   │   │   ├── base.py               # SQLite engine, Base, init_db()
 │   │   │   └── models.py             # SavedReport and InterviewPreset ORM models
 │   │   ├── schemas/
-│   │   │   ├── session.py            # request/response models for sessions (incl. answer limits)
-│   │   │   ├── report.py             # request/response models for saved reports
-│   │   │   ├── preset.py             # request/response models for presets
-│   │   │   └── personalization.py    # shared role/company/location validation rules
+│   │   │   ├── analytics.py          # Analytics KPIs and chart models
+│   │   │   ├── interview.py          # Mock interview requests and responses
+│   │   │   ├── preset.py             # Preset models
+│   │   │   ├── question.py           # Curated question models
+│   │   │   ├── report.py             # Saved report models
+│   │   │   └── session.py            # Single-practice session models
 │   │   ├── services/
-│   │   │   ├── llm/
-│   │   │   │   ├── base.py           # LLMProvider interface, Message/Role types
-│   │   │   │   ├── factory.py        # get_provider(LLMRole) -> the right provider
-│   │   │   │   ├── groq_provider.py  # interviewer provider (Groq free tier)
-│   │   │   │   ├── gemini_provider.py# grader provider (Gemini free tier)
-│   │   │   │   └── retry.py          # shared retry-with-backoff for transient errors
-│   │   │   └── session_store.py      # in-memory store for in-progress TechnicalSessions
-│   │   └── main.py                   # FastAPI app, CORS, router registration
-│   ├── scripts/
-│   │   └── smoke_test_llm.py         # manual script - hits the real Groq/Gemini APIs
-│   ├── tests/
-│   │   ├── conftest.py               # in-memory DB + fake LLM providers shared by the tests
-│   │   ├── test_llm_wrapper.py       # LLM wrapper / provider behaviour
-│   │   ├── test_retry.py             # retry-with-backoff
-│   │   ├── test_prompts.py           # interviewer prompt construction
-│   │   ├── test_grading.py           # grader route and reply parser
-│   │   ├── test_sessions.py          # start-session and submit-answer routes
-│   │   ├── test_presets.py           # preset CRUD
-│   │   └── test_reports.py           # opt-in save, list, delete
+│   │   │   ├── llm/                  # Provider-agnostic LLM interface & retry engine
+│   │   │   │   ├── base.py
+│   │   │   │   ├── factory.py
+│   │   │   │   ├── gemini_provider.py
+│   │   │   │   ├── groq_provider.py
+│   │   │   │   └── retry.py
+│   │   │   ├── rag/                  # Offline RAG retrieval engine
+│   │   │   │   ├── retriever.py      # Domain & keyword query retriever
+│   │   │   │   └── vector_store.py   # Pure Python TF-IDF/BM25 vector space
+│   │   │   ├── interview_store.py    # In-memory store for multi-turn mock interviews
+│   │   │   └── session_store.py      # In-memory store for single drills
+│   │   └── main.py                   # FastAPI app entry point & CORS
+│   ├── tests/                        # 211 pytest test cases across all modules
 │   ├── .env.example
-│   ├── pyproject.toml                # pytest configuration
+│   ├── pyproject.toml
 │   └── requirements.txt
 │
 ├── frontend/
-│   ├── public/
-│   │   └── favicon.svg
-│   └── src/
-│       ├── api/
-│       │   └── practiceApi.ts             # fetch wrapper for every backend endpoint
-│       ├── components/
-│       │   ├── PracticeCard.tsx/.css      # technical-question flow (start → answer → grade → save)
-│       │   ├── InterviewPresets.tsx/.css  # create / edit / delete presets, choose the active one
-│       │   └── SavedReports.tsx/.css      # list + two-step-confirm delete of saved reports
-│       ├── pages/
-│       │   ├── HomePage.tsx/.css          # mode-selection landing page
-│       │   ├── SituationalPracticePage.tsx# hosts the technical-question flow (/practice)
-│       │   ├── MockInterviewPage.tsx/.css # Phase 2 placeholder - not built yet
-│       │   ├── PresetsPage.tsx            # /presets
-│       │   └── SavedReportsPage.tsx       # /reports
-│       ├── activePreset.ts                # which preset is active (browser localStorage)
-│       ├── App.tsx/.css                   # BrowserRouter + persistent header/nav layout
-│       ├── main.tsx
-│       └── index.css
+│   ├── src/
+│   │   ├── api/                      # Type-safe API clients for all backend routes
+│   │   │   ├── analyticsApi.ts
+│   │   │   ├── interviewApi.ts
+│   │   │   ├── practiceApi.ts
+│   │   │   └── questionsApi.ts
+│   │   ├── components/               # Modular UI components
+│   │   │   ├── BehavioralPracticeCard.tsx
+│   │   │   ├── Icons.tsx             # Clean, modern SVG icon set
+│   │   │   ├── InterviewPresets.tsx
+│   │   │   ├── PracticeCard.tsx
+│   │   │   ├── RightNavbar.tsx       # Collapsible right-hand navigation
+│   │   │   ├── SavedReports.tsx
+│   │   │   └── ThemeSelector.tsx
+│   │   ├── pages/                    # Application pages
+│   │   │   ├── AnalyticsPage.tsx
+│   │   │   ├── BehavioralPracticePage.tsx
+│   │   │   ├── HomePage.tsx
+│   │   │   ├── MockInterviewPage.tsx
+│   │   │   ├── PresetsPage.tsx
+│   │   │   ├── QuestionBankPage.tsx
+│   │   │   ├── SavedReportsPage.tsx
+│   │   │   ├── SettingsPage.tsx
+│   │   │   └── TechnicalPracticePage.tsx
+│   │   ├── theme.ts                  # 8 curated color palette definitions
+│   │   ├── voiceSettings.ts          # Speech synthesis & recognition settings
+│   │   ├── App.tsx
+│   │   ├── index.css                 # Global theme variables & canvas textures
+│   │   └── main.tsx
+│   ├── package.json
+│   ├── tsconfig.json
+│   └── vite.config.ts
 │
 ├── docs/
-│   └── RP-AI_Interview_Assistant_Project_Scope.md  # design rationale + decisions log
+│   └── RP-AI_Interview_Assistant_Project_Scope.md # Architectural decisions & log
 └── README.md
 ```
 
-(Standard boilerplate — `tsconfig*.json`, `eslint.config.js`, lockfiles, empty `__init__.py` package markers — is omitted above for readability.)
+---
 
 ## Getting Started
 
 ### Prerequisites
+- **Python 3.11+**
+- **Node.js 20.19+, 22.13+, or 24+**
+- Free API keys from [Groq Console](https://console.groq.com) and [Google AI Studio](https://aistudio.google.com)
 
-- Python 3.11+
-- Node.js 20.19+, 22.13+, or 24+ (the Vite and ESLint versions in the lockfile don't support anything older)
-- Free API keys from [console.groq.com](https://console.groq.com) and [aistudio.google.com](https://aistudio.google.com)
+---
 
-### Backend
+### Backend Setup
 
-```bash
-cd backend
-python -m venv venv
-source venv/bin/activate        # Windows: venv\Scripts\activate
-pip install -r requirements.txt
+1. Navigate to the backend directory and set up a virtual environment:
+   ```bash
+   cd backend
+   python -m venv venv
+   source venv/bin/activate        # Windows: venv\Scripts\activate
+   pip install -r requirements.txt
+   ```
 
-cp .env.example .env            # Windows: copy .env.example .env
-# then edit .env and paste in your real GROQ_API_KEY / GEMINI_API_KEY
+2. Create your `.env` file and populate your API keys:
+   ```bash
+   cp .env.example .env            # Windows: copy .env.example .env
+   ```
+   Open `.env` and configure:
+   ```env
+   GROQ_API_KEY=your_groq_api_key_here
+   GEMINI_API_KEY=your_gemini_api_key_here
+   ```
 
-uvicorn app.main:app --reload --port 8000
-```
+3. Start the FastAPI development server:
+   ```bash
+   uvicorn app.main:app --reload --port 8000
+   ```
+   The API will be available at `http://localhost:8000`. Interactive OpenAPI documentation is at `http://localhost:8000/docs`.
 
-Check it's running at `http://localhost:8000/docs`. The SQLite database file (`interview_reports.db`) is created inside `backend/` the first time the server starts.
+---
 
-### Frontend
+### Frontend Setup
 
-In a second terminal:
+In a separate terminal:
 
-```bash
-cd frontend
-npm install
-npm run dev
-```
+1. Navigate to the frontend directory:
+   ```bash
+   cd frontend
+   npm install
+   ```
 
-Open `http://localhost:5173`.
+2. Start the Vite development server:
+   ```bash
+   npm run dev
+   ```
+   Open `http://localhost:5173` in your browser.
 
-### First run
+---
 
-1. Open **Presets** in the header and add a preset. Only the role is required; company and location are optional.
-2. Click **Use this** on the preset to make it active.
-3. Go back to the home page, open **Technical questions**, and start a practice question.
-4. Type your answer, submit it, read the score and feedback, and click **Save this report** if you want to keep it. Saved reports are under **Saved reports** in the header.
+### First Run Walkthrough
+
+1. **Preset Setup**: When you first open the app, the Home page will prompt you to set up your primary interview preset (Target Role, Company, Location, and Seniority).
+2. **Practice Single Drills**: Select **Technical Questions** or **Behavioral (STAR)** on the Home page to practice focused questions with instant feedback. Use the mic button for voice dictation or the speaker button to listen to questions.
+3. **Run a Full Mock Interview**: Navigate to **Full Mock Interview**, choose your track (*Technical* or *Behavioral/HR*), select the domain and number of questions, and practice realistic conversational turn-taking.
+4. **Review Holistic Diagnostics**: Once an interview concludes, review your overall score, 5-dimensional breakdown, specific strengths, actionable growth areas, and transcript citations.
+5. **Track Progress**: Inspect your **Analytics** page to monitor your score trajectories and domain competency breakdown.
+6. **Customize**: Open **Settings** to choose from 8 linen themes and configure your preferred natural voice.
+
+---
 
 ## Running Tests
+
+### Backend Test Suite (pytest)
+The backend test suite covers all API routes, RAG vector retrieval, prompt generators, session stores, and retry logic using fake LLM providers and in-memory databases (no real API quota consumed):
 
 ```bash
 cd backend
 pytest -v
 ```
+*(All 211 tests passing)*
 
-The backend suite covers the LLM wrapper and retry logic, prompt construction, grading and its reply parser, sessions, presets, and saved reports. LLM providers and the database are faked, so the tests make no API calls, cost nothing, and never touch your real `interview_reports.db`.
-
-`backend/scripts/smoke_test_llm.py` is a separate, manually-run script that hits the real Groq/Gemini APIs. It is kept out of the automated suite deliberately, because it uses a sliver of real API quota.
-
-The frontend has no automated tests yet. Check it with:
+### Frontend Verification
+Verify TypeScript types and ESLint conformance:
 
 ```bash
 cd frontend
 npm run lint
-npm run build     # type-checks with tsc -b, then builds
+npm run build
 ```
+
+---
 
 ## Troubleshooting
 
-**Getting a `404 model not found` from Groq or Gemini?** This is expected to happen occasionally, not a bug — free-tier providers deprecate, rename, or move models off the free tier over time, and this project has already hit it more than once during development. It's a quick fix:
+- **`404 Model Not Found` from Groq or Gemini**: Free-tier providers periodically update available models. You can override default models anytime via your `.env` file (`GROQ_MODEL=...` or `GEMINI_MODEL=...`) without modifying code.
+- **`502 Bad Gateway` on grading or generation**: Usually caused by momentary free-tier rate limits. The backend automatically retries with exponential backoff. If it still fails, wait a few seconds and retry — your active session transcript is preserved in memory.
+- **Microphone / Speech Recognition Not Responding**: Ensure your browser has granted microphone permissions. The app automatically provides a text input fallback if microphone access is unavailable.
 
-1. Check the current model lists: [Groq](https://console.groq.com/docs/models) / [Gemini](https://ai.google.dev/gemini-api/docs/models).
-2. Update `groq_model` / `gemini_model` in `backend/app/core/config.py`, or override either without touching code by adding `GROQ_MODEL=...` / `GEMINI_MODEL=...` to your `.env`.
+---
 
-**Getting a `502` when starting a question or grading an answer?** Usually a free-tier rate limit or a malformed model reply. Wait a few seconds and retry — your typed answer is kept when grading fails.
+## Current Scope & Limitations
 
-**Getting `no such column` from SQLite after updating the code?** The project creates tables with `create_all()` rather than migrations, so it can't alter a table that already exists. Stop the backend and delete `backend/interview_reports.db`; a fresh one is created on the next start. This removes your saved reports and presets.
+- **In-Memory Active Sessions**: Active in-progress mock interviews and drills reside in memory; restarting the backend server resets in-progress sessions (saved reports are fully persisted in SQLite).
+- **Zero Cloud Deployment**: Designed and optimized specifically for local execution on individual developer machines.
+- **Free-Tier Model Rate Limits**: Throughput is governed by provider free-tier concurrency limits.
 
-## Known Limitations
+---
 
-- **In-progress practice sessions live in memory.** Restarting the backend discards any question you haven't finished (saved reports are unaffected). The UI offers "Start over" when this happens.
-- **No database migrations.** Schema changes between versions mean deleting the local `.db` file (see Troubleshooting). Alembic is a candidate for when Phase 2 adds mock-interview persistence.
-- **Local only.** There is no authentication or hosting setup; it is designed to be cloned and run on your own machine.
-- **Free-tier limits.** Rate limits and available models depend on Groq's and Google's current free tiers.
+## Roadmap towards v1.0.0
 
-## Roadmap
+- [ ] **Interactive Live Coding Sandbox**: In-browser code editor with syntax highlighting and unit testing to verify the `practical_readiness` dimension.
+- [ ] **Exportable PDF Reports**: Formatted report card exports for mock interviews to share with mentors or recruiters.
+- [ ] **Targeted Weak-Spot Drills**: Direct integration from Analytics into targeted question bank drills based on lower-scoring dimensions.
+- [ ] **Expanded Audio Customization**: Advanced voice pitch and speaking rate controls.
 
-- **Phase 2 (the v1.0.0 milestone):** full mock interview mode (multi-turn, HR/Technical branching, holistic end-of-interview grading), and voice input/output via the Web Speech API with a text fallback.
-- **Behavioral mode:** its own mode, with its own interviewer prompt and a STAR-based grading rubric.
-- **Phase 3:** RAG-grounded question generation, and possible stretch goals (adaptive difficulty, deeper answer analysis).
+---
 
-See the [scope document](./docs/RP-AI_Interview_Assistant_Project_Scope.md) for full detail on every decision and trade-off behind this project.
+## License & Attribution
+
+Designed and built by **Rugved Patil** as a portfolio project demonstrating end-to-end full-stack engineering, prompt design, local RAG architectures, and AI-assisted software development.
