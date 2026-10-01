@@ -1,10 +1,10 @@
 # RP-AI Interview Assistant — Project Scope
 
-**Status:** **v0.5.0 Release** — Feature-complete across Phases 1, 2, 3, and 4. Implements Full Multi-Turn Mock Interviews (Technical & Behavioral/HR), Single Practice Drills (Technical & STAR), Grounded Offline RAG Question Bank, 5-Dimensional Evidence-Based Diagnostic Grader, Lifetime Analytics & Score Trajectory, Unified Saved Reports Repository with Smart Search, Native Voice (STT/TTS), and the Organic Linen & Olive Design System. Phase 5 (Live Coding Sandbox, PDF Export) is scheduled for the upcoming v1.0.0 release.
+**Status:** **v1.0.0 Official Release** — Feature-complete across all 5 project phases (Phases 1, 2, 3, 4, and 5). Implements Full Multi-Turn Mock Interviews (Technical & Behavioral/HR), Single Practice Drills (Technical & STAR), In-Browser Python Live Coding Sandbox with AI Evaluation & Test Runner, Grounded Offline RAG Question Bank, 5-Dimensional Evidence-Based Diagnostic Grader, Lifetime Analytics & Score Trajectory, Unified Saved Reports Repository with Smart Search, Native Voice (STT/TTS), Organic Linen & Olive Design System, One-Command Launcher, and Remote Public HTTPS Tunneling.
 
 **Owner:** AI & Data Science student (personal practice/portfolio project)
 
-**Last updated:** 2026-10-01 — v0.5.0 release preparation: unified reports and analytics, minimalist symbol-first voice controls, calibrated 5-dimension diagnostic grading, and theme engine finalized.
+**Last updated:** 2026-10-02 — v1.0.0 Official Release finalized: Live Coding Sandbox, AI Big-O & code grader, persistent coding report analytics, one-command launcher (`./run.sh` / `start.py`), and `--share` remote live access.
 
 **Purpose:** A self-directed learning project to demonstrate proficiency in (a) building production-grade full-stack AI applications, (b) advanced prompt engineering and evidence-based diagnostic rubrics, (c) local offline RAG architectures with zero paid dependencies, and (d) clean, modern UI/UX design.
 
@@ -162,10 +162,13 @@ Both practice formats support browser-native voice interaction (STT speech recog
 - Organic Linen & Olive design system with 8 theme palettes and canvas fabric textures.
 - Minimalist symbol-first voice UI.
 
-### Phase 5 — Interactive Coding & Export Engine (v1.0.0 Target) — ⏳ Scheduled
-- In-browser live coding editor and sandbox for interactive coding interviews.
-- Exportable, beautifully formatted PDF report cards.
-- Targeted weak-spot practice recommendations linked directly to question bank drills.
+### Phase 5 — Interactive Coding, DevOps & v1.0.0 Release (v1.0.0) — ✅ Completed
+- In-browser interactive Python live coding sandbox and scratchpad.
+- Subprocess execution engine with 4.0-second timeout guard and clean standard error formatting.
+- Comprehensive unit test runner with real-time pass/fail badges and tracebacks.
+- Google Gemini code diagnostic reviewer with Big-O time/space complexity analysis, edge case checks, and code quality breakdown.
+- Persistent coding reports with automatic integration into Saved Reports and Lifetime Analytics.
+- Frictionless one-command launcher (`./run.sh` / `start.py`) and remote live sharing via secure HTTPS tunnels (`--share`).
 
 ---
 

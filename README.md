@@ -4,8 +4,8 @@ An AI-powered interview practice platform built for high-signal technical and be
 
 Everything runs locally on your machine with a **\$0 budget** using free-tier LLM APIs (Groq for real-time conversational turns, Google Gemini for deep holistic grading) and a lightweight local vector store.
 
-> **Current Status: v0.5.0 Release**  
-> Complete implementation of Multi-Turn Mock Interviews (Technical & Behavioral), Single Practice Drills (Technical & STAR), Grounded Offline RAG Question Bank, 5-Dimensional Evidence-Based Diagnostic Grader, Lifetime Analytics, Unified Saved Reports, Native Voice (STT/TTS), and the Organic Linen & Olive Design System.
+> **Current Status: v1.0.0 Official Release**  
+> Complete implementation of all 5 Development Phases: Multi-Turn Mock Interviews (Technical & Behavioral), Single Practice Drills (Technical & STAR), In-Browser Live Coding Sandbox & Python Test Runner, Grounded Offline RAG Question Bank, 5-Dimensional Diagnostic Grader, Lifetime Analytics, Unified Saved Reports, Native Voice (STT/TTS), One-Command Launch, and Remote Public HTTPS Tunneling.
 
 ---
 
@@ -323,12 +323,19 @@ npm run build
 
 ---
 
-## Roadmap towards v1.0.0
+## Release History & Milestone Status
+- [x] **Phase 1 (v0.1.0)**: Technical single-question drills, preset management, LLM retry backoff.
+- [x] **Phase 2 (v0.2.0–v0.3.0)**: Multi-turn mock interviews, STAR behavioral practice, Web Speech STT/TTS.
+- [x] **Phase 3 (v0.4.0)**: Curated 100+ question bank, offline TF-IDF/BM25 local RAG engine.
+- [x] **Phase 4 (v0.5.0)**: 5-dimensional evidence-based diagnostic grader, lifetime analytics, unified reports repository, organic linen theme engine.
+- [x] **Phase 5 (v1.0.0)**: In-browser live coding editor & test runner sandbox, Gemini Big-O & AI review, persistent coding reports, 1-command startup (`./run.sh`), and `--share` remote live tunneling.
 
-- [ ] **Interactive Live Coding Sandbox**: In-browser code editor with syntax highlighting and unit testing to verify the `practical_readiness` dimension.
-- [ ] **Exportable PDF Reports**: Formatted report card exports for mock interviews to share with mentors or recruiters.
-- [ ] **Targeted Weak-Spot Drills**: Direct integration from Analytics into targeted question bank drills based on lower-scoring dimensions.
-- [ ] **Expanded Audio Customization**: Advanced voice pitch and speaking rate controls.
+---
+
+## Future Roadmap (v1.1.0+)
+- [ ] **Exportable PDF Reports**: Downloadable, formatted PDF report cards for mock interviews and coding submissions.
+- [ ] **Targeted Weak-Spot Drills**: Direct 1-click drill launching from lower-scoring analytics dimensions.
+- [ ] **Expanded Audio Preferences**: Granular speech pitch and rate controls.
 
 ---
 

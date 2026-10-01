@@ -34,7 +34,7 @@ init_db()
 app = FastAPI(
     title=settings.app_name,
     description="Backend for the RP-AI mock interview practice app.",
-    version="0.5.0",
+    version="1.0.0",
 )
 
 # Allows the React (Vite) dev server to call this API from the browser.
