@@ -192,10 +192,19 @@ export interface EndInterviewResponse {
   status: string
 }
 
+export interface InterviewDimensions {
+  technical_correctness: number
+  depth_of_knowledge: number
+  problem_solving: number
+  communication: number
+  practical_readiness: number
+}
+
 export interface InterviewGradeResponse {
   session_id: string
   score: number
   feedback: string
+  dimensions?: InterviewDimensions | null
 }
 
 export function startInterview(body: StartInterviewRequest): Promise<StartInterviewResponse> {
@@ -257,6 +266,7 @@ export interface SavedInterviewReportSummary {
   feedback: string
   transcript: TurnSummary[]
   created_at: string
+  dimensions?: InterviewDimensions | null
 }
 
 export function saveInterviewReport(sessionId: string): Promise<SaveInterviewReportResponse> {
@@ -481,4 +491,107 @@ export function getAnalytics(filters?: AnalyticsFilters): Promise<AnalyticsDashb
 
 export function getAnalyticsSummary(): Promise<AnalyticsSummary> {
   return fetch(`${API_BASE_URL}/analytics/summary`).then(parseOrThrow<AnalyticsSummary>)
+}
+
+// --- Settings, Engine Diagnostics & Data Management (Phase 4/5) ------------
+
+export interface SettingsConfigResponse {
+  app_name: string
+  evaluator_configured: boolean
+  evaluator_key_preview: string | null
+  interviewer_configured: boolean
+  interviewer_key_preview: string | null
+  rag_enabled: boolean
+  rag_questions_count: number
+  total_single_reports: number
+  total_mock_reports: number
+  total_presets: number
+}
+
+export interface ProviderVerificationResult {
+  ok: boolean
+  message: string
+  provider: string
+  latency_ms: number | null
+}
+
+export interface VerifyConnectionsResponse {
+  evaluator: ProviderVerificationResult
+  interviewer: ProviderVerificationResult
+  all_ok: boolean
+}
+
+export interface ExportDataResponse {
+  version: string
+  exported_at: string
+  saved_reports: Record<string, unknown>[]
+  saved_interview_reports: Record<string, unknown>[]
+  presets: Record<string, unknown>[]
+}
+
+export interface ImportDataRequest {
+  saved_reports?: Record<string, unknown>[]
+  saved_interview_reports?: Record<string, unknown>[]
+  presets?: Record<string, unknown>[]
+}
+
+export interface ImportDataResponse {
+  imported_single_reports: number
+  imported_mock_reports: number
+  imported_presets: number
+  total_imported: number
+  message: string
+}
+
+export interface ClearDataRequest {
+  clear_single_reports?: boolean
+  clear_mock_reports?: boolean
+  clear_presets?: boolean
+  clear_all?: boolean
+}
+
+export interface ClearDataResponse {
+  cleared_single_reports: number
+  cleared_mock_reports: number
+  cleared_presets: number
+  message: string
+}
+
+export function getSettingsConfig(): Promise<SettingsConfigResponse> {
+  return fetch(`${API_BASE_URL}/settings/config`).then(parseOrThrow<SettingsConfigResponse>)
+}
+
+export function verifyEngineConnections(): Promise<VerifyConnectionsResponse> {
+  return fetch(`${API_BASE_URL}/settings/verify`, {
+    method: 'POST',
+  }).then(parseOrThrow<VerifyConnectionsResponse>)
+}
+
+export async function exportDataJSON(): Promise<ExportDataResponse> {
+  return fetch(`${API_BASE_URL}/data/export?format=json`).then(parseOrThrow<ExportDataResponse>)
+}
+
+export async function downloadDataCSV(): Promise<string> {
+  const res = await fetch(`${API_BASE_URL}/data/export?format=csv`)
+  if (!res.ok) {
+    const body = await res.text()
+    throw new Error(`Export failed (${res.status}): ${body}`)
+  }
+  return res.text()
+}
+
+export function importDataBackup(body: ImportDataRequest): Promise<ImportDataResponse> {
+  return fetch(`${API_BASE_URL}/data/import`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  }).then(parseOrThrow<ImportDataResponse>)
+}
+
+export function clearDataStore(body: ClearDataRequest): Promise<ClearDataResponse> {
+  return fetch(`${API_BASE_URL}/data/clear`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  }).then(parseOrThrow<ClearDataResponse>)
 }

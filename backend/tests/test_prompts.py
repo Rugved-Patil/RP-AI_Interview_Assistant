@@ -139,8 +139,14 @@ def test_mock_grader_prompt_keeps_the_labels_the_parser_depends_on():
         InterviewType.TECHNICAL, ExperienceLevel.MID,
         "ML Engineer", None, None,
     )
-    assert "SCORE:" in prompt
-    assert "FEEDBACK:" in prompt
+    assert '"score":' in prompt
+    assert '"feedback":' in prompt
+    assert '"dimensions":' in prompt
+    assert "technical_correctness" in prompt
+    assert "depth_of_knowledge" in prompt
+    assert "problem_solving" in prompt
+    assert "communication" in prompt
+    assert "practical_readiness" in prompt
 
 
 def test_mock_grader_prompt_focuses_appropriately_for_interview_type():

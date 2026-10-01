@@ -1,20 +1,21 @@
 /*
-  Design concept: Linen & Olive Editorial Theme with subtle fabric weave.
-  Palette:
-    - Main Background: Warm Linen (#E8DDC8)
-    - Secondary Background: Oat / Canvas (#D8CBB3)
-    - Primary Olive: Deep Olive (#596044)
-    - Secondary Olive: Muted Sage (#7B8061)
-    - Dark Text: Olive Charcoal (#303329)
-    - Light Text: Warm Ivory (#F5F0E5)
-    - Accent: Terracotta Beige (#A4775C)
-    - Subtle Border: Natural Taupe (#B9AC94)
+  Artisanal Textile & Editorial Design System with realistic fabric canvas weave.
+  Supported Themes:
+    1. linen-olive (Default Warm Linen & Deep Olive)
+    2. slate-sage (Cool Editorial & Sage Forest)
+    3. terracotta-dune (Desert Terracotta & Warm Sand Dune)
+    4. nocturne-olive (Dark Studio Canvas & Olive Glow)
+    5. espresso-oat (Rich Espresso & Cashmere Oat)
+    6. indigo-parchment (Oxford Indigo & Tailored Denim)
+    7. burgundy-tweed (Heritage Bordeaux & Rose Tweed)
+    8. nordic-moss (Nordic Pine & Moss Dark Studio)
 */
 
-:root {
+:root,
+[data-theme="linen-olive"] {
   color-scheme: light;
 
-  /* Theme Color Tokens */
+  /* Theme Color Tokens - Linen & Olive */
   --paper: #E8DDC8;              /* Warm Linen Main Background */
   --paper-card: #F5F0E5;         /* Warm Ivory Card Surface */
   --canvas: #D8CBB3;             /* Oat / Canvas Secondary Surface */
@@ -28,8 +29,167 @@
   --rule: #B9AC94;               /* Natural Taupe Subtle Border */
   --text-light: #F5F0E5;         /* Warm Ivory Light Text */
 
+  /* Realistic Fabric Texture Parameters (Light) */
+  --bg-fabric-thread-1: rgba(48, 51, 41, 0.035);
+  --bg-fabric-thread-2: rgba(185, 172, 148, 0.18);
+  --bg-fabric-slub: rgba(48, 51, 41, 0.03);
+
   --font-serif: 'Fraunces', 'Iowan Old Style', Georgia, serif;
   --font-mono: 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', Consolas, monospace;
+}
+
+[data-theme="slate-sage"] {
+  color-scheme: light;
+
+  /* Theme Color Tokens - Slate & Sage */
+  --paper: #DFE5E0;              /* Cool Misty Paper */
+  --paper-card: #F0F5F1;         /* Pale Sage White Card */
+  --canvas: #CFD9D1;             /* Soft Sage Canvas */
+  --ink: #222E25;                /* Forest Slate Dark Text */
+  --ink-muted: #486350;          /* Deep Sage Subtext */
+  --ink-sage: #6B8874;           /* Soft Sage */
+  --olive-deep: #486350;         /* Pine Sage Primary */
+  --olive-sage: #6B8874;         /* Muted Sage Secondary */
+  --accent: #C07D3E;             /* Amber Terracotta Accent */
+  --ink-red: #B56041;            /* Warm Crimson Accent */
+  --rule: #B5C4B8;               /* Cool Sage Border */
+  --text-light: #F0F5F1;         /* Light Ivory */
+
+  --bg-fabric-thread-1: rgba(34, 46, 37, 0.035);
+  --bg-fabric-thread-2: rgba(181, 196, 184, 0.22);
+  --bg-fabric-slub: rgba(34, 46, 37, 0.03);
+}
+
+[data-theme="terracotta-dune"] {
+  color-scheme: light;
+
+  /* Theme Color Tokens - Terracotta & Dune */
+  --paper: #EFE4D6;              /* Warm Sand Dune Background */
+  --paper-card: #FAF5EE;         /* Alabaster Card Surface */
+  --canvas: #E2D2C0;             /* Soft Dune Canvas */
+  --ink: #382B24;                /* Espresso Clay Text */
+  --ink-muted: #6B4E3D;          /* Muted Terracotta Brown */
+  --ink-sage: #8C6A54;           /* Soft Clay */
+  --olive-deep: #8C4A32;         /* Rich Terracotta Primary */
+  --olive-sage: #756D54;         /* Clay Olive Secondary */
+  --accent: #BA5D3F;             /* Desert Coral Accent */
+  --ink-red: #B2462D;            /* Rich Rust Accent */
+  --rule: #CEBCA8;               /* Sand Taupe Border */
+  --text-light: #FAF5EE;         /* Light Cream */
+
+  --bg-fabric-thread-1: rgba(56, 43, 36, 0.035);
+  --bg-fabric-thread-2: rgba(206, 188, 168, 0.24);
+  --bg-fabric-slub: rgba(56, 43, 36, 0.03);
+}
+
+[data-theme="nocturne-olive"] {
+  color-scheme: dark;
+
+  /* Theme Color Tokens - Nocturne Olive (Dark Studio) */
+  --paper: #1A1D17;              /* Dark Olive Charcoal Surface */
+  --paper-card: #242820;         /* Deep Studio Card Surface */
+  --canvas: #2E3328;             /* Muted Olive Charcoal Canvas */
+  --ink: #EAE3D2;                /* Warm Ivory Light Text */
+  --ink-muted: #B8B09C;          /* Soft Taupe Subtext */
+  --ink-sage: #98AB80;           /* Soft Bright Sage */
+  --olive-deep: #8EA473;         /* Bright Sage Olive Primary */
+  --olive-sage: #6B7D57;         /* Deep Muted Olive */
+  --accent: #D4956B;             /* Glowing Terracotta Accent */
+  --ink-red: #D47B62;            /* Coral Flame Accent */
+  --rule: #3D4435;               /* Charcoal Olive Border */
+  --text-light: #1A1D17;         /* Dark Text for bright buttons */
+
+  --bg-fabric-thread-1: rgba(234, 227, 210, 0.035);
+  --bg-fabric-thread-2: rgba(61, 68, 53, 0.40);
+  --bg-fabric-slub: rgba(234, 227, 210, 0.025);
+}
+
+[data-theme="espresso-oat"] {
+  color-scheme: light;
+
+  /* Theme Color Tokens - Espresso & Oat */
+  --paper: #E5DDD1;              /* Warm Oatmeal Background */
+  --paper-card: #F6F1EA;         /* Cashmere Cream Card */
+  --canvas: #D5C8B8;             /* Toasted Oat Canvas */
+  --ink: #2C1E16;                /* Dark Roast Coffee Text */
+  --ink-muted: #594233;          /* Warm Cocoa Subtext */
+  --ink-sage: #755B49;           /* Muted Mocha */
+  --olive-deep: #4A3528;         /* Deep Roast Primary */
+  --olive-sage: #7A5C47;         /* Bronze Clay Secondary */
+  --accent: #9C6644;             /* Warm Caramel Accent */
+  --ink-red: #8B4513;            /* Roasted Sienna */
+  --rule: #BFAFA0;               /* Toasted Linen Border */
+  --text-light: #F6F1EA;         /* Cream Text */
+
+  --bg-fabric-thread-1: rgba(44, 30, 22, 0.035);
+  --bg-fabric-thread-2: rgba(191, 175, 160, 0.22);
+  --bg-fabric-slub: rgba(44, 30, 22, 0.03);
+}
+
+[data-theme="indigo-parchment"] {
+  color-scheme: light;
+
+  /* Theme Color Tokens - Indigo & Parchment */
+  --paper: #E2E6EC;              /* Oxford Cloth Paper */
+  --paper-card: #F2F5F9;         /* Crisp White Cotton Card */
+  --canvas: #D0D7E2;             /* Chambray Canvas */
+  --ink: #1C293D;                /* Midnight Navy Text */
+  --ink-muted: #3B5377;          /* Indigo Slate Subtext */
+  --ink-sage: #587299;           /* Slate Denim */
+  --olive-deep: #2B4468;         /* Tailored Indigo Primary */
+  --olive-sage: #4E688E;         /* Steel Blue Secondary */
+  --accent: #B86B35;             /* Burnished Amber Accent */
+  --ink-red: #A84E38;            /* Brick Rose Accent */
+  --rule: #B8C3D2;               /* Oxford Slate Border */
+  --text-light: #F2F5F9;         /* Light Cotton */
+
+  --bg-fabric-thread-1: rgba(28, 41, 61, 0.035);
+  --bg-fabric-thread-2: rgba(184, 195, 210, 0.24);
+  --bg-fabric-slub: rgba(28, 41, 61, 0.03);
+}
+
+[data-theme="burgundy-tweed"] {
+  color-scheme: light;
+
+  /* Theme Color Tokens - Burgundy & Tweed */
+  --paper: #E9DFDF;              /* Heathered Tweed Paper */
+  --paper-card: #F7F2F2;         /* Rosewater Card Surface */
+  --canvas: #DCCECE;             /* Muted Heather Canvas */
+  --ink: #33181C;                /* Dark Wine Velvet Text */
+  --ink-muted: #66333C;          /* Bordeaux Subtext */
+  --ink-sage: #85535C;           /* Heather Rose */
+  --olive-deep: #6E2E39;         /* Heritage Bordeaux Primary */
+  --olive-sage: #8A4854;         /* Muted Rosewood */
+  --accent: #A85A48;             /* Mulberry Ochre Accent */
+  --ink-red: #8B2635;            /* Crimson Seal */
+  --rule: #C6B4B6;               /* Tweed Taupe Border */
+  --text-light: #F7F2F2;         /* Pale Rosewater */
+
+  --bg-fabric-thread-1: rgba(51, 24, 28, 0.035);
+  --bg-fabric-thread-2: rgba(198, 180, 182, 0.24);
+  --bg-fabric-slub: rgba(51, 24, 28, 0.03);
+}
+
+[data-theme="nordic-moss"] {
+  color-scheme: dark;
+
+  /* Theme Color Tokens - Nordic Moss & Pine */
+  --paper: #161F1A;              /* Deep Pine Surface */
+  --paper-card: #1F2C24;         /* Emerald Moss Card */
+  --canvas: #2A3A31;             /* Dense Spruce Canvas */
+  --ink: #E4EDE7;                /* Frosted Pine Text */
+  --ink-muted: #A3B8AB;          /* Muted Moss Subtext */
+  --ink-sage: #819E8A;           /* Soft Sage */
+  --olive-deep: #76A786;         /* Luminous Pine Primary */
+  --olive-sage: #537A60;         /* Spruce Green Secondary */
+  --accent: #D99B52;             /* Glowing Amber Pinecone */
+  --ink-red: #D4715A;            /* Nordic Coral Accent */
+  --rule: #34483D;               /* Deep Pine Border */
+  --text-light: #161F1A;         /* Dark Text for bright buttons */
+
+  --bg-fabric-thread-1: rgba(228, 237, 231, 0.035);
+  --bg-fabric-thread-2: rgba(52, 72, 61, 0.45);
+  --bg-fabric-slub: rgba(228, 237, 231, 0.025);
 }
 
 * {
@@ -45,12 +205,18 @@ body,
 body {
   margin: 0;
   background-color: var(--paper);
-  /* Tactile Linen & Fabric Canvas Texture */
+  /* Realistic Tactile Woven Fabric / Linen Canvas Weave */
   background-image: 
-    radial-gradient(rgba(48, 51, 41, 0.04) 1px, transparent 0),
-    linear-gradient(to right, rgba(185, 172, 148, 0.15) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(185, 172, 148, 0.15) 1px, transparent 1px);
-  background-size: 24px 24px, 8px 8px, 8px 8px;
+    /* Diagonal twill warp thread highlights */
+    repeating-linear-gradient(45deg, var(--bg-fabric-thread-1) 0px, var(--bg-fabric-thread-1) 1px, transparent 1px, transparent 5px),
+    repeating-linear-gradient(-45deg, var(--bg-fabric-thread-1) 0px, var(--bg-fabric-thread-1) 1px, transparent 1px, transparent 5px),
+    /* Horizontal & vertical cross-hatch fabric thread weave */
+    repeating-linear-gradient(0deg, var(--bg-fabric-thread-2) 0px, var(--bg-fabric-thread-2) 1px, transparent 1px, transparent 7px),
+    repeating-linear-gradient(90deg, var(--bg-fabric-thread-2) 0px, var(--bg-fabric-thread-2) 1px, transparent 1px, transparent 7px),
+    /* Organic linen slub / fiber grain nodes */
+    radial-gradient(circle at 30% 40%, var(--bg-fabric-slub) 1px, transparent 1.5px),
+    radial-gradient(circle at 80% 70%, var(--bg-fabric-slub) 1px, transparent 1.5px);
+  background-size: 10px 10px, 10px 10px, 7px 7px, 7px 7px, 20px 20px, 24px 24px;
   color: var(--ink);
   font-family: var(--font-serif);
   -webkit-font-smoothing: antialiased;

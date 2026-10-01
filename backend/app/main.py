@@ -22,6 +22,7 @@ from app.api.routes import (
     questions,
     reports,
     sessions,
+    settings as settings_routes,
 )
 from app.core.config import get_settings
 from app.db.base import init_db
@@ -54,6 +55,7 @@ app.include_router(reports.router)
 app.include_router(presets.router)
 app.include_router(questions.router)
 app.include_router(analytics.router)
+app.include_router(settings_routes.router)
 
 
 @app.get("/")

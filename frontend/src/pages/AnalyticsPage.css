@@ -218,7 +218,7 @@
 }
 
 .empty-cta--secondary:hover {
-  background-color: #ffffff;
+  background-color: var(--paper, #E8DDC8);
   border-color: var(--olive-deep, #596044);
 }
 

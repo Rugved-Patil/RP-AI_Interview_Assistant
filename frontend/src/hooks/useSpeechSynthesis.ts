@@ -1,4 +1,26 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { getSpeechSettings, subscribeSpeechSettings } from '../speechSettings'
+
+export function isNaturalVoice(v: SpeechSynthesisVoice): boolean {
+  const name = v.name.toLowerCase()
+  return (
+    name.includes('natural') ||
+    name.includes('enhanced') ||
+    name.includes('premium') ||
+    name.includes('online') ||
+    name.includes('google') ||
+    name.includes('siri') ||
+    name.includes('neural') ||
+    name === 'alex' ||
+    name === 'samantha' ||
+    name === 'daniel' ||
+    name === 'ava' ||
+    name === 'allison' ||
+    name === 'karen' ||
+    name === 'tessa' ||
+    name === 'serena'
+  )
+}
 
 function cleanTextForSpeech(text: string): string {
   return text
@@ -24,79 +46,136 @@ export function useSpeechSynthesis() {
     typeof window !== 'undefined' && 'speechSynthesis' in window && 'SpeechSynthesisUtterance' in window
 
   const selectedVoiceRef = useRef<SpeechSynthesisVoice | null>(null)
+  const speakTimeoutRef = useRef<number | null>(null)
 
-  // Load and pick a natural English voice
+  const resolvePreferredVoice = useCallback((availableVoices: SpeechSynthesisVoice[]) => {
+    if (!availableVoices || availableVoices.length === 0) return null
+    const settings = getSpeechSettings()
+
+    // 1. User selected voice URI
+    if (settings.voiceURI) {
+      const match = availableVoices.find(
+        (v) =>
+          v.voiceURI === settings.voiceURI ||
+          v.name === settings.voiceURI ||
+          `${v.name} (${v.lang})` === settings.voiceURI,
+      )
+      if (match) return match
+    }
+
+    // 2. Priority list of natural-sounding English voices
+    const englishVoices = availableVoices.filter((v) => v.lang.startsWith('en'))
+    const preferred =
+      englishVoices.find((v) => v.name.includes('Google US English')) ||
+      englishVoices.find((v) => v.name.toLowerCase().includes('samantha') && v.name.toLowerCase().includes('enhanced')) ||
+      englishVoices.find((v) => v.name.toLowerCase().includes('samantha')) ||
+      englishVoices.find((v) => v.name.toLowerCase().includes('daniel') && v.name.toLowerCase().includes('enhanced')) ||
+      englishVoices.find((v) => v.name.toLowerCase().includes('daniel')) ||
+      englishVoices.find((v) => v.name.toLowerCase().includes('alex')) ||
+      englishVoices.find((v) => isNaturalVoice(v)) ||
+      englishVoices.find((v) => v.lang === 'en-US') ||
+      englishVoices[0] ||
+      availableVoices[0] ||
+      null
+
+    return preferred
+  }, [])
+
+  // Load voices and sync with speech settings
   useEffect(() => {
     if (!isSupported) return
 
     function updateVoices() {
       const availableVoices = window.speechSynthesis.getVoices()
-      setVoices(availableVoices)
-
-      // Priority list of natural-sounding English voices
-      const englishVoices = availableVoices.filter((v) => v.lang.startsWith('en'))
-      const preferred =
-        englishVoices.find((v) => v.name.includes('Google US English')) ||
-        englishVoices.find((v) => v.name.includes('Samantha')) ||
-        englishVoices.find((v) => v.name.includes('Daniel')) ||
-        englishVoices.find((v) => v.name.includes('Natural')) ||
-        englishVoices.find((v) => v.lang === 'en-US') ||
-        englishVoices[0] ||
-        availableVoices[0] ||
-        null
-
-      selectedVoiceRef.current = preferred
+      if (availableVoices && availableVoices.length > 0) {
+        setVoices(availableVoices)
+        selectedVoiceRef.current = resolvePreferredVoice(availableVoices)
+      }
     }
 
     updateVoices()
     window.speechSynthesis.onvoiceschanged = updateVoices
 
+    // Subscribe to speech settings changes
+    const unsubscribe = subscribeSpeechSettings(() => {
+      const availableVoices = window.speechSynthesis.getVoices()
+      selectedVoiceRef.current = resolvePreferredVoice(availableVoices)
+    })
+
     return () => {
+      unsubscribe()
       if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
         window.speechSynthesis.onvoiceschanged = null
       }
     }
-  }, [isSupported])
+  }, [isSupported, resolvePreferredVoice])
 
   const cancel = useCallback(() => {
-    if (isSupported) {
-      window.speechSynthesis.cancel()
+    if (speakTimeoutRef.current !== null) {
+      clearTimeout(speakTimeoutRef.current)
+      speakTimeoutRef.current = null
+    }
+    if (isSupported && typeof window !== 'undefined' && 'speechSynthesis' in window) {
+      try {
+        window.speechSynthesis.cancel()
+        window.speechSynthesis.resume()
+      } catch {
+        // Ignored
+      }
     }
     setIsSpeaking(false)
   }, [isSupported])
 
   const speak = useCallback(
     (text: string) => {
-      if (!isSupported || isMuted) return
+      if (!isSupported || isMuted || typeof window === 'undefined') return
 
       const cleaned = cleanTextForSpeech(text)
       if (!cleaned) return
 
       cancel()
 
-      const utterance = new SpeechSynthesisUtterance(cleaned)
-      if (selectedVoiceRef.current) {
-        utterance.voice = selectedVoiceRef.current
-      }
-      utterance.rate = 1.0
-      utterance.pitch = 1.0
-      utterance.lang = selectedVoiceRef.current?.lang || 'en-US'
+      // Small tick delay to let previous cancel finish cleanly on all browsers
+      speakTimeoutRef.current = window.setTimeout(() => {
+        try {
+          const currentSettings = getSpeechSettings()
+          const availableVoices = window.speechSynthesis.getVoices()
+          const voice = resolvePreferredVoice(availableVoices) || selectedVoiceRef.current
 
-      utterance.onstart = () => {
-        setIsSpeaking(true)
-      }
+          const utterance = new SpeechSynthesisUtterance(cleaned)
+          if (voice) {
+            utterance.voice = voice
+            utterance.lang = voice.lang || 'en-US'
+          } else {
+            utterance.lang = 'en-US'
+          }
+          utterance.rate = currentSettings.rate
+          utterance.pitch = currentSettings.pitch
 
-      utterance.onend = () => {
-        setIsSpeaking(false)
-      }
+          utterance.onstart = () => {
+            setIsSpeaking(true)
+          }
 
-      utterance.onerror = () => {
-        setIsSpeaking(false)
-      }
+          utterance.onend = () => {
+            setIsSpeaking(false)
+          }
 
-      window.speechSynthesis.speak(utterance)
+          utterance.onerror = (e) => {
+            if (e.error !== 'canceled' && e.error !== 'interrupted') {
+              console.warn('Speech synthesis error:', e)
+            }
+            setIsSpeaking(false)
+          }
+
+          window.speechSynthesis.resume()
+          window.speechSynthesis.speak(utterance)
+        } catch (err) {
+          console.error('Speech synthesis speak failure:', err)
+          setIsSpeaking(false)
+        }
+      }, 30)
     },
-    [cancel, isMuted, isSupported],
+    [cancel, isMuted, isSupported, resolvePreferredVoice],
   )
 
   const toggleMute = useCallback(() => {
@@ -112,8 +191,15 @@ export function useSpeechSynthesis() {
   // Cleanup on unmount
   useEffect(() => {
     return () => {
-      if (isSupported) {
-        window.speechSynthesis.cancel()
+      if (speakTimeoutRef.current !== null) {
+        clearTimeout(speakTimeoutRef.current)
+      }
+      if (isSupported && typeof window !== 'undefined' && 'speechSynthesis' in window) {
+        try {
+          window.speechSynthesis.cancel()
+        } catch {
+          // Ignored
+        }
       }
     }
   }, [isSupported])

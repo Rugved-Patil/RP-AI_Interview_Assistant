@@ -63,10 +63,19 @@ class EndInterviewResponse(BaseModel):
     status: str
 
 
+class InterviewDimensions(BaseModel):
+    technical_correctness: int
+    depth_of_knowledge: int
+    problem_solving: int
+    communication: int
+    practical_readiness: int
+
+
 class InterviewGradeResponse(BaseModel):
     session_id: str
     score: int
     feedback: str
+    dimensions: InterviewDimensions | None = None
 
 
 class TurnSchema(BaseModel):
@@ -97,3 +106,4 @@ class SavedInterviewReportSummary(BaseModel):
     feedback: str
     transcript: list[TurnSchema]
     created_at: str  # ISO string representation of datetime
+    dimensions: InterviewDimensions | None = None

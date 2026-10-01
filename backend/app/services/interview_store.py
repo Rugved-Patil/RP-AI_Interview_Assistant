@@ -74,6 +74,7 @@ class InterviewSession:
     transcript: list[Turn] = field(default_factory=list)
     score: int | None = None
     feedback: str | None = None
+    dimensions: dict[str, int] | None = None
 
 
 # Process-lifetime storage, same pattern as session_store._sessions.
@@ -103,3 +104,8 @@ def create_interview(
 
 def get_interview(session_id: str) -> InterviewSession | None:
     return _interviews.get(session_id)
+
+
+def clear_all_interviews() -> None:
+    _interviews.clear()
+

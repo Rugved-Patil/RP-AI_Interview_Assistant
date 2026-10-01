@@ -10,7 +10,7 @@ import {
   startInterview,
   submitInterviewAnswer,
 } from '../api/practiceApi'
-import type { PresetSummary } from '../api/practiceApi'
+import type { InterviewDimensions, PresetSummary } from '../api/practiceApi'
 import { getActivePresetId, setActivePresetId } from '../activePreset'
 import { UnsavedSessionModal } from '../components/UnsavedSessionModal'
 import { useSpeechRecognition } from '../hooks/useSpeechRecognition'
@@ -56,6 +56,7 @@ type MockStage =
       transcript: MessageTurn[]
       score: number
       feedback: string
+      dimensions?: InterviewDimensions | null
       saving?: boolean
       saved?: boolean
       saveError?: string | null
@@ -282,6 +283,7 @@ export function MockInterviewPage() {
         transcript,
         score: grade.score,
         feedback: grade.feedback,
+        dimensions: grade.dimensions,
       })
     } catch (err) {
       setStage({
@@ -614,7 +616,7 @@ export function MockInterviewPage() {
                 <div className="mock-concluded__header">
                   <h2 className="mock-concluded__title">Interview Complete</h2>
                   <p className="mock-concluded__desc">
-                    Ready to evaluate your full conversation across all questions with Gemini.
+                    Ready to evaluate your full conversation across all questions with the diagnostic assessment engine.
                   </p>
                 </div>
 
@@ -626,7 +628,7 @@ export function MockInterviewPage() {
                     onClick={handleGradeInterview}
                     disabled={stage.grading}
                   >
-                    {stage.grading ? 'Grading conversation with Gemini…' : 'Grade interview transcript'}
+                    {stage.grading ? 'Generating diagnostic assessment…' : 'Grade interview transcript'}
                   </button>
                   <button
                     className="mock-card__button mock-card__button--ghost"
@@ -644,6 +646,9 @@ export function MockInterviewPage() {
         {stage.name === 'graded' && (
           <div className="mock-card__panel">
             <ScoreMark score={stage.score} />
+
+            {stage.dimensions && <DimensionsBreakdown dimensions={stage.dimensions} />}
+
             <h2 className="mock-graded__title">Holistic Feedback</h2>
             <p className="mock-graded__feedback">{stage.feedback}</p>
 
@@ -699,6 +704,85 @@ export function MockInterviewPage() {
             </button>
           </div>
         )}
+      </div>
+    </div>
+  )
+}
+
+interface DimensionConfigItem {
+  key: keyof InterviewDimensions
+  label: string
+  description: string
+}
+
+const DIMENSION_CONFIG: DimensionConfigItem[] = [
+  {
+    key: 'technical_correctness',
+    label: 'Technical Correctness',
+    description: 'Factual accuracy and correct application of domain concepts',
+  },
+  {
+    key: 'depth_of_knowledge',
+    label: 'Depth of Knowledge',
+    description: 'Mechanisms, trade-offs, and reasoning beyond surface-level definitions',
+  },
+  {
+    key: 'problem_solving',
+    label: 'Problem Solving',
+    description: 'Decomposition, constraint evaluation, and adaptive logical deduction',
+  },
+  {
+    key: 'communication',
+    label: 'Communication',
+    description: 'Clarity, conciseness, structured delivery, and technical coherence',
+  },
+  {
+    key: 'practical_readiness',
+    label: 'Practical Readiness',
+    description: 'Implementation thinking, production readiness, and failure considerations',
+  },
+]
+
+function DimensionsBreakdown({ dimensions }: { dimensions: InterviewDimensions }) {
+  return (
+    <div className="mock-dimensions">
+      <div className="mock-dimensions__header">
+        <h3 className="mock-dimensions__title">Diagnostic Dimensions</h3>
+        <p className="mock-dimensions__subtitle">
+          Dimension scores explain specific aspects of performance. The overall score is your primary holistic evaluation.
+        </p>
+      </div>
+
+      <div className="mock-dimensions__list">
+        {DIMENSION_CONFIG.map(({ key, label, description }) => {
+          const val = dimensions[key]
+          if (typeof val !== 'number') return null
+          const pct = Math.max(0, Math.min(100, val * 10))
+          return (
+            <div key={key} className="mock-dimensions__item">
+              <div className="mock-dimensions__item-header">
+                <div className="mock-dimensions__item-info">
+                  <span className="mock-dimensions__item-label">{label}</span>
+                  <span className="mock-dimensions__item-desc">{description}</span>
+                </div>
+                <span className="mock-dimensions__item-score">
+                  <strong>{val}</strong>
+                  <span className="mock-dimensions__item-denom">/10</span>
+                </span>
+              </div>
+              <div className="mock-dimensions__bar-track" aria-hidden="true">
+                <div
+                  className="mock-dimensions__bar-fill"
+                  style={{ width: `${pct}%` }}
+                />
+              </div>
+            </div>
+          )
+        })}
+      </div>
+
+      <div className="mock-dimensions__footer-note">
+        <em>Note:</em> Practical readiness reflects evidence verified in this interview. If coding or live debugging was not tested, a moderate score denotes unverified scope rather than a performance flaw.
       </div>
     </div>
   )

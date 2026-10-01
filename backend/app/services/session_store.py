@@ -76,3 +76,7 @@ def create_session(
 
 def get_session(session_id: str) -> TechnicalSession | None:
     return _sessions.get(session_id)
+
+
+def clear_all_sessions() -> None:
+    _sessions.clear()

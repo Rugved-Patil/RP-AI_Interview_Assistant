@@ -348,7 +348,7 @@
 }
 
 .mock-chat__bubble--candidate .mock-chat__message {
-  background: #f0eae0;
+  background: var(--canvas);
   border: 1px solid var(--rule);
   color: var(--ink);
 }
@@ -481,7 +481,7 @@
 }
 
 .mock-voice__mic-btn:hover:not(:disabled) {
-  background: #eae3d7;
+  background: var(--canvas);
   color: var(--ink);
 }
 
@@ -564,6 +564,110 @@
 
 .mock-graded__transcript-summary:hover {
   color: var(--ink);
+}
+
+.mock-dimensions {
+  background: var(--canvas);
+  border: 1px solid var(--rule);
+  border-radius: 8px;
+  padding: 1.25rem;
+  margin: 1.25rem 0 1.5rem;
+  text-align: left;
+}
+
+.mock-dimensions__header {
+  margin-bottom: 1rem;
+}
+
+.mock-dimensions__title {
+  font-family: var(--font-serif);
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--ink);
+  margin: 0 0 0.25rem;
+}
+
+.mock-dimensions__subtitle {
+  font-family: var(--font-serif);
+  font-size: 0.85rem;
+  color: var(--ink-muted);
+  margin: 0;
+  line-height: 1.4;
+}
+
+.mock-dimensions__list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.mock-dimensions__item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.mock-dimensions__item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.mock-dimensions__item-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.mock-dimensions__item-label {
+  font-family: var(--font-serif);
+  font-weight: 600;
+  font-size: 0.92rem;
+  color: var(--ink);
+}
+
+.mock-dimensions__item-desc {
+  font-family: var(--font-serif);
+  font-size: 0.78rem;
+  color: var(--ink-muted);
+  line-height: 1.3;
+}
+
+.mock-dimensions__item-score {
+  font-family: var(--font-mono);
+  font-size: 0.95rem;
+  color: var(--olive-deep);
+  white-space: nowrap;
+}
+
+.mock-dimensions__item-denom {
+  font-size: 0.75rem;
+  color: var(--ink-muted);
+}
+
+.mock-dimensions__bar-track {
+  width: 100%;
+  height: 6px;
+  background: rgba(185, 172, 148, 0.4);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.mock-dimensions__bar-fill {
+  height: 100%;
+  background: var(--olive-deep);
+  border-radius: 3px;
+  transition: width 0.4s ease-out;
+}
+
+.mock-dimensions__footer-note {
+  margin-top: 1rem;
+  padding-top: 0.75rem;
+  border-top: 1px dashed var(--rule);
+  font-family: var(--font-serif);
+  font-size: 0.78rem;
+  color: var(--ink-muted);
+  line-height: 1.4;
 }
 
 @media (max-width: 540px) {

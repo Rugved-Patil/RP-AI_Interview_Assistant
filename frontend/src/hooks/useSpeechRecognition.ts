@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { getSpeechSettings } from '../speechSettings'
 
 // Browser Web Speech API type declarations
 interface SpeechRecognitionErrorEvent extends Event {
@@ -40,7 +41,8 @@ interface UseSpeechRecognitionOptions {
 }
 
 export function useSpeechRecognition(options: UseSpeechRecognitionOptions = {}) {
-  const { onTranscriptChange, lang = 'en-US' } = options
+  const settingsLang = getSpeechSettings().dictationLang || 'en-US'
+  const { onTranscriptChange, lang = settingsLang } = options
   const [isListening, setIsListening] = useState(false)
   const [error, setError] = useState<string | null>(null)
 

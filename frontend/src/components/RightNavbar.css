@@ -52,7 +52,7 @@
 }
 
 .right-nav__toggle-btn:hover {
-  background-color: #ffffff;
+  background-color: var(--paper-card);
   color: var(--ink, #303329);
   border-color: var(--olive-deep, #596044);
 }

@@ -1,5 +1,6 @@
 """Tests for the mock interview endpoints (interviews.py)."""
 
+import json
 import pytest
 
 from app.services import interview_store
@@ -484,11 +485,55 @@ def test_grade_interview_returns_score_and_feedback(client, providers, start_int
         "session_id": session_id,
         "score": 8,
         "feedback": "Strong domain knowledge and clear communication.",
+        "dimensions": None,
     }
 
     session = interview_store.get_interview(session_id)
     assert session.score == 8
     assert session.feedback == "Strong domain knowledge and clear communication."
+    assert session.dimensions is None
+    assert session.status is InterviewStatus.GRADED
+
+
+def test_grade_interview_returns_structured_dimensions(client, providers, start_interview):
+    providers.grader.reply = json.dumps({
+        "score": 8,
+        "feedback": {
+            "overall_impression": "Solid conceptual understanding and structured answers.",
+            "key_strengths": ["Clear explanation of attention mechanisms."],
+            "areas_for_improvement": ["Could elaborate more on failure modes."],
+            "skills_not_fully_verified": ["Hands-on debugging was not tested."],
+            "recommended_preparation": ["Review distributed training patterns."],
+        },
+        "dimensions": {
+            "technical_correctness": 9,
+            "depth_of_knowledge": 8,
+            "problem_solving": 8,
+            "communication": 9,
+            "practical_readiness": 6,
+        },
+    })
+    session_id = start_interview()
+    client.post(f"/interviews/{session_id}/answer", json={"answer": "Detailed answer."})
+
+    response = client.post(f"/interviews/{session_id}/grade")
+    assert response.status_code == 200
+    data = response.json()
+    assert data["session_id"] == session_id
+    assert data["score"] == 8
+    assert "### Overall Impression" in data["feedback"]
+    assert "Solid conceptual understanding" in data["feedback"]
+    assert data["dimensions"] == {
+        "technical_correctness": 9,
+        "depth_of_knowledge": 8,
+        "problem_solving": 8,
+        "communication": 9,
+        "practical_readiness": 6,
+    }
+
+    session = interview_store.get_interview(session_id)
+    assert session.score == 8
+    assert session.dimensions["technical_correctness"] == 9
     assert session.status is InterviewStatus.GRADED
 
 
@@ -670,6 +715,93 @@ def test_delete_interview_report_success(client, providers, start_interview):
 
 def test_delete_unknown_interview_report_is_a_404(client):
     assert client.delete("/interviews/reports/999999").status_code == 404
+
+
+def test_parse_mock_grade_json_and_fences():
+    from app.api.routes.interviews import _parse_mock_grade
+    from app.api.routes.grading import GradeParseError
+
+    raw_json = """```json
+    {
+      "score": 9,
+      "feedback": {
+        "overall_impression": "Strong candidate.",
+        "key_strengths": ["Deep knowledge of systems.", "Good STAR structure."],
+        "areas_for_improvement": ["Elaborate on edge cases."],
+        "skills_not_fully_verified": ["Live coding."],
+        "recommended_preparation": ["Practice concurrency."]
+      },
+      "dimensions": {
+        "technical_correctness": 10,
+        "depth_of_knowledge": 9,
+        "problem_solving": 8,
+        "communication": 9,
+        "practical_readiness": 7
+      }
+    }
+    ```"""
+    score, feedback, dims = _parse_mock_grade(raw_json)
+    assert score == 9
+    assert "### Overall Impression\nStrong candidate." in feedback
+    assert "### Key Strengths\n- Deep knowledge of systems.\n- Good STAR structure." in feedback
+    assert "### Areas for Improvement\n- Elaborate on edge cases." in feedback
+    assert "### Skills Not Fully Verified\n- Live coding." in feedback
+    assert "### Recommended Preparation\n- Practice concurrency." in feedback
+    assert dims is not None
+    assert dims.technical_correctness == 10
+    assert dims.depth_of_knowledge == 9
+    assert dims.problem_solving == 8
+    assert dims.communication == 9
+    assert dims.practical_readiness == 7
+
+
+def test_parse_mock_grade_clamping_and_missing_dimensions():
+    from app.api.routes.interviews import _parse_mock_grade
+
+    # Out of bounds scores are clamped 0-10
+    raw = json.dumps({
+        "score": 15,
+        "feedback": "Plain string feedback.",
+        "dimensions": {
+            "technical_correctness": 12,
+            "depth_of_knowledge": -5,
+            "problem_solving": 7,
+            "communication": 8,
+            "practical_readiness": 6,
+        },
+    })
+    score, feedback, dims = _parse_mock_grade(raw)
+    assert score == 10
+    assert feedback == "Plain string feedback."
+    assert dims.technical_correctness == 10
+    assert dims.depth_of_knowledge == 0
+
+    # Incomplete dimensions gracefully fall back to None
+    raw_missing = json.dumps({
+        "score": 7,
+        "feedback": "Feedback text.",
+        "dimensions": {
+            "technical_correctness": 8,
+        },
+    })
+    score2, feedback2, dims2 = _parse_mock_grade(raw_missing)
+    assert score2 == 7
+    assert feedback2 == "Feedback text."
+    assert dims2 is None
+
+
+def test_parse_mock_grade_legacy_format_and_error():
+    import pytest
+    from app.api.routes.interviews import _parse_mock_grade
+    from app.api.routes.grading import GradeParseError
+
+    score, feedback, dims = _parse_mock_grade("SCORE: 8\nFEEDBACK: Clear communication.")
+    assert score == 8
+    assert feedback == "Clear communication."
+    assert dims is None
+
+    with pytest.raises(GradeParseError):
+        _parse_mock_grade("This is just invalid text with no score.")
 
 
 
