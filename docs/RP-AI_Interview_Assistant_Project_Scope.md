@@ -185,9 +185,10 @@ Every major enhancement for the next milestone is divided into independent, veri
   - Realistic seniority-calibrated difficulty pacing (Junior/Fresher foundational concepts vs. Senior architecture).
   - Constructive 5-dimension diagnostic grader with calibrated curve (solid answers score 7–8/10; 9-10 reserved for comprehensive mastery with trade-offs).
 
-- [ ] **Chunk 2: Deep Local RAG Activation & Question Bank Grounding** — ⏳ **Scheduled (To Be Built)**
-  - Expand `question_bank.json` across diverse engineering and professional domains with comprehensive rubrics.
-  - Dynamically inject relevant retrieved exemplar blueprints into multi-turn interview turns via pure Python BM25/TF-IDF retriever.
+- [x] **Chunk 2: Deep Local RAG Activation & Question Bank Grounding** — ✅ **Completed**
+  - Massively expanded `question_bank.json` from 29 to **148 curated, high-quality exemplars across 19 technical and non-technical domains** (Frontend, Backend, System Design, DevOps, Data Engineering, Machine Learning, Cybersecurity, Mobile, Product Management, Project Management, UI/UX Design, Leadership & Executive, Sales & Marketing, Finance & Accounting, Healthcare, Education, Hospitality & Operations, Customer Success, and Behavioral STAR).
+  - Verified pure Python BM25/TF-IDF vector retrieval engine with 8,270 vocabulary tokens for $0 cost, sub-millisecond similarity queries.
+  - Revamped Question Bank Explorer UI with dynamic domain filter chips, search term highlighting, match score badges, collapsible evaluation rubrics, direct `▶ Practice This Question` routing, and 1-click `📋 Copy` actions.
 
 - [ ] **Chunk 3: Smart Adaptive Training Engine (Analytics to Action)** — ⏳ **Scheduled (To Be Built)**
   - Replace arbitrary unlock gates ("5 mocks unlock") with instant, dynamic weak-spot analytics.

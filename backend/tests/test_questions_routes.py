@@ -50,10 +50,10 @@ def test_get_domains_stats_endpoint(client: TestClient):
 
 def test_get_question_by_id_success_and_not_found(client: TestClient):
     # Valid question
-    response = client.get("/questions/swe-backend-001")
+    response = client.get("/questions/be-003")
     assert response.status_code == 200
     data = response.json()
-    assert data["id"] == "swe-backend-001"
+    assert data["id"] == "be-003"
     assert "idempotent" in data["question"].lower()
 
     # Invalid question

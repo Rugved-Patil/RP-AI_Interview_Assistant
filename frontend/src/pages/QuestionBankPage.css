@@ -20,6 +20,18 @@
   gap: 1rem;
 }
 
+.qb-count-pill {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  font-weight: 500;
+  background: var(--paper-card);
+  color: var(--ink-muted);
+  border: 1px solid var(--rule);
+  padding: 0.35rem 0.85rem;
+  border-radius: 999px;
+  box-shadow: 0 2px 8px -4px rgba(35, 38, 43, 0.2);
+}
+
 .qb-title {
   font-family: var(--font-serif);
   font-size: clamp(1.5rem, 3.5vw, 1.95rem);
@@ -371,7 +383,12 @@
   font-weight: 600;
 }
 
-/* Evaluation Rubric Accordion */
+.qb-criteria-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
 .qb-criteria-toggle {
   display: flex;
   align-items: center;
@@ -404,4 +421,74 @@
   color: var(--ink-muted);
   line-height: 1.55;
   margin-top: 0.4rem;
+}
+
+/* Results Count & Header */
+.qb-results-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 0.25rem;
+}
+
+.qb-results-count {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--ink-muted);
+}
+
+.qb-results-count strong {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+/* Card Actions */
+.qb-card-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 0.25rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--rule);
+}
+
+.qb-practice-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: var(--ink);
+  color: var(--paper-card);
+  border: 1px solid var(--ink);
+  padding: 0.45rem 0.9rem;
+  border-radius: 6px;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.qb-practice-btn:hover {
+  background: var(--paper-card);
+  color: var(--ink);
+}
+
+.qb-copy-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: var(--paper);
+  color: var(--ink-muted);
+  border: 1px solid var(--rule);
+  padding: 0.45rem 0.85rem;
+  border-radius: 6px;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.qb-copy-btn:hover {
+  border-color: var(--ink);
+  color: var(--ink);
 }

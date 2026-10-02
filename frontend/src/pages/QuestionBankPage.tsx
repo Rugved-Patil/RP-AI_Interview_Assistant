@@ -25,12 +25,13 @@ export function QuestionBankPage() {
   const [selectedDifficulty, setSelectedDifficulty] = useState<string>('all')
   const [searchQuery, setSearchQuery] = useState<string>('')
   const [expandedCriteria, setExpandedCriteria] = useState<Record<string, boolean>>({})
+  const [copiedId, setCopiedId] = useState<string | null>(null)
 
   // Load initial stats & questions
   useEffect(() => {
     let cancelled = false
 
-    Promise.all([getQuestionBankStats(), listQuestionBank({ limit: 100 })])
+    Promise.all([getQuestionBankStats(), listQuestionBank({ limit: 200 })])
       .then(([statsData, listData]) => {
         if (!cancelled) {
           setStats(statsData)
@@ -64,7 +65,7 @@ export function QuestionBankPage() {
         category: selectedCategory === 'all' ? undefined : selectedCategory,
         domain: selectedDomain === 'all' ? undefined : selectedDomain,
         difficulty: selectedDifficulty === 'all' ? undefined : (selectedDifficulty as 'junior' | 'mid' | 'senior' | 'lead'),
-        top_k: 20,
+        top_k: 30,
       })
         .then((res) => {
           setRetrievedResults(res.retrieved_questions)
@@ -74,7 +75,7 @@ export function QuestionBankPage() {
           setRetrievedResults(null)
           setSearching(false)
         })
-    }, 250)
+    }, 200)
 
     return () => clearTimeout(timer)
   }, [searchQuery, selectedCategory, selectedDomain, selectedDifficulty])
@@ -86,6 +87,25 @@ export function QuestionBankPage() {
       ...prev,
       [id]: !prev[id],
     }))
+  }
+
+  const handleCopyQuestion = (id: string, text: string) => {
+    navigator.clipboard.writeText(text).then(() => {
+      setCopiedId(id)
+      setTimeout(() => setCopiedId(null), 2000)
+    })
+  }
+
+  const handlePracticeQuestion = (q: QuestionDoc | RetrievedQuestion) => {
+    if (q.category === 'behavioral') {
+      navigate('/practice/behavioral', {
+        state: { directQuestion: q.question, domain: q.domain, difficulty: q.difficulty },
+      })
+    } else {
+      navigate('/practice', {
+        state: { directQuestion: q.question, domain: q.domain, difficulty: q.difficulty },
+      })
+    }
   }
 
   // Filtered standard questions when not searching
@@ -100,6 +120,8 @@ export function QuestionBankPage() {
       return true
     })
   }, [questions, effectiveRetrievedResults, selectedCategory, selectedDomain, selectedDifficulty])
+
+  const currentCount = effectiveRetrievedResults !== null ? effectiveRetrievedResults.length : displayedQuestions.length
 
   return (
     <div className="qb-container">
@@ -121,34 +143,17 @@ export function QuestionBankPage() {
       {/* Header */}
       <header className="qb-header">
         <div className="qb-title-row">
-          <h1 className="qb-title">Curated Question Bank</h1>
+          <h1 className="qb-title">Question Bank & RAG Explorer</h1>
+          {stats && (
+            <div className="qb-count-pill">
+              {stats.total_questions} Curated Questions • {stats.domains.length} Domains
+            </div>
+          )}
         </div>
         <p className="qb-subtitle">
-          Browse and search exemplar interview questions across engineering and behavioral domains.
+          Search and practice vetted interview exemplars across engineering, management, healthcare, operations, and behavioral disciplines.
         </p>
       </header>
-
-      {/* Stats Overview */}
-      {stats && (
-        <section className="qb-stats-banner">
-          <div className="qb-stat-box">
-            <span className="qb-stat-label">Total Questions</span>
-            <span className="qb-stat-value">{stats.total_questions}</span>
-          </div>
-          <div className="qb-stat-box">
-            <span className="qb-stat-label">Technical Domains</span>
-            <span className="qb-stat-value">{stats.domains.filter((d) => d.categories.includes('technical')).length}</span>
-          </div>
-          <div className="qb-stat-box">
-            <span className="qb-stat-label">Behavioral Topics</span>
-            <span className="qb-stat-value">{stats.domains.filter((d) => d.categories.includes('behavioral')).length}</span>
-          </div>
-          <div className="qb-stat-box">
-            <span className="qb-stat-label">Concept Tags</span>
-            <span className="qb-stat-value">{stats.tags.length}</span>
-          </div>
-        </section>
-      )}
 
       {/* Search & Filter Controls */}
       <section className="qb-search-section">
@@ -158,7 +163,7 @@ export function QuestionBankPage() {
             <input
               type="text"
               className="qb-search-input"
-              placeholder="Search concepts, algorithms, architectures, or behavioral topics (e.g. 'caching', 'indexing', 'leadership')..."
+              placeholder="Search by keyword, concept, or role (e.g., 'React Fiber', 'Kubernetes', 'B-Tree', 'Triage', 'STAR', 'Cash flow')..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
@@ -177,30 +182,30 @@ export function QuestionBankPage() {
               className={`qb-tab-btn ${selectedCategory === 'all' ? 'active' : ''}`}
               onClick={() => setSelectedCategory('all')}
             >
-              All Types
+              All Categories
             </button>
             <button
               className={`qb-tab-btn ${selectedCategory === 'technical' ? 'active' : ''}`}
               onClick={() => setSelectedCategory('technical')}
             >
-              Technical
+              Technical & Domain
             </button>
             <button
               className={`qb-tab-btn ${selectedCategory === 'behavioral' ? 'active' : ''}`}
               onClick={() => setSelectedCategory('behavioral')}
             >
-              Behavioral
+              Behavioral (STAR)
             </button>
           </div>
 
-          <div>
+          <div className="qb-filter-dropdowns">
             <select
               className="qb-select"
               value={selectedDifficulty}
               onChange={(e) => setSelectedDifficulty(e.target.value)}
             >
               <option value="all">All Difficulties</option>
-              <option value="junior">Junior</option>
+              <option value="junior">Junior / Entry</option>
               <option value="mid">Mid-Level</option>
               <option value="senior">Senior</option>
               <option value="lead">Lead / Staff</option>
@@ -215,7 +220,7 @@ export function QuestionBankPage() {
               className={`qb-domain-chip ${selectedDomain === 'all' ? 'active' : ''}`}
               onClick={() => setSelectedDomain('all')}
             >
-              All Domains
+              All Domains ({stats.total_questions})
             </button>
             {stats.domains.map((d) => (
               <button
@@ -234,11 +239,19 @@ export function QuestionBankPage() {
         )}
       </section>
 
+      {/* Results Header Count */}
+      <div className="qb-results-header">
+        <span className="qb-results-count">
+          Showing <strong>{currentCount}</strong> question{currentCount === 1 ? '' : 's'}
+          {searchQuery.trim() ? ` matching "${searchQuery}"` : ''}
+        </span>
+      </div>
+
       {/* Error state */}
       {error && <div className="qb-empty">{error}</div>}
 
       {/* Loading state */}
-      {loading && <div className="qb-empty">Loading questions…</div>}
+      {loading && <div className="qb-empty">Loading question bank…</div>}
 
       {/* Question List */}
       {!loading && !error && (
@@ -278,20 +291,37 @@ export function QuestionBankPage() {
                     </div>
 
                     {q.evaluation_criteria && (
-                      <div>
+                      <div className="qb-criteria-container">
                         <button
                           className="qb-criteria-toggle"
                           onClick={() => toggleCriteria(q.id)}
                           type="button"
                         >
                           <span>Evaluation Rubric & Key Concepts</span>
-                          <span>{expandedCriteria[q.id] ? '▲ Hide' : '▼ View'}</span>
+                          <span>{expandedCriteria[q.id] ? '▲ Hide' : '▼ View Rubric'}</span>
                         </button>
                         {expandedCriteria[q.id] && (
                           <div className="qb-criteria-content">{q.evaluation_criteria}</div>
                         )}
                       </div>
                     )}
+
+                    <div className="qb-card-actions">
+                      <button
+                        type="button"
+                        className="qb-practice-btn"
+                        onClick={() => handlePracticeQuestion(q)}
+                      >
+                        ▶ Practice This Question
+                      </button>
+                      <button
+                        type="button"
+                        className="qb-copy-btn"
+                        onClick={() => handleCopyQuestion(q.id, q.question)}
+                      >
+                        {copiedId === q.id ? '✓ Copied' : '📋 Copy'}
+                      </button>
+                    </div>
                   </article>
                 ))
               )}
@@ -325,20 +355,37 @@ export function QuestionBankPage() {
                     </div>
 
                     {q.evaluation_criteria && (
-                      <div>
+                      <div className="qb-criteria-container">
                         <button
                           className="qb-criteria-toggle"
                           onClick={() => toggleCriteria(q.id)}
                           type="button"
                         >
                           <span>Evaluation Rubric & Key Concepts</span>
-                          <span>{expandedCriteria[q.id] ? '▲ Hide' : '▼ View'}</span>
+                          <span>{expandedCriteria[q.id] ? '▲ Hide' : '▼ View Rubric'}</span>
                         </button>
                         {expandedCriteria[q.id] && (
                           <div className="qb-criteria-content">{q.evaluation_criteria}</div>
                         )}
                       </div>
                     )}
+
+                    <div className="qb-card-actions">
+                      <button
+                        type="button"
+                        className="qb-practice-btn"
+                        onClick={() => handlePracticeQuestion(q)}
+                      >
+                        ▶ Practice This Question
+                      </button>
+                      <button
+                        type="button"
+                        className="qb-copy-btn"
+                        onClick={() => handleCopyQuestion(q.id, q.question)}
+                      >
+                        {copiedId === q.id ? '✓ Copied' : '📋 Copy'}
+                      </button>
+                    </div>
                   </article>
                 ))
               )}
@@ -349,3 +396,4 @@ export function QuestionBankPage() {
     </div>
   )
 }
+

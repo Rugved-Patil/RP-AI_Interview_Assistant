@@ -1,292 +1,2727 @@
 [
   {
-    "id": "swe-backend-001",
-    "question": "How would you design an idempotent API endpoint for processing financial payments or order placements? What mechanisms ensure safety against network retries and duplicate requests?",
-    "category": "technical",
-    "domain": "Software Engineering",
-    "tags": ["backend", "api-design", "idempotency", "distributed-systems", "databases"],
-    "difficulty": "mid",
-    "company_archetypes": ["fintech", "tech", "enterprise"],
-    "evaluation_criteria": "Look for idempotency keys (UUIDs) stored in Redis/database with TTL, unique transaction constraints, distributed locking (e.g. Redlock), two-phase commits or transactional outbox pattern, and returning cached responses for duplicate idempotency keys."
-  },
-  {
-    "id": "swe-backend-002",
-    "question": "Explain the trade-offs between database indexing strategies (B-Tree vs. Hash vs. LSM-Tree). When would an index degrade database performance rather than improve it?",
-    "category": "technical",
-    "domain": "Software Engineering",
-    "tags": ["backend", "databases", "indexing", "performance", "storage-engines"],
-    "difficulty": "mid",
-    "company_archetypes": ["tech", "enterprise", "faang"],
-    "evaluation_criteria": "Evaluates understanding of write amplification during inserts/updates, index maintenance overhead, index selectivity/cardinality, composite index column ordering, and storage engine mechanics (B-Tree in Postgres/MySQL vs LSM-tree in RocksDB/Cassandra for write-heavy workloads)."
-  },
-  {
-    "id": "swe-backend-003",
-    "question": "How do you mitigate the 'Thundering Herd' problem and Cache Penetration / Cache Breakdown in a high-traffic microservices backend using Redis?",
-    "category": "technical",
-    "domain": "Software Engineering",
-    "tags": ["backend", "caching", "redis", "concurrency", "distributed-systems"],
-    "difficulty": "senior",
-    "company_archetypes": ["tech", "faang", "startup"],
-    "evaluation_criteria": "Looks for mutex/distributed locking (SingleFlight / lock on miss), probabilistic early expiration (XFetch algorithm), Bloom filters for non-existent keys (cache penetration), jitter/randomized TTLs (cache avalanche), and fallback default values."
-  },
-  {
-    "id": "swe-backend-004",
-    "question": "In an asynchronous Python or Node.js backend, what causes event loop blocking and how do you profile and prevent CPU-bound tasks from starving I/O throughput?",
-    "category": "technical",
-    "domain": "Software Engineering",
-    "tags": ["backend", "concurrency", "async", "performance", "python", "nodejs"],
-    "difficulty": "senior",
-    "company_archetypes": ["tech", "startup"],
-    "evaluation_criteria": "Understanding of single-threaded event loops, non-blocking I/O vs synchronous CPU tasks (JSON parsing, regex, cryptography), thread pools / worker processes (ProcessPoolExecutor, worker threads), and profiling tools."
-  },
-  {
-    "id": "swe-backend-005",
-    "question": "Describe how database transaction isolation levels (Read Uncommitted, Read Committed, Repeatable Read, Serializable) prevent anomalies like dirty reads, non-repeatable reads, and phantom reads.",
-    "category": "technical",
-    "domain": "Software Engineering",
-    "tags": ["backend", "databases", "transactions", "acid", "sql"],
-    "difficulty": "mid",
-    "company_archetypes": ["enterprise", "fintech", "tech"],
-    "evaluation_criteria": "Clear explanation of ACID properties, Multi-Version Concurrency Control (MVCC), snapshot isolation, row-level locks vs predicate locks, and performance trade-offs of serialization."
-  },
-  {
-    "id": "fe-react-001",
-    "question": "How does the React Virtual DOM reconciliation algorithm work (Fiber architecture)? Under what circumstances can improper key usage cause rendering bugs or performance degradation in dynamic lists?",
+    "id": "fe-001",
+    "question": "How does the browser's Critical Rendering Path work, and what specific techniques can you use to optimize Largest Contentful Paint (LCP)?",
     "category": "technical",
     "domain": "Frontend",
-    "tags": ["frontend", "react", "virtual-dom", "rendering", "javascript"],
+    "tags": [
+      "performance",
+      "browser-internals",
+      "web-vitals",
+      "css",
+      "dom"
+    ],
     "difficulty": "mid",
-    "company_archetypes": ["tech", "startup", "faang"],
-    "evaluation_criteria": "Looks for diffing heuristics (O(n) tree comparison, component type identity, persistent keys), Fiber unit-of-work scheduling, problems with array indexes as keys (state retention bugs, unnecessary DOM re-creation), and stable identifier generation."
+    "company_archetypes": [
+      "FAANG",
+      "High-Growth Startup",
+      "Enterprise"
+    ],
+    "evaluation_criteria": "Understanding of DOM/CSSOM construction, render tree, layout/reflow, paint, compositing, preload scanner, priority hints (fetchpriority), and CDN caching."
   },
   {
-    "id": "fe-perf-002",
-    "question": "Walk through your strategy for diagnosing and improving Core Web Vitals (specifically LCP, INP, and CLS) in a modern client-heavy single-page web application.",
+    "id": "fe-002",
+    "question": "Explain the mechanics of React Fiber and how concurrent rendering improves UI responsiveness during heavy state updates.",
     "category": "technical",
     "domain": "Frontend",
-    "tags": ["frontend", "performance", "web-vitals", "optimization", "browser"],
+    "tags": [
+      "react",
+      "architecture",
+      "concurrency",
+      "javascript",
+      "scheduling"
+    ],
     "difficulty": "senior",
-    "company_archetypes": ["tech", "faang", "e-commerce"],
-    "evaluation_criteria": "LCP: resource prioritization, SSR/SSG, font preloading, CDN caching, image formats (WebP/AVIF). INP: breaking long tasks, yield to main thread (requestIdleCallback, startTransition), debouncing event listeners. CLS: explicit aspect ratios on media, reserve layout space for ads/skeletons, avoid injecting DOM above the fold."
+    "company_archetypes": [
+      "FAANG",
+      "Scaleup"
+    ],
+    "evaluation_criteria": "Clear explanation of cooperative scheduling, work-in-progress tree, reconciliation phases (render vs commit), useTransition, and interruptible work."
   },
   {
-    "id": "fe-sec-003",
-    "question": "How do you protect a modern Single Page Application (SPA) against Cross-Site Scripting (XSS) and Cross-Site Request Forgery (CSRF)? Where should session tokens (JWT vs. HttpOnly cookies) be stored and why?",
+    "id": "fe-003",
+    "question": "What is the difference between CSS Grid and Flexbox, and how do you decide which one to use when building complex responsive layouts?",
     "category": "technical",
     "domain": "Frontend",
-    "tags": ["frontend", "security", "xss", "csrf", "auth", "cookies"],
-    "difficulty": "mid",
-    "company_archetypes": ["fintech", "enterprise", "tech"],
-    "evaluation_criteria": "Understands HttpOnly + Secure + SameSite=Strict/Lax cookies vs localStorage (vulnerable to XSS), Content Security Policy (CSP) headers, input sanitization/DOMPurify, anti-CSRF double-submit cookies or custom headers."
-  },
-  {
-    "id": "fe-state-004",
-    "question": "Compare modern frontend state management patterns: global stores (Redux/Zustand), atomic state (Jotai/Recoil), and server state management (TanStack Query / SWR). How do you decide which to use?",
-    "category": "technical",
-    "domain": "Frontend",
-    "tags": ["frontend", "react", "state-management", "architecture"],
-    "difficulty": "mid",
-    "company_archetypes": ["tech", "startup"],
-    "evaluation_criteria": "Distinguishing server cache state (caching, deduplication, invalidation, background refetching) from client UI state; avoiding over-centralized global stores for local component state; performance implications of re-renders and selectors."
-  },
-  {
-    "id": "ml-nlp-001",
-    "question": "Explain the self-attention mechanism in the Transformer architecture. How does scaled dot-product attention compute token relationships and why is the scaling factor sqrt(d_k) necessary?",
-    "category": "technical",
-    "domain": "Machine Learning",
-    "tags": ["ml", "nlp", "transformers", "deep-learning", "attention", "ai"],
-    "difficulty": "mid",
-    "company_archetypes": ["tech", "faang", "ai-startup"],
-    "evaluation_criteria": "Query, Key, Value matrix projections; attention score formula softmax(Q * K^T / sqrt(d_k)) * V; reason for scaling factor: large dot-products push softmax into regions with vanishing gradients; multi-head attention enabling attending to information from different representation subspaces."
-  },
-  {
-    "id": "ml-eval-002",
-    "question": "When evaluating an imbalanced classification model (e.g. fraud detection with 0.1% positive rate), why is ROC-AUC misleading, and how do Precision-Recall AUC, Cost-Sensitive Learning, and Focal Loss help?",
-    "category": "technical",
-    "domain": "Machine Learning",
-    "tags": ["ml", "evaluation", "classification", "metrics", "imbalanced-data"],
-    "difficulty": "mid",
-    "company_archetypes": ["fintech", "enterprise", "tech"],
-    "evaluation_criteria": "ROC-AUC uses False Positive Rate (FP / (FP+TN)), which remains tiny when True Negatives dominate; PR-AUC focuses on Precision (TP / (TP+FP)) and Recall (TP / (TP+FN)); threshold tuning based on business cost matrix; focal loss down-weighting easy negatives."
-  },
-  {
-    "id": "ml-genai-003",
-    "question": "In building an enterprise RAG (Retrieval-Augmented Generation) system, how do you solve chunk boundary loss, semantic retrieval degradation, and hallucination during LLM context synthesis?",
-    "category": "technical",
-    "domain": "Machine Learning",
-    "tags": ["ml", "rag", "llm", "embeddings", "vector-search", "genai"],
-    "difficulty": "senior",
-    "company_archetypes": ["tech", "ai-startup", "enterprise"],
-    "evaluation_criteria": "Chunking strategies (parent-child documents, semantic chunking, sliding windows with overlap); hybrid search (BM25 + dense vector embeddings with Reciprocal Rank Fusion); cross-encoder reranking; context trimming and citation grounding; guardrails and evaluation frameworks (e.g. RAGAS)."
-  },
-  {
-    "id": "ml-train-004",
-    "question": "What is the difference between Parameter-Efficient Fine-Tuning (PEFT/LoRA), full fine-tuning, and in-context learning? How does low-rank adaptation (LoRA) reduce GPU VRAM requirements mathematically?",
-    "category": "technical",
-    "domain": "Machine Learning",
-    "tags": ["ml", "llm", "fine-tuning", "lora", "deep-learning", "ai"],
-    "difficulty": "senior",
-    "company_archetypes": ["tech", "ai-startup", "faang"],
-    "evaluation_criteria": "Freezing base model weights W_0 (d x k) and introducing low-rank decomposition matrices B (d x r) and A (r x k) where r << min(d, k); saving memory on optimizer states (Adam momentum/variance) for frozen parameters; catastrophic forgetting mitigation and adapter merging."
-  },
-  {
-    "id": "ml-ds-005",
-    "question": "How do you detect and prevent data leakage and covariate shift in machine learning training and production deployment pipelines?",
-    "category": "technical",
-    "domain": "Machine Learning",
-    "tags": ["ml", "data-science", "mlops", "data-leakage", "feature-engineering"],
-    "difficulty": "mid",
-    "company_archetypes": ["enterprise", "fintech", "tech"],
-    "evaluation_criteria": "Target leakage, temporal leakage in time-series data; fitting transformers/scalers only on training fold inside cross-validation; feature store point-in-time correctness; statistical distribution drift monitoring (PSI, KS-test, Wasserstein distance)."
-  },
-  {
-    "id": "sd-dist-001",
-    "question": "Design a globally distributed URL shortening service (like Bitly) handling 100M new URLs created per month and 10B clicks per month. How do you generate unique short keys, handle caching, and ensure 99.99% availability?",
-    "category": "technical",
-    "domain": "System Design",
-    "tags": ["system-design", "distributed-systems", "scalability", "caching", "databases"],
-    "difficulty": "senior",
-    "company_archetypes": ["faang", "tech", "enterprise"],
-    "evaluation_criteria": "Base62 encoding, unique ID generation (distributed Snowflake ID generator vs Pre-generated key generator service vs counter), high read-to-write ratio (100:1) with Redis Cache-Aside, database sharding/replication, 301 vs 302 HTTP redirect trade-offs, analytics asynchronously queued via Kafka."
-  },
-  {
-    "id": "sd-dist-002",
-    "question": "Design a distributed API Rate Limiter supporting multi-tier throttling (e.g. 100 req/min per user, 10,000 req/sec cluster-wide). Compare Token Bucket, Leaky Bucket, and Sliding Window Log algorithms.",
-    "category": "technical",
-    "domain": "System Design",
-    "tags": ["system-design", "rate-limiting", "distributed-systems", "algorithms", "redis"],
-    "difficulty": "senior",
-    "company_archetypes": ["tech", "faang", "fintech"],
-    "evaluation_criteria": "Detailed trade-offs of Token Bucket vs Sliding Window Counter; distributed state synchronization using Redis Lua scripts to avoid race conditions; handling distributed clock skew; tiering at API gateway level vs client SDK fallback with HTTP 429 Retry-After headers."
-  },
-  {
-    "id": "sd-dist-003",
-    "question": "Design a real-time messaging and chat application (like WhatsApp or Slack) that supports 1-on-1 messaging, group chats with hundreds of users, and reliable message delivery with read receipts.",
-    "category": "technical",
-    "domain": "System Design",
-    "tags": ["system-design", "websockets", "messaging", "pubsub", "scalability"],
-    "difficulty": "senior",
-    "company_archetypes": ["faang", "tech", "startup"],
-    "evaluation_criteria": "Persistent connections (WebSocket / gRPC bidirectional streaming), connection gateway session routing via Redis pub/sub or service registry, message ordering with sequential message IDs, offline message storage and push notifications, group fan-out strategies (fan-out on write vs fan-out on read)."
-  },
-  {
-    "id": "sd-dist-004",
-    "question": "Explain the CAP theorem and PACELC theorem. In what scenarios would you choose an AP (Available / Partition-tolerant) architecture over a CP (Consistent / Partition-tolerant) architecture in production?",
-    "category": "technical",
-    "domain": "System Design",
-    "tags": ["system-design", "distributed-systems", "cap-theorem", "databases", "consistency"],
-    "difficulty": "mid",
-    "company_archetypes": ["enterprise", "tech", "fintech"],
-    "evaluation_criteria": "CAP definitions under network partitions; PACELC extension for normal latency/consistency trade-offs (e.g. DynamoDB vs Spanner); concrete examples: e-commerce shopping cart (AP) vs banking financial ledger (CP); eventual consistency models and conflict resolution (CRDTs, vector clocks)."
-  },
-  {
-    "id": "dsa-algo-001",
-    "question": "How does a Hash Table resolve hash collisions under the hood (Chaining vs Open Addressing / Linear Probing)? What factors dictate when a hash table dynamically resizes, and what is the amortized time complexity?",
-    "category": "technical",
-    "domain": "Data Structures & Algorithms",
-    "tags": ["dsa", "algorithms", "hash-table", "data-structures", "complexity"],
+    "tags": [
+      "css",
+      "responsive-design",
+      "layout",
+      "web-standards"
+    ],
     "difficulty": "junior",
-    "company_archetypes": ["tech", "faang", "enterprise"],
-    "evaluation_criteria": "Load factor threshold (typically 0.7-0.75), rehashing all keys into a doubled bucket array, O(1) average lookup vs O(n) worst-case collision degradation, tombstone markers in open addressing, worst-case DoS vulnerability with crafted hash collisions."
+    "company_archetypes": [
+      "Agency",
+      "Startup",
+      "Enterprise"
+    ],
+    "evaluation_criteria": "1D (flexbox) vs 2D (grid) mental models, content-first vs layout-first alignment, responsive subgrid, and real-world layout examples."
   },
   {
-    "id": "dsa-algo-002",
-    "question": "Explain the mechanics and design of an LRU (Least Recently Used) Cache that achieves O(1) Get and O(1) Put operations. Which combined data structures make this possible?",
+    "id": "fe-004",
+    "question": "How do you detect and fix JavaScript memory leaks in a single-page application (SPA)?",
     "category": "technical",
-    "domain": "Data Structures & Algorithms",
-    "tags": ["dsa", "lru-cache", "hash-map", "linked-list", "algorithms"],
-    "difficulty": "mid",
-    "company_archetypes": ["tech", "faang", "startup"],
-    "evaluation_criteria": "Combination of a Hash Map (O(1) key-to-node pointer lookup) and a Doubly Linked List (O(1) node removal and insertion to head/tail); eviction of the tail node on capacity overflow; concurrency considerations (read/write locks)."
+    "domain": "Frontend",
+    "tags": [
+      "debugging",
+      "memory-management",
+      "javascript",
+      "browser-devtools"
+    ],
+    "difficulty": "senior",
+    "company_archetypes": [
+      "Enterprise",
+      "High-Growth Startup"
+    ],
+    "evaluation_criteria": "Knowledge of detached DOM nodes, uncleaned event listeners/timers, closure retention, Chrome DevTools heap snapshots, and allocation timelines."
   },
   {
-    "id": "dsa-algo-003",
-    "question": "When approaching dynamic programming problems, how do you identify the optimal substructure and overlapping subproblems? Compare Top-Down (Memoization) with Bottom-Up (Tabulation) regarding space and call-stack limits.",
+    "id": "fe-005",
+    "question": "Compare Server-Side Rendering (SSR), Static Site Generation (SSG), and Client-Side Rendering (CSR) in modern web frameworks. What are the key trade-offs?",
     "category": "technical",
-    "domain": "Data Structures & Algorithms",
-    "tags": ["dsa", "dynamic-programming", "algorithms", "recursion", "complexity"],
+    "domain": "Frontend",
+    "tags": [
+      "architecture",
+      "nextjs",
+      "ssr",
+      "performance",
+      "seo"
+    ],
     "difficulty": "mid",
-    "company_archetypes": ["tech", "faang"],
-    "evaluation_criteria": "Defining state variables and state transition recurrence relation; recursion stack depth overhead vs cache locality in bottom-up arrays; space optimization (e.g. rolling array variables reducing O(n) space to O(1))."
+    "company_archetypes": [
+      "Scaleup",
+      "E-Commerce",
+      "Agency"
+    ],
+    "evaluation_criteria": "Trade-offs around TTFB vs TTI, SEO indexing, build times, server compute overhead, hydration costs, and incremental static regeneration (ISR)."
   },
   {
-    "id": "devops-infra-001",
-    "question": "In a Kubernetes production cluster, what happens step-by-step when a pod receives a SIGTERM signal during a rolling deployment? How do you prevent dropped active connections using readiness probes and preStop hooks?",
+    "id": "fe-006",
+    "question": "How would you design a accessible modal dialog adhering to WAI-ARIA 1.2 guidelines?",
+    "category": "technical",
+    "domain": "Frontend",
+    "tags": [
+      "accessibility",
+      "a11y",
+      "aria",
+      "dom",
+      "ux"
+    ],
+    "difficulty": "mid",
+    "company_archetypes": [
+      "Enterprise",
+      "Government",
+      "FinTech"
+    ],
+    "evaluation_criteria": "Focus trapping, restoring focus on close, ESC key listener, aria-modal, aria-labelledby/describedby, inert backdrop, and screen reader announcements."
+  },
+  {
+    "id": "fe-007",
+    "question": "Explain the difference between useEffect, useLayoutEffect, and useInsertionEffect in React, citing practical use cases for each.",
+    "category": "technical",
+    "domain": "Frontend",
+    "tags": [
+      "react",
+      "hooks",
+      "rendering-lifecycle",
+      "javascript"
+    ],
+    "difficulty": "mid",
+    "company_archetypes": [
+      "Startup",
+      "Tech"
+    ],
+    "evaluation_criteria": "Timing relative to DOM mutation and paint, preventing layout flicker in DOM measurements, CSS-in-JS injection timing, and dependency array subtleties."
+  },
+  {
+    "id": "fe-008",
+    "question": "How does modern CSS cascade resolution work, including cascade layers (@layer), specificity, and inheritance?",
+    "category": "technical",
+    "domain": "Frontend",
+    "tags": [
+      "css",
+      "modern-css",
+      "web-standards",
+      "architecture"
+    ],
+    "difficulty": "senior",
+    "company_archetypes": [
+      "Design Systems",
+      "Enterprise"
+    ],
+    "evaluation_criteria": "Order of precedence across user/author layers, specificity calculations, !important inversion within layers, and clean design system architecture."
+  },
+  {
+    "id": "fe-009",
+    "question": "What strategies would you employ to implement a resilient offline-first Progressive Web App (PWA) with background data sync?",
+    "category": "technical",
+    "domain": "Frontend",
+    "tags": [
+      "pwa",
+      "service-workers",
+      "offline",
+      "caching",
+      "indexeddb"
+    ],
+    "difficulty": "lead",
+    "company_archetypes": [
+      "High-Growth Startup",
+      "Mobile-First"
+    ],
+    "evaluation_criteria": "Service Worker lifecycle, Cache Storage API strategies (stale-while-revalidate, cache-first), IndexedDB persistence, conflict resolution, and Background Sync API."
+  },
+  {
+    "id": "fe-010",
+    "question": "Explain JavaScript closures and lexical scoping with a clear example of how they can lead to unexpected behavior in loops.",
+    "category": "technical",
+    "domain": "Frontend",
+    "tags": [
+      "javascript",
+      "fundamentals",
+      "closures",
+      "scope"
+    ],
+    "difficulty": "junior",
+    "company_archetypes": [
+      "All"
+    ],
+    "evaluation_criteria": "Lexical environment, scope chain, difference between var and let in block scoping, and practical applications like data privacy/memoization."
+  },
+  {
+    "id": "fe-011",
+    "question": "What is the Event Loop in JavaScript, and how do microtasks (Promises) differ from macrotasks (setTimeout, I/O) in execution priority?",
+    "category": "technical",
+    "domain": "Frontend",
+    "tags": [
+      "javascript",
+      "event-loop",
+      "async",
+      "browser-internals"
+    ],
+    "difficulty": "mid",
+    "company_archetypes": [
+      "FAANG",
+      "Tech"
+    ],
+    "evaluation_criteria": "Call stack, task queue, microtask queue draining before next rendering frame or macrotask, requestAnimationFrame timing."
+  },
+  {
+    "id": "fe-012",
+    "question": "How would you architect a reusable, themeable component library for a large multi-brand enterprise application?",
+    "category": "technical",
+    "domain": "Frontend",
+    "tags": [
+      "design-systems",
+      "architecture",
+      "component-design",
+      "typescript"
+    ],
+    "difficulty": "lead",
+    "company_archetypes": [
+      "Enterprise",
+      "FinTech",
+      "SaaS"
+    ],
+    "evaluation_criteria": "Design tokens, CSS custom properties, headless component primitives (Radix/Aria), tree-shaking, automated visual regression testing, and versioning."
+  },
+  {
+    "id": "be-001",
+    "question": "Explain how database indexing works internally with B-Trees. When might adding an index actually degrade database performance?",
+    "category": "technical",
+    "domain": "Backend",
+    "tags": [
+      "databases",
+      "sql",
+      "indexing",
+      "performance",
+      "storage"
+    ],
+    "difficulty": "mid",
+    "company_archetypes": [
+      "FAANG",
+      "Enterprise",
+      "FinTech"
+    ],
+    "evaluation_criteria": "B-Tree structure, leaf nodes, index lookups vs table scans, write amplification on inserts/updates, index maintenance overhead, and low-cardinality pitfalls."
+  },
+  {
+    "id": "be-002",
+    "question": "What is the difference between Optimistic Concurrency Control and Pessimistic Locking in relational databases? In what scenarios is each preferred?",
+    "category": "technical",
+    "domain": "Backend",
+    "tags": [
+      "databases",
+      "concurrency",
+      "transactions",
+      "acid"
+    ],
+    "difficulty": "senior",
+    "company_archetypes": [
+      "FinTech",
+      "E-Commerce",
+      "Enterprise"
+    ],
+    "evaluation_criteria": "SELECT FOR UPDATE vs version/timestamp columns, deadlock risks, throughput trade-offs under high vs low contention, retry storm handling."
+  },
+  {
+    "id": "be-003",
+    "question": "How do you design a robust, idempotent REST API endpoint for financial transaction processing?",
+    "category": "technical",
+    "domain": "Backend",
+    "tags": [
+      "api-design",
+      "idempotency",
+      "payments",
+      "rest",
+      "architecture"
+    ],
+    "difficulty": "senior",
+    "company_archetypes": [
+      "FinTech",
+      "Stripe-like",
+      "E-Commerce"
+    ],
+    "evaluation_criteria": "Idempotency keys, atomic check-and-insert in database, distributed locks (Redis), payload hashing, handling concurrent in-flight retries, and cached response headers."
+  },
+  {
+    "id": "be-004",
+    "question": "Compare REST, GraphQL, and gRPC. What criteria do you use to choose the right communication protocol for microservices vs client-facing apps?",
+    "category": "technical",
+    "domain": "Backend",
+    "tags": [
+      "protocols",
+      "grpc",
+      "graphql",
+      "rest",
+      "microservices"
+    ],
+    "difficulty": "mid",
+    "company_archetypes": [
+      "Scaleup",
+      "Tech",
+      "Enterprise"
+    ],
+    "evaluation_criteria": "Protobuf serialization vs JSON, HTTP/2 multiplexing, over/under-fetching, caching layers, schema enforcement, and latency characteristics."
+  },
+  {
+    "id": "be-005",
+    "question": "Explain the Saga Pattern for managing distributed transactions across microservices. Compare Choreography vs Orchestration.",
+    "category": "technical",
+    "domain": "Backend",
+    "tags": [
+      "microservices",
+      "distributed-systems",
+      "transactions",
+      "patterns"
+    ],
+    "difficulty": "lead",
+    "company_archetypes": [
+      "Enterprise",
+      "FinTech",
+      "High-Growth Startup"
+    ],
+    "evaluation_criteria": "Compensating transactions, eventual consistency, centralized orchestrator state machine vs decentralized event pub/sub, failure handling, and debugging complexity."
+  },
+  {
+    "id": "be-006",
+    "question": "How does connection pooling work in database clients, and what parameters do you tune to prevent pool exhaustion under high concurrency?",
+    "category": "technical",
+    "domain": "Backend",
+    "tags": [
+      "databases",
+      "connection-pooling",
+      "performance",
+      "concurrency"
+    ],
+    "difficulty": "mid",
+    "company_archetypes": [
+      "Enterprise",
+      "High-Traffic Web"
+    ],
+    "evaluation_criteria": "TCP handshake overhead, min/max pool size, connection acquisition timeouts, max idle lifetime, thread vs connection ratios, and PgBouncer/proxy architectures."
+  },
+  {
+    "id": "be-007",
+    "question": "Describe the differences between Session-based authentication with cookies and Stateless JWT authentication. What are the security and scalability implications of each?",
+    "category": "technical",
+    "domain": "Backend",
+    "tags": [
+      "security",
+      "auth",
+      "jwt",
+      "sessions",
+      "architecture"
+    ],
+    "difficulty": "mid",
+    "company_archetypes": [
+      "All"
+    ],
+    "evaluation_criteria": "Server-side state/Redis lookup vs cryptographic verification, token revocation challenges, CSRF vs XSS attack vectors, HttpOnly cookies, and token refresh rotations."
+  },
+  {
+    "id": "be-008",
+    "question": "What is Database Sharding, and how do you select an effective shard key to avoid hotspotting?",
+    "category": "technical",
+    "domain": "Backend",
+    "tags": [
+      "databases",
+      "sharding",
+      "scalability",
+      "distributed-systems"
+    ],
+    "difficulty": "senior",
+    "company_archetypes": [
+      "FAANG",
+      "Hyper-Scale"
+    ],
+    "evaluation_criteria": "Horizontal partitioning, hash-based vs range-based vs directory-based routing, cross-shard joins/transactions complexity, re-sharding strategies, and hotspot mitigation."
+  },
+  {
+    "id": "be-009",
+    "question": "How do you implement the Token Bucket rate limiting algorithm in a distributed backend environment using Redis?",
+    "category": "technical",
+    "domain": "Backend",
+    "tags": [
+      "rate-limiting",
+      "redis",
+      "algorithms",
+      "distributed-systems"
+    ],
+    "difficulty": "senior",
+    "company_archetypes": [
+      "FinTech",
+      "Cloud Platforms",
+      "FAANG"
+    ],
+    "evaluation_criteria": "Redis Lua scripts for atomic token refill and deduction, sliding window vs token bucket trade-offs, handling clock skew, and client response headers (429, Retry-After)."
+  },
+  {
+    "id": "be-010",
+    "question": "What is the N+1 query problem in Object-Relational Mappers (ORMs), and how do you diagnose and eliminate it?",
+    "category": "technical",
+    "domain": "Backend",
+    "tags": [
+      "orm",
+      "sql",
+      "performance",
+      "databases"
+    ],
+    "difficulty": "junior",
+    "company_archetypes": [
+      "All"
+    ],
+    "evaluation_criteria": "Lazy loading vs eager loading, JOIN FETCH, batch queries (IN clause), SQL query profiling tools, and ORM query overhead."
+  },
+  {
+    "id": "be-011",
+    "question": "Explain how Kafka achieves high throughput and durability compared to traditional message brokers like RabbitMQ.",
+    "category": "technical",
+    "domain": "Backend",
+    "tags": [
+      "kafka",
+      "messaging",
+      "distributed-systems",
+      "streaming"
+    ],
+    "difficulty": "senior",
+    "company_archetypes": [
+      "FAANG",
+      "Big Data",
+      "FinTech"
+    ],
+    "evaluation_criteria": "Append-only commit log, zero-copy OS transfers (sendfile), sequential disk I/O, partition-based horizontal scalability, consumer group offset tracking."
+  },
+  {
+    "id": "be-012",
+    "question": "How do you design a database schema and indexing strategy for a multi-tenant SaaS application to balance isolation, performance, and operational cost?",
+    "category": "technical",
+    "domain": "Backend",
+    "tags": [
+      "saas",
+      "multi-tenancy",
+      "databases",
+      "architecture"
+    ],
+    "difficulty": "lead",
+    "company_archetypes": [
+      "B2B SaaS",
+      "Enterprise"
+    ],
+    "evaluation_criteria": "Shared database + shared schema (tenant_id filtering + row-level security) vs separate schema vs separate database, noisy neighbor isolation, tenant-aware connection routing."
+  },
+  {
+    "id": "sd-001",
+    "question": "Design a globally distributed URL shortener (like TinyURL or bit.ly) handling 100 million new URLs per month and 10 billion redirects.",
+    "category": "technical",
+    "domain": "System Design",
+    "tags": [
+      "system-design",
+      "distributed-systems",
+      "scalability",
+      "caching",
+      "hashing"
+    ],
+    "difficulty": "senior",
+    "company_archetypes": [
+      "FAANG",
+      "Tech"
+    ],
+    "evaluation_criteria": "Base62 encoding with distributed counter (ZooKeeper/Snowflake ID), read-heavy caching (80/20 rule with Redis), database schema, 301 vs 302 redirects, and analytics pipeline."
+  },
+  {
+    "id": "sd-002",
+    "question": "Design a real-time collaborative document editing system (like Google Docs) supporting concurrent edits from multiple users.",
+    "category": "technical",
+    "domain": "System Design",
+    "tags": [
+      "system-design",
+      "crdt",
+      "ot",
+      "concurrency",
+      "websockets"
+    ],
+    "difficulty": "lead",
+    "company_archetypes": [
+      "FAANG",
+      "Productivity SaaS"
+    ],
+    "evaluation_criteria": "Operational Transformation (OT) vs Conflict-free Replicated Data Types (CRDTs), WebSockets gateway, connection management, snapshotting, and undo/redo histories."
+  },
+  {
+    "id": "sd-003",
+    "question": "Design a distributed metrics aggregation and alerting pipeline capable of ingesting millions of telemetry events per second.",
+    "category": "technical",
+    "domain": "System Design",
+    "tags": [
+      "system-design",
+      "telemetry",
+      "time-series",
+      "streaming",
+      "scalability"
+    ],
+    "difficulty": "lead",
+    "company_archetypes": [
+      "Datadog-like",
+      "Cloud Infra",
+      "FAANG"
+    ],
+    "evaluation_criteria": "Edge agents, Kafka ingestion, time-series storage (Prometheus/ClickHouse/InfluxDB), downsampling/rollup workers, sliding window alerting, and query engines."
+  },
+  {
+    "id": "sd-004",
+    "question": "Explain the CAP Theorem and PACELC Theorem with real-world examples of distributed systems choosing different trade-offs.",
+    "category": "technical",
+    "domain": "System Design",
+    "tags": [
+      "distributed-systems",
+      "theory",
+      "consistency",
+      "availability"
+    ],
+    "difficulty": "mid",
+    "company_archetypes": [
+      "FAANG",
+      "FinTech",
+      "Enterprise"
+    ],
+    "evaluation_criteria": "Consistency vs Availability during Partition, Latency vs Consistency during Normal operation (PACELC), Spanner vs DynamoDB vs Cassandra comparison."
+  },
+  {
+    "id": "sd-005",
+    "question": "Design a high-throughput notification service that sends notifications across Push, SMS, and Email with user preference filtering and rate limits.",
+    "category": "technical",
+    "domain": "System Design",
+    "tags": [
+      "system-design",
+      "queues",
+      "microservices",
+      "pubsub"
+    ],
+    "difficulty": "mid",
+    "company_archetypes": [
+      "Scaleup",
+      "E-Commerce",
+      "FinTech"
+    ],
+    "evaluation_criteria": "Priority queues, third-party provider failovers (Twilio/Sendgrid/APNS), deduplication, rate limiters per user, template rendering, and delivery status tracking."
+  },
+  {
+    "id": "sd-006",
+    "question": "Design a video streaming platform (like YouTube or Netflix) handling video uploads, adaptive bitrate transcoding, and global playback.",
+    "category": "technical",
+    "domain": "System Design",
+    "tags": [
+      "system-design",
+      "cdn",
+      "video-processing",
+      "storage",
+      "scalability"
+    ],
+    "difficulty": "senior",
+    "company_archetypes": [
+      "FAANG",
+      "Media Tech"
+    ],
+    "evaluation_criteria": "Chunked upload to object storage, async transcoding pipeline (HLS/DASH at 1080p, 720p, etc.), multi-CDN caching strategy, edge caching, and metadata search."
+  },
+  {
+    "id": "sd-007",
+    "question": "How does Consistent Hashing work in distributed caching (e.g. Memcached/Redis clusters), and how do virtual nodes prevent hotspot imbalance?",
+    "category": "technical",
+    "domain": "System Design",
+    "tags": [
+      "caching",
+      "distributed-systems",
+      "algorithms",
+      "consistent-hashing"
+    ],
+    "difficulty": "senior",
+    "company_archetypes": [
+      "FAANG",
+      "Cloud Infra"
+    ],
+    "evaluation_criteria": "Hash ring mapping, adding/removing servers with minimal key movement (K/N keys remapped), virtual node replication for uniform distribution."
+  },
+  {
+    "id": "sd-008",
+    "question": "Design an online ride-hailing matching service (like Uber or Lyft) connecting nearby drivers to passengers with real-time location tracking.",
+    "category": "technical",
+    "domain": "System Design",
+    "tags": [
+      "system-design",
+      "geospatial",
+      "websockets",
+      "redis",
+      "scalability"
+    ],
+    "difficulty": "senior",
+    "company_archetypes": [
+      "FAANG",
+      "Ride-Sharing",
+      "Logistics"
+    ],
+    "evaluation_criteria": "Geospatial indexing (Quadtree, Google S2, or Uber H3), driver location ingestion via WebSockets, Redis pub/sub, dispatch matching engine, ETA estimation."
+  },
+  {
+    "id": "sd-009",
+    "question": "Explain the difference between strong consistency, eventual consistency, and causal consistency, giving practical engineering scenarios for each.",
+    "category": "technical",
+    "domain": "System Design",
+    "tags": [
+      "distributed-systems",
+      "consistency-models",
+      "databases"
+    ],
+    "difficulty": "mid",
+    "company_archetypes": [
+      "FAANG",
+      "Enterprise"
+    ],
+    "evaluation_criteria": "Linearizability, read-your-writes, social media feeds vs banking balances vs collaborative editing requirements, and replication lag considerations."
+  },
+  {
+    "id": "sd-010",
+    "question": "Design a distributed job scheduling engine (like Celery, Quartz, or Airflow) supporting cron expressions, dependency chains, and retry backoffs.",
+    "category": "technical",
+    "domain": "System Design",
+    "tags": [
+      "system-design",
+      "distributed-scheduling",
+      "queues",
+      "resilience"
+    ],
+    "difficulty": "lead",
+    "company_archetypes": [
+      "Enterprise",
+      "Cloud Platforms"
+    ],
+    "evaluation_criteria": "Master/worker leader election (Raft/etcd), distributed heartbeat monitoring, dead-letter queues, DAG dependency resolution, and exactly-once vs at-least-once execution."
+  },
+  {
+    "id": "do-001",
+    "question": "Explain the step-by-step lifecycle of a Kubernetes Pod from creation via kubectl to running state, including admission controllers, scheduler, kubelet, and CRI.",
     "category": "technical",
     "domain": "DevOps & Cloud",
-    "tags": ["devops", "kubernetes", "containers", "cloud", "reliability"],
+    "tags": [
+      "kubernetes",
+      "containers",
+      "cloud-native",
+      "infrastructure"
+    ],
     "difficulty": "senior",
-    "company_archetypes": ["tech", "enterprise", "fintech"],
-    "evaluation_criteria": "Kubelet marking pod Terminating and removing from Service Endpoints asynchronously while sending SIGTERM; race condition where iptables/kube-proxy hasn't updated yet; using preStop sleep hook (e.g. sleep 5-10s) to allow existing traffic to finish; terminationGracePeriodSeconds tuning; graceful HTTP server shutdown."
+    "company_archetypes": [
+      "Cloud Platforms",
+      "Enterprise",
+      "FAANG"
+    ],
+    "evaluation_criteria": "API server validation, Mutating/Validating Webhooks, etcd persistence, Kube-scheduler filtering/scoring, Kubelet watch, CNI network setup, CRI container pull & run."
   },
   {
-    "id": "devops-infra-002",
-    "question": "Compare Canary Deployments, Blue-Green Deployments, and Rolling Updates. How do you automate rollback triggers based on Prometheus error budget or latency SLI metrics?",
+    "id": "do-002",
+    "question": "How do you structure a multi-environment Infrastructure as Code (IaC) repository using Terraform to prevent state file conflicts and drift?",
     "category": "technical",
     "domain": "DevOps & Cloud",
-    "tags": ["devops", "ci-cd", "deployments", "monitoring", "sre"],
+    "tags": [
+      "terraform",
+      "iac",
+      "cloud",
+      "aws",
+      "automation"
+    ],
     "difficulty": "mid",
-    "company_archetypes": ["tech", "enterprise", "startup"],
-    "evaluation_criteria": "Traffic splitting at service mesh / ingress (e.g. Argo Rollouts / Flagger / Istio); monitoring HTTP 5xx error rate and p99 latency deltas; automated progressive step weighting (10% -> 25% -> 50% -> 100%) with immediate automated rollback on threshold breach."
+    "company_archetypes": [
+      "All"
+    ],
+    "evaluation_criteria": "Remote state backends (S3 + DynamoDB locking), Terraform workspaces vs directory-per-environment structure, reusable modules, drift detection in CI/CD."
   },
   {
-    "id": "behav-star-001",
-    "question": "Tell me about a time when you were faced with an ambiguous or poorly specified technical requirement. How did you break down the problem, align stakeholders, and deliver results?",
-    "category": "behavioral",
-    "domain": "Behavioral",
-    "tags": ["behavioral", "leadership", "ambiguity", "ownership", "star-method"],
+    "id": "do-003",
+    "question": "Compare Blue-Green Deployments, Canary Deployments, and Rolling Updates. How do you automate rollback triggers based on Prometheus metrics?",
+    "category": "technical",
+    "domain": "DevOps & Cloud",
+    "tags": [
+      "ci-cd",
+      "deployment-strategies",
+      "sre",
+      "monitoring",
+      "argocd"
+    ],
     "difficulty": "mid",
-    "company_archetypes": ["tech", "startup", "faang", "enterprise"],
-    "evaluation_criteria": "STAR methodology: Specific situation context, proactive initiative in interviewing users/stakeholders, drafting RFC/design doc with clear options and trade-offs, iterative MVP validation, and measurable impact."
+    "company_archetypes": [
+      "Scaleup",
+      "Enterprise",
+      "FAANG"
+    ],
+    "evaluation_criteria": "Traffic splitting (Ingress / Service Mesh / Flagger / Argo Rollouts), HTTP 5xx error rate thresholds, p99 latency SLOs, and automated rollback execution."
   },
   {
-    "id": "behav-star-002",
-    "question": "Describe a situation where you had a significant technical disagreement with a team member or senior engineer regarding architecture or design. How did you navigate the conflict and reach a resolution?",
-    "category": "behavioral",
-    "domain": "Behavioral",
-    "tags": ["behavioral", "conflict-resolution", "collaboration", "teamwork", "star-method"],
-    "difficulty": "mid",
-    "company_archetypes": ["tech", "faang", "enterprise"],
-    "evaluation_criteria": "STAR structure: Focus on objective criteria (benchmarks, constraints, user impact) rather than ego; active listening to other perspectives; building consensus through prototyping or spikes; committed alignment once a decision was made (disagree and commit)."
-  },
-  {
-    "id": "behav-star-003",
-    "question": "Give an example of a project or production deployment that went wrong or failed to meet expectations. What was your personal accountability, what did you learn, and what preventive systems did you implement?",
-    "category": "behavioral",
-    "domain": "Behavioral",
-    "tags": ["behavioral", "failure", "ownership", "post-mortem", "reliability", "star-method"],
+    "id": "do-004",
+    "question": "A production Linux server experiences high load average, but CPU utilization is only 15%. How do you diagnose the root cause?",
+    "category": "technical",
+    "domain": "DevOps & Cloud",
+    "tags": [
+      "linux",
+      "troubleshooting",
+      "sre",
+      "performance",
+      "operating-systems"
+    ],
     "difficulty": "senior",
-    "company_archetypes": ["tech", "faang", "startup", "enterprise"],
-    "evaluation_criteria": "STAR structure: Genuine ownership without blaming teammates; blameless post-mortem root cause analysis (5 Whys); concrete corrective actions (automated test suites, lint checks, alerting, runbooks) preventing future recurrence."
+    "company_archetypes": [
+      "SRE",
+      "Infrastructure",
+      "FAANG"
+    ],
+    "evaluation_criteria": "Understanding of uninterruptible sleep (D-state) processes, disk I/O bottlenecks (iostat, iotop), NFS/network hangs, memory pressure (vmstat), and dmesg inspection."
   },
   {
-    "id": "behav-star-004",
-    "question": "Tell me about a time you had to explain a complex technical concept or architecture to a non-technical stakeholder or client to gain their buy-in. How did you adjust your communication?",
-    "category": "behavioral",
-    "domain": "Behavioral",
-    "tags": ["behavioral", "communication", "stakeholder-management", "star-method"],
+    "id": "do-005",
+    "question": "How do you design a Zero-Trust security model for cloud infrastructure and internal service-to-service communication?",
+    "category": "technical",
+    "domain": "DevOps & Cloud",
+    "tags": [
+      "security",
+      "zero-trust",
+      "cloud",
+      "iam",
+      "mtls"
+    ],
+    "difficulty": "lead",
+    "company_archetypes": [
+      "FinTech",
+      "Enterprise",
+      "Defense"
+    ],
+    "evaluation_criteria": "Mutual TLS (mTLS) with SPIFFE/SPIRE or Service Mesh, least-privilege IAM roles, ephemeral credentials, micro-segmentation, and continuous device/identity posture checks."
+  },
+  {
+    "id": "do-006",
+    "question": "Explain the Three Pillars of Observability (Metrics, Logs, Traces) and how OpenTelemetry standardizes telemetry collection across distributed services.",
+    "category": "technical",
+    "domain": "DevOps & Cloud",
+    "tags": [
+      "observability",
+      "opentelemetry",
+      "monitoring",
+      "tracing"
+    ],
+    "difficulty": "mid",
+    "company_archetypes": [
+      "Tech",
+      "Enterprise"
+    ],
+    "evaluation_criteria": "Trace context propagation (W3C TraceContext headers), high-cardinality metric challenges, structured JSON logging with trace correlation, OTel Collector architecture."
+  },
+  {
+    "id": "do-007",
+    "question": "How do you optimize Docker container builds for minimal image size, fast caching, and security hardening in a CI/CD pipeline?",
+    "category": "technical",
+    "domain": "DevOps & Cloud",
+    "tags": [
+      "docker",
+      "containers",
+      "ci-cd",
+      "security"
+    ],
     "difficulty": "junior",
-    "company_archetypes": ["enterprise", "consulting", "fintech", "startup"],
-    "evaluation_criteria": "STAR structure: Avoiding deep jargon and using relatable business analogies; tying technical trade-offs directly to business value, costs, timeline, and risk; checking for understanding and facilitating collaborative questions."
+    "company_archetypes": [
+      "All"
+    ],
+    "evaluation_criteria": "Multi-stage builds, non-root user execution, alpine/distroless base images, layer order caching, .dockerignore usage, and container vulnerability scanning (Trivy)."
   },
   {
-    "id": "behav-star-005",
-    "question": "Describe a time when you had to prioritize between delivering a feature quickly under a tight deadline and taking the time to refactor tech debt or write thorough tests. How did you make that trade-off?",
-    "category": "behavioral",
-    "domain": "Behavioral",
-    "tags": ["behavioral", "prioritization", "tech-debt", "decision-making", "star-method"],
+    "id": "do-008",
+    "question": "What is an Error Budget in SRE, and how do you use Service Level Objectives (SLOs) to negotiate feature velocity vs reliability investments?",
+    "category": "technical",
+    "domain": "DevOps & Cloud",
+    "tags": [
+      "sre",
+      "slo",
+      "sla",
+      "reliability",
+      "management"
+    ],
     "difficulty": "senior",
-    "company_archetypes": ["startup", "tech", "enterprise"],
-    "evaluation_criteria": "STAR structure: Transparent communication of business risk with product managers; defining tactical vs strategic debt; creating follow-up tickets with explicit timeline commitments; adding critical path automated safety nets."
+    "company_archetypes": [
+      "FAANG",
+      "FinTech",
+      "High-Growth Startup"
+    ],
+    "evaluation_criteria": "SLI (indicator) vs SLO (target) vs SLA (contract), error budget burn rate alerting, freeze policies when budget is depleted, and balanced product collaboration."
   },
   {
-    "id": "behav-star-006",
-    "question": "Tell me about a project where you took the initiative to improve an existing process, tool, or codebase without being explicitly asked by your manager. What drove you and what was the outcome?",
+    "id": "do-009",
+    "question": "Describe how you would architect a multi-region Disaster Recovery (DR) plan with defined RTO (Recovery Time Objective) and RPO (Recovery Point Objective).",
+    "category": "technical",
+    "domain": "DevOps & Cloud",
+    "tags": [
+      "disaster-recovery",
+      "cloud",
+      "architecture",
+      "resilience"
+    ],
+    "difficulty": "lead",
+    "company_archetypes": [
+      "Enterprise",
+      "Banking",
+      "Healthcare"
+    ],
+    "evaluation_criteria": "Active-Active vs Active-Passive (Warm/Cold Standby), cross-region database replication, DNS failover (Route 53 latency routing), automated testing of DR playbooks."
+  },
+  {
+    "id": "do-010",
+    "question": "Explain how Linux cgroups and namespaces form the foundation of container isolation in Docker and Kubernetes.",
+    "category": "technical",
+    "domain": "DevOps & Cloud",
+    "tags": [
+      "linux",
+      "containers",
+      "kernel",
+      "docker"
+    ],
+    "difficulty": "senior",
+    "company_archetypes": [
+      "Cloud Infra",
+      "FAANG"
+    ],
+    "evaluation_criteria": "Namespaces (PID, NET, MNT, IPC, UTS, USER) for boundary isolation, cgroups (v1/v2) for resource metering/limits (CPU, Memory, IO), and seccomp/AppArmor security profiles."
+  },
+  {
+    "id": "de-001",
+    "question": "Explain the architectural differences between a Data Lake, a Data Warehouse, and a Lakehouse (e.g. Apache Iceberg / Delta Lake).",
+    "category": "technical",
+    "domain": "Data Engineering",
+    "tags": [
+      "data-engineering",
+      "lakehouse",
+      "iceberg",
+      "snowflake",
+      "bigquery"
+    ],
+    "difficulty": "mid",
+    "company_archetypes": [
+      "Enterprise",
+      "Big Data",
+      "Tech"
+    ],
+    "evaluation_criteria": "Unstructured object storage vs columnar proprietary warehouses, ACID transactions on object storage, metadata layers, schema evolution, time travel, and BI query performance."
+  },
+  {
+    "id": "de-002",
+    "question": "How does Apache Spark execute a distributed SQL transformation? Explain DAG generation, Catalyst Optimizer, and Shuffles.",
+    "category": "technical",
+    "domain": "Data Engineering",
+    "tags": [
+      "spark",
+      "big-data",
+      "distributed-compute",
+      "performance"
+    ],
+    "difficulty": "senior",
+    "company_archetypes": [
+      "FAANG",
+      "Enterprise",
+      "Analytics"
+    ],
+    "evaluation_criteria": "Logical plan optimization, physical plan selection, narrow vs wide transformations (map vs groupBy), shuffle partitions, memory spill, and broadcast hash joins."
+  },
+  {
+    "id": "de-003",
+    "question": "How do you handle late-arriving and out-of-order data in streaming pipelines using Apache Flink or Spark Structured Streaming?",
+    "category": "technical",
+    "domain": "Data Engineering",
+    "tags": [
+      "streaming",
+      "flink",
+      "spark-streaming",
+      "event-time",
+      "watermarks"
+    ],
+    "difficulty": "senior",
+    "company_archetypes": [
+      "FinTech",
+      "AdTech",
+      "FAANG"
+    ],
+    "evaluation_criteria": "Event time vs processing time, watermarks, allowed lateness, tumbling vs sliding vs session windows, side outputs for dead-letter processing."
+  },
+  {
+    "id": "de-004",
+    "question": "What is the difference between Star Schema and Snowflake Schema in dimensional modeling? When do you choose one over the other?",
+    "category": "technical",
+    "domain": "Data Engineering",
+    "tags": [
+      "data-modeling",
+      "dimensional-modeling",
+      "sql",
+      "analytics"
+    ],
+    "difficulty": "junior",
+    "company_archetypes": [
+      "All"
+    ],
+    "evaluation_criteria": "Fact tables vs Dimension tables, denormalized dimensions (star) vs normalized sub-dimensions (snowflake), query join performance vs storage redundancy, BI analyst readability."
+  },
+  {
+    "id": "de-005",
+    "question": "How do you build an idempotent, backfillable data pipeline in dbt and Airflow?",
+    "category": "technical",
+    "domain": "Data Engineering",
+    "tags": [
+      "dbt",
+      "airflow",
+      "etl",
+      "idempotency",
+      "data-quality"
+    ],
+    "difficulty": "mid",
+    "company_archetypes": [
+      "Startups",
+      "Scaleup",
+      "Enterprise"
+    ],
+    "evaluation_criteria": "Partition-based overwrite strategies, incremental models with unique keys, Airflow execution_date determinism, automated schema tests and freshness checks."
+  },
+  {
+    "id": "de-006",
+    "question": "Compare columnar storage formats like Apache Parquet and Apache ORC with row-based formats like CSV and JSON. Why are columnar formats superior for analytical queries?",
+    "category": "technical",
+    "domain": "Data Engineering",
+    "tags": [
+      "parquet",
+      "storage-formats",
+      "compression",
+      "data-engineering"
+    ],
+    "difficulty": "junior",
+    "company_archetypes": [
+      "Big Data",
+      "Tech"
+    ],
+    "evaluation_criteria": "Column pruning (read only queried columns), dictionary encoding & snappy compression, row group statistics for predicate pushdown (skipping chunks)."
+  },
+  {
+    "id": "de-007",
+    "question": "What strategies do you use to detect and mitigate data skew in distributed joins across massive datasets?",
+    "category": "technical",
+    "domain": "Data Engineering",
+    "tags": [
+      "spark",
+      "performance",
+      "data-skew",
+      "optimization"
+    ],
+    "difficulty": "lead",
+    "company_archetypes": [
+      "FAANG",
+      "Big Data"
+    ],
+    "evaluation_criteria": "Symptoms (single task taking 90% of job time), salting keys with random prefixes, broadcast joins for small side tables, Adaptive Query Execution (AQE skew join)."
+  },
+  {
+    "id": "de-008",
+    "question": "How do you implement Data Quality Gates and automated schema drift alerts in modern data pipelines (e.g. Great Expectations, Soda)?",
+    "category": "technical",
+    "domain": "Data Engineering",
+    "tags": [
+      "data-quality",
+      "governance",
+      "testing",
+      "monitoring"
+    ],
+    "difficulty": "mid",
+    "company_archetypes": [
+      "FinTech",
+      "Enterprise"
+    ],
+    "evaluation_criteria": "Pre-ingestion assertion checks (nulls, ranges, uniqueness), breaking vs non-breaking schema drift alerts, quarantine tables, and automated Slack/PagerDuty alerts."
+  },
+  {
+    "id": "ml-001",
+    "question": "Explain the Multi-Head Self-Attention mechanism in the Transformer architecture. How does its computational complexity scale with sequence length?",
+    "category": "technical",
+    "domain": "Machine Learning",
+    "tags": [
+      "deep-learning",
+      "transformers",
+      "nlp",
+      "llm",
+      "math"
+    ],
+    "difficulty": "senior",
+    "company_archetypes": [
+      "FAANG",
+      "AI Research",
+      "Tech"
+    ],
+    "evaluation_criteria": "Query, Key, Value matrix projections, scaled dot-product attention formula, softmax scaling factor (sqrt(d_k)), O(N^2) complexity, and FlashAttention optimizations."
+  },
+  {
+    "id": "ml-002",
+    "question": "How do you design an end-to-end Retrieval-Augmented Generation (RAG) system? What are the key bottlenecks in retrieval accuracy and generation quality?",
+    "category": "technical",
+    "domain": "Machine Learning",
+    "tags": [
+      "rag",
+      "llm",
+      "embeddings",
+      "vector-search",
+      "genai"
+    ],
+    "difficulty": "senior",
+    "company_archetypes": [
+      "AI Startups",
+      "Enterprise",
+      "FAANG"
+    ],
+    "evaluation_criteria": "Document parsing, chunking strategies, embedding model selection, hybrid search (dense + BM25 sparse), re-ranking (cross-encoders), context window management, and hallucination evaluation (Ragas)."
+  },
+  {
+    "id": "ml-003",
+    "question": "What is the difference between Precision, Recall, and ROC-AUC? How do you choose an evaluation metric when building a fraud detection model with 99.9% negative class balance?",
+    "category": "technical",
+    "domain": "Machine Learning",
+    "tags": [
+      "metrics",
+      "classification",
+      "imbalanced-data",
+      "data-science"
+    ],
+    "difficulty": "junior",
+    "company_archetypes": [
+      "FinTech",
+      "E-Commerce",
+      "Healthcare"
+    ],
+    "evaluation_criteria": "Why accuracy is useless in imbalanced settings, PR-AUC vs ROC-AUC, threshold tuning, cost-benefit trade-off of False Positives vs False Negatives."
+  },
+  {
+    "id": "ml-004",
+    "question": "Compare Full Fine-Tuning, LoRA (Low-Rank Adaptation), and Prompt Engineering with In-Context Learning for adapting foundation LLMs to a custom enterprise task.",
+    "category": "technical",
+    "domain": "Machine Learning",
+    "tags": [
+      "llm",
+      "lora",
+      "fine-tuning",
+      "genai",
+      "peft"
+    ],
+    "difficulty": "senior",
+    "company_archetypes": [
+      "AI Startups",
+      "Enterprise"
+    ],
+    "evaluation_criteria": "Parameter efficiency, GPU memory footprint (rank decomposition matrices A & B), catastrophic forgetting, serving latency, and maintenance overhead."
+  },
+  {
+    "id": "ml-005",
+    "question": "What is the Bias-Variance Tradeoff, and what concrete techniques do you use to diagnose and fix high variance (overfitting) in a model?",
+    "category": "technical",
+    "domain": "Machine Learning",
+    "tags": [
+      "fundamentals",
+      "regularization",
+      "model-tuning",
+      "math"
+    ],
+    "difficulty": "junior",
+    "company_archetypes": [
+      "All"
+    ],
+    "evaluation_criteria": "Training vs validation loss curves, L1/L2 regularization, dropout, data augmentation, early stopping, cross-validation, and reducing model capacity."
+  },
+  {
+    "id": "ml-006",
+    "question": "How do you detect Data Drift and Concept Drift in a production machine learning model, and what automated retraining strategies do you deploy?",
+    "category": "technical",
+    "domain": "Machine Learning",
+    "tags": [
+      "mlops",
+      "monitoring",
+      "model-drift",
+      "production-ml"
+    ],
+    "difficulty": "senior",
+    "company_archetypes": [
+      "FinTech",
+      "Enterprise",
+      "FAANG"
+    ],
+    "evaluation_criteria": "Statistical divergence metrics (KS test, PSI, Wasserstein distance), delayed ground truth labels, shadow deployment / canary evaluation, and automated CI/CD retraining triggers."
+  },
+  {
+    "id": "ml-007",
+    "question": "Explain how Gradient Boosting (XGBoost / LightGBM) constructs trees sequentially compared to the parallel tree construction in Random Forest.",
+    "category": "technical",
+    "domain": "Machine Learning",
+    "tags": [
+      "algorithms",
+      "gradient-boosting",
+      "tabular-ml",
+      "ensemble"
+    ],
+    "difficulty": "mid",
+    "company_archetypes": [
+      "FinTech",
+      "Analytics",
+      "Tech"
+    ],
+    "evaluation_criteria": "Bagging vs boosting, fitting trees to pseudo-residuals/gradients of the loss function, learning rate shrinkage, leaf-wise vs depth-wise tree growth, and feature subsampling."
+  },
+  {
+    "id": "ml-008",
+    "question": "How do Vector Databases (e.g. Pinecone, Milvus, Qdrant) perform approximate nearest neighbor (ANN) search over millions of high-dimensional vectors? Explain HNSW.",
+    "category": "technical",
+    "domain": "Machine Learning",
+    "tags": [
+      "vector-search",
+      "embeddings",
+      "hnsw",
+      "algorithms"
+    ],
+    "difficulty": "lead",
+    "company_archetypes": [
+      "AI Startups",
+      "Search",
+      "FAANG"
+    ],
+    "evaluation_criteria": "Exact KNN vs ANN, Hierarchical Navigable Small World graphs (skip-list inspiration on multi-layer graphs), distance metrics (Cosine vs Dot Product vs Euclidean), IVF-PQ quantization."
+  },
+  {
+    "id": "ml-009",
+    "question": "What strategies would you use to optimize inference latency and memory throughput for serving large language models at scale (e.g. vLLM, TensorRT-LLM)?",
+    "category": "technical",
+    "domain": "Machine Learning",
+    "tags": [
+      "mlops",
+      "llm-serving",
+      "optimization",
+      "gpu"
+    ],
+    "difficulty": "lead",
+    "company_archetypes": [
+      "AI Cloud",
+      "FAANG",
+      "Tech"
+    ],
+    "evaluation_criteria": "PagedAttention (eliminating KV cache fragmentation), continuous batching, quantization (FP8, INT4 AWQ/GPTQ), speculative decoding, and tensor parallelism across multiple GPUs."
+  },
+  {
+    "id": "ml-010",
+    "question": "Explain the difference between supervised learning, unsupervised learning, and reinforcement learning from human feedback (RLHF).",
+    "category": "technical",
+    "domain": "Machine Learning",
+    "tags": [
+      "fundamentals",
+      "rlhf",
+      "alignment",
+      "concepts"
+    ],
+    "difficulty": "junior",
+    "company_archetypes": [
+      "All"
+    ],
+    "evaluation_criteria": "Labeled datasets vs pattern discovery, reward models, PPO (Proximal Policy Optimization), alignment for helpfulness/safety, and DPO (Direct Preference Optimization)."
+  },
+  {
+    "id": "sec-001",
+    "question": "How do Cross-Site Scripting (XSS) attacks work, and what layered defenses (CSP, sanitization, framework protections) prevent them in modern web apps?",
+    "category": "technical",
+    "domain": "Cybersecurity",
+    "tags": [
+      "appsec",
+      "web-security",
+      "xss",
+      "csp",
+      "owasp"
+    ],
+    "difficulty": "mid",
+    "company_archetypes": [
+      "All"
+    ],
+    "evaluation_criteria": "Stored vs Reflected vs DOM-based XSS, Content Security Policy headers (nonce/hash), context-aware output encoding, DOMPurify, and modern framework auto-escaping."
+  },
+  {
+    "id": "sec-002",
+    "question": "Explain the TLS 1.3 cryptographic handshake. How does it establish forward secrecy and encrypt traffic faster than TLS 1.2?",
+    "category": "technical",
+    "domain": "Cybersecurity",
+    "tags": [
+      "cryptography",
+      "networking",
+      "tls",
+      "pki",
+      "security"
+    ],
+    "difficulty": "senior",
+    "company_archetypes": [
+      "FinTech",
+      "Cloud Platforms",
+      "Defense"
+    ],
+    "evaluation_criteria": "1-RTT handshake (and 0-RTT resumption), Diffie-Hellman ephemeral key exchange (ECDHE), deprecation of static RSA key transport, certificate validation, and forward secrecy."
+  },
+  {
+    "id": "sec-003",
+    "question": "How do you detect and mitigate a Server-Side Request Forgery (SSRF) vulnerability in an application that fetches user-provided URLs?",
+    "category": "technical",
+    "domain": "Cybersecurity",
+    "tags": [
+      "appsec",
+      "vulnerabilities",
+      "ssrf",
+      "cloud-security"
+    ],
+    "difficulty": "senior",
+    "company_archetypes": [
+      "Enterprise",
+      "Cloud Platforms"
+    ],
+    "evaluation_criteria": "Attack vector against cloud instance metadata (169.254.169.254) or internal services, DNS rebinding attacks, strict IP allowlisting, and disabling HTTP redirects."
+  },
+  {
+    "id": "sec-004",
+    "question": "What is the Principle of Least Privilege in cloud IAM (AWS/GCP), and how do you implement automated IAM role right-sizing?",
+    "category": "technical",
+    "domain": "Cybersecurity",
+    "tags": [
+      "iam",
+      "cloud-security",
+      "aws",
+      "governance"
+    ],
+    "difficulty": "junior",
+    "company_archetypes": [
+      "Enterprise",
+      "FinTech"
+    ],
+    "evaluation_criteria": "Wildcard permissions risks, service-specific roles vs shared credentials, analyzing CloudTrail/Access Analyzer logs, and automated role scoping in CI/CD."
+  },
+  {
+    "id": "sec-005",
+    "question": "Explain how OAuth 2.0 Authorization Code Flow with PKCE (Proof Key for Code Exchange) protects mobile and single-page apps against interception attacks.",
+    "category": "technical",
+    "domain": "Cybersecurity",
+    "tags": [
+      "auth",
+      "oauth",
+      "pkce",
+      "security-architecture"
+    ],
+    "difficulty": "mid",
+    "company_archetypes": [
+      "FinTech",
+      "SaaS",
+      "Mobile"
+    ],
+    "evaluation_criteria": "Why public clients cannot protect a client_secret, code_verifier and code_challenge generation, authorization code interception mitigation, state parameter for CSRF."
+  },
+  {
+    "id": "sec-006",
+    "question": "How would you design a Security Incident Response plan for a confirmed database credential breach in production?",
+    "category": "technical",
+    "domain": "Cybersecurity",
+    "tags": [
+      "incident-response",
+      "secops",
+      "forensics",
+      "leadership"
+    ],
+    "difficulty": "lead",
+    "company_archetypes": [
+      "Enterprise",
+      "Healthcare",
+      "FinTech"
+    ],
+    "evaluation_criteria": "Preparation, Identification, Containment (rotating credentials, isolating affected nodes), Eradication, Recovery, and Post-Incident Root Cause Analysis (blameless postmortem)."
+  },
+  {
+    "id": "mob-001",
+    "question": "How does memory management work in iOS (ARC - Automatic Reference Counting)? Explain retain cycles and how weak and unowned references prevent them.",
+    "category": "technical",
+    "domain": "Mobile",
+    "tags": [
+      "ios",
+      "swift",
+      "memory-management",
+      "arc"
+    ],
+    "difficulty": "mid",
+    "company_archetypes": [
+      "Tech",
+      "Scaleup",
+      "FAANG"
+    ],
+    "evaluation_criteria": "Reference count increment/decrement, strong reference cycles in closures (capture lists `[weak self]`), unowned vs weak nilability, and Xcode Memory Graph Debugger."
+  },
+  {
+    "id": "mob-002",
+    "question": "Explain the Android Activity and Fragment lifecycle. How do you preserve UI state during configuration changes like screen rotation?",
+    "category": "technical",
+    "domain": "Mobile",
+    "tags": [
+      "android",
+      "kotlin",
+      "architecture",
+      "lifecycle"
+    ],
+    "difficulty": "junior",
+    "company_archetypes": [
+      "All"
+    ],
+    "evaluation_criteria": "onCreate/onStart/onResume/onPause/onStop/onDestroy, ViewModel outliving Activity recreations, SavedStateHandle for process death, Jetpack Compose state hoist."
+  },
+  {
+    "id": "mob-003",
+    "question": "Compare Native iOS/Android development with cross-platform frameworks (Flutter / React Native). In what scenarios is full native development mandatory?",
+    "category": "technical",
+    "domain": "Mobile",
+    "tags": [
+      "architecture",
+      "cross-platform",
+      "flutter",
+      "react-native",
+      "native"
+    ],
+    "difficulty": "mid",
+    "company_archetypes": [
+      "Startup",
+      "Enterprise",
+      "Tech"
+    ],
+    "evaluation_criteria": "Bridge/JSI/Skia/Impeller rendering performance, day-1 OS API access, background processing constraints, complex native audio/Bluetooth/ARKit, and team velocity."
+  },
+  {
+    "id": "mob-004",
+    "question": "How do you design a resilient offline-first mobile synchronization engine with local SQLite/Room/CoreData and remote cloud backends?",
+    "category": "technical",
+    "domain": "Mobile",
+    "tags": [
+      "mobile",
+      "offline-first",
+      "sync",
+      "sqlite",
+      "architecture"
+    ],
+    "difficulty": "senior",
+    "company_archetypes": [
+      "Productivity",
+      "FinTech",
+      "Field Ops"
+    ],
+    "evaluation_criteria": "Optimistic UI updates, write queues with exponential backoff, conflict resolution (last-write-wins vs field-level merging), handling battery and network transitions."
+  },
+  {
+    "id": "mob-005",
+    "question": "How do you profile and optimize mobile app launch time (cold start vs warm start) in iOS and Android?",
+    "category": "technical",
+    "domain": "Mobile",
+    "tags": [
+      "performance",
+      "mobile",
+      "profiling",
+      "optimization"
+    ],
+    "difficulty": "senior",
+    "company_archetypes": [
+      "FAANG",
+      "High-Scale Apps"
+    ],
+    "evaluation_criteria": "Dynamic library loading (dyld), main thread blocking during Application.onCreate or AppDelegate, lazy initialization, baseline profiles in Android, Instruments Time Profiler."
+  },
+  {
+    "id": "mob-006",
+    "question": "Explain mobile push notification architecture (APNS & FCM) and how background notification payloads wake the app for background processing.",
+    "category": "technical",
+    "domain": "Mobile",
+    "tags": [
+      "notifications",
+      "apns",
+      "fcm",
+      "mobile-architecture"
+    ],
+    "difficulty": "mid",
+    "company_archetypes": [
+      "Social",
+      "E-Commerce",
+      "FinTech"
+    ],
+    "evaluation_criteria": "Token registration lifecycle, silent push notifications (`content-available: 1`), OS background execution quotas, Notification Service Extension for rich media/decryption."
+  },
+  {
+    "id": "pm-001",
+    "question": "How do you prioritize a product backlog when engineering, sales, and executive leadership have competing, conflicting feature requests?",
+    "category": "behavioral",
+    "domain": "Product Management",
+    "tags": [
+      "prioritization",
+      "stakeholder-management",
+      "product-strategy",
+      "frameworks"
+    ],
+    "difficulty": "senior",
+    "company_archetypes": [
+      "Tech",
+      "Enterprise",
+      "Startup"
+    ],
+    "evaluation_criteria": "Prioritization frameworks (RICE, Kano, Value vs Effort), anchoring decisions in north star metrics and company strategy, saying 'no' with transparent data."
+  },
+  {
+    "id": "pm-002",
+    "question": "Walk me through how you would diagnose a sudden 20% drop in user activation on an onboarding funnel.",
+    "category": "technical",
+    "domain": "Product Management",
+    "tags": [
+      "analytics",
+      "funnel-optimization",
+      "problem-solving",
+      "data-driven"
+    ],
+    "difficulty": "mid",
+    "company_archetypes": [
+      "SaaS",
+      "Consumer Apps",
+      "FinTech"
+    ],
+    "evaluation_criteria": "Systematic funnel segmentation (device, geography, traffic source, new app release), quantitative analytics (Mixpanel/Amplitude) vs qualitative user session replays, hypothesis testing."
+  },
+  {
+    "id": "pm-003",
+    "question": "How do you write an effective, unambiguous Product Requirements Document (PRD) that empowers engineering without micromanaging implementation?",
+    "category": "technical",
+    "domain": "Product Management",
+    "tags": [
+      "prd",
+      "communication",
+      "agile",
+      "specs"
+    ],
+    "difficulty": "junior",
+    "company_archetypes": [
+      "All"
+    ],
+    "evaluation_criteria": "Problem statement, success metrics/OKRs, user personas, user stories with clear acceptance criteria, non-goals, technical constraints, and edge case specifications."
+  },
+  {
+    "id": "pm-004",
+    "question": "Describe your strategy for gracefully deprecating (sunsetting) an enterprise feature that is used by a vocal 5% minority of legacy customers.",
+    "category": "behavioral",
+    "domain": "Product Management",
+    "tags": [
+      "deprecation",
+      "customer-success",
+      "strategy",
+      "communication"
+    ],
+    "difficulty": "senior",
+    "company_archetypes": [
+      "B2B SaaS",
+      "Enterprise"
+    ],
+    "evaluation_criteria": "Direct customer outreach, clear migration paths/alternatives, transparent timelines with milestones, feature flag deprecation warnings, and executive alignment."
+  },
+  {
+    "id": "pm-005",
+    "question": "How do you manage scope creep on a high-stakes project with a fixed regulatory or contract deadline?",
+    "category": "behavioral",
+    "domain": "Project Management",
+    "tags": [
+      "scope-management",
+      "agile",
+      "risk-management",
+      "delivery"
+    ],
+    "difficulty": "mid",
+    "company_archetypes": [
+      "Enterprise",
+      "FinTech",
+      "Healthcare"
+    ],
+    "evaluation_criteria": "Iron Triangle (Scope, Time, Cost/Quality), ruthless MVP de-scoping, transparent change-request processes, daily standup blockers tracking, and proactive stakeholder communication."
+  },
+  {
+    "id": "pm-006",
+    "question": "In an Agile/Scrum sprint retrospective, your team notes that velocity has dropped by 30% for three consecutive sprints. How do you investigate and remediate this?",
+    "category": "behavioral",
+    "domain": "Project Management",
+    "tags": [
+      "scrum",
+      "agile",
+      "velocity",
+      "continuous-improvement"
+    ],
+    "difficulty": "senior",
+    "company_archetypes": [
+      "All"
+    ],
+    "evaluation_criteria": "Investigating unplanned work/production bugs, story point inflation/misestimation, external dependencies/blockers, team burnout, and actionable retro experiments."
+  },
+  {
+    "id": "pm-007",
+    "question": "How do you design and interpret an A/B test for a core checkout conversion flow with statistical significance?",
+    "category": "technical",
+    "domain": "Product Management",
+    "tags": [
+      "ab-testing",
+      "experimentation",
+      "statistics",
+      "growth"
+    ],
+    "difficulty": "mid",
+    "company_archetypes": [
+      "E-Commerce",
+      "Tech",
+      "Growth"
+    ],
+    "evaluation_criteria": "Null hypothesis, sample size & power calculation, p-values (alpha 0.05), preventing early-stopping peeking bias, guardrail metrics (e.g. refund rate), and holdout groups."
+  },
+  {
+    "id": "pm-008",
+    "question": "Explain the difference between Agile, Kanban, and Waterfall methodologies. Under what project conditions would you deliberately choose Waterfall over Agile?",
+    "category": "technical",
+    "domain": "Project Management",
+    "tags": [
+      "methodologies",
+      "agile",
+      "kanban",
+      "waterfall"
+    ],
+    "difficulty": "junior",
+    "company_archetypes": [
+      "All"
+    ],
+    "evaluation_criteria": "Iterative vs sequential phases, fixed requirements vs evolutionary discovery, safety-critical hardware/medical/construction applications suitable for Waterfall."
+  },
+  {
+    "id": "pm-009",
+    "question": "How do you define a North Star Metric for a two-sided marketplace product (like Airbnb or DoorDash)?",
+    "category": "technical",
+    "domain": "Product Management",
+    "tags": [
+      "metrics",
+      "marketplace",
+      "north-star",
+      "growth"
+    ],
+    "difficulty": "senior",
+    "company_archetypes": [
+      "Marketplaces",
+      "Scaleup",
+      "FAANG"
+    ],
+    "evaluation_criteria": "Balancing supply and demand (e.g. nights booked with positive review), input metrics driving the North Star, avoiding vanity metrics like total signups."
+  },
+  {
+    "id": "pm-010",
+    "question": "How do you calculate and manage the Critical Path in a complex multi-team infrastructure migration project?",
+    "category": "technical",
+    "domain": "Project Management",
+    "tags": [
+      "project-management",
+      "critical-path",
+      "scheduling",
+      "risk"
+    ],
+    "difficulty": "lead",
+    "company_archetypes": [
+      "Enterprise",
+      "Infrastructure",
+      "Tech"
+    ],
+    "evaluation_criteria": "Dependency mapping (DAG), identifying zero-float task sequences, resource leveling, risk buffers, and mitigation for high-variance dependencies."
+  },
+  {
+    "id": "ux-001",
+    "question": "How do you balance high aesthetic appeal with strict web accessibility (WCAG 2.1 AA/AAA compliance) in a complex enterprise dashboard?",
+    "category": "technical",
+    "domain": "UI/UX Design",
+    "tags": [
+      "design",
+      "accessibility",
+      "wcag",
+      "color-contrast",
+      "visual-design"
+    ],
+    "difficulty": "mid",
+    "company_archetypes": [
+      "Design Agencies",
+      "Enterprise",
+      "B2B SaaS"
+    ],
+    "evaluation_criteria": "Color contrast ratios (4.5:1 text, 3:1 UI), non-color state indicators (icons + text), accessible typography scale, dark/light theme tokens, and keyboard focus states."
+  },
+  {
+    "id": "ux-002",
+    "question": "Walk me through how you conduct unmoderated usability testing with 5 target users to validate a new complex checkout flow.",
+    "category": "technical",
+    "domain": "UI/UX Design",
+    "tags": [
+      "usability-testing",
+      "user-research",
+      "ux-research",
+      "methods"
+    ],
+    "difficulty": "mid",
+    "company_archetypes": [
+      "All"
+    ],
+    "evaluation_criteria": "Nielsen's 5-user rule, task script formulation (think-aloud protocol without leading questions), task completion rate, time on task, and thematic synthesis."
+  },
+  {
+    "id": "ux-003",
+    "question": "What is the difference between Low-Fidelity wireframes, Interactive Prototypes, and Production Design Systems? When do you transition between them?",
+    "category": "technical",
+    "domain": "UI/UX Design",
+    "tags": [
+      "wireframing",
+      "prototyping",
+      "design-systems",
+      "figma"
+    ],
+    "difficulty": "junior",
+    "company_archetypes": [
+      "All"
+    ],
+    "evaluation_criteria": "Speed of ideation vs fidelity, testing information architecture in lo-fi vs testing micro-interactions in prototypes, component reuse in design systems."
+  },
+  {
+    "id": "ux-004",
+    "question": "How do you design intuitive data visualizations for non-technical users viewing dense financial or operational data?",
+    "category": "technical",
+    "domain": "UI/UX Design",
+    "tags": [
+      "data-viz",
+      "information-design",
+      "dashboards",
+      "ux"
+    ],
+    "difficulty": "senior",
+    "company_archetypes": [
+      "FinTech",
+      "Analytics",
+      "Enterprise"
+    ],
+    "evaluation_criteria": "Choosing the right chart type (avoiding 3D/pie charts for multi-series), progressive disclosure (summary cards with drilldowns), clear labeling, and cognitive load reduction."
+  },
+  {
+    "id": "ux-005",
+    "question": "Describe your process for establishing a cohesive Design System Token taxonomy across typography, color, spacing, and elevation.",
+    "category": "technical",
+    "domain": "UI/UX Design",
+    "tags": [
+      "design-tokens",
+      "design-systems",
+      "figma",
+      "collaboration"
+    ],
+    "difficulty": "lead",
+    "company_archetypes": [
+      "Scaleup",
+      "Design-Centric Tech"
+    ],
+    "evaluation_criteria": "Global tokens (e.g., blue-500) vs semantic tokens (e.g., background-interactive-hover) vs component tokens, handoff collaboration with frontend developers."
+  },
+  {
+    "id": "ux-006",
+    "question": "How do you handle a situation where an executive demands a design change that directly contradicts your user research findings?",
+    "category": "behavioral",
+    "domain": "UI/UX Design",
+    "tags": [
+      "stakeholder-management",
+      "user-advocacy",
+      "collaboration"
+    ],
+    "difficulty": "senior",
+    "company_archetypes": [
+      "Tech",
+      "Agency",
+      "Enterprise"
+    ],
+    "evaluation_criteria": "Empathy for executive business objectives, presenting direct user video clips and metric data, proposing a fast A/B test rather than defensive arguing."
+  },
+  {
+    "id": "lead-001",
+    "question": "How do you manage an underperforming team member while maintaining team morale and treating the individual with empathy and fairness?",
+    "category": "behavioral",
+    "domain": "Leadership & Management",
+    "tags": [
+      "management",
+      "performance-management",
+      "coaching",
+      "empathy"
+    ],
+    "difficulty": "senior",
+    "company_archetypes": [
+      "All"
+    ],
+    "evaluation_criteria": "Early direct 1-on-1 feedback, root cause discovery (skill vs will vs personal blocker), clear 30/60/90-day PIP milestones with measurable targets, and respectful exit if necessary."
+  },
+  {
+    "id": "lead-002",
+    "question": "How do you foster psychological safety in an engineering or product team so people admit mistakes early and take calculated innovations?",
+    "category": "behavioral",
+    "domain": "Leadership & Management",
+    "tags": [
+      "culture",
+      "psychological-safety",
+      "team-building",
+      "leadership"
+    ],
+    "difficulty": "senior",
+    "company_archetypes": [
+      "All"
+    ],
+    "evaluation_criteria": "Blameless postmortems, leader modeling vulnerability and fallibility, rewarding constructive dissent, framing mistakes as learning opportunities."
+  },
+  {
+    "id": "lead-003",
+    "question": "How do you align long-term technical debt reduction with urgent executive demands for short-term revenue features?",
+    "category": "behavioral",
+    "domain": "Leadership & Management",
+    "tags": [
+      "technical-debt",
+      "strategic-alignment",
+      "executive-communication"
+    ],
+    "difficulty": "lead",
+    "company_archetypes": [
+      "Enterprise",
+      "High-Growth Startup"
+    ],
+    "evaluation_criteria": "Translating technical debt into business metrics (velocity risk, customer churn, outage downtime costs), allocating fixed capacity (e.g. 20% budget), and incremental refactoring."
+  },
+  {
+    "id": "lead-004",
+    "question": "Walk me through how you lead a cross-functional team through a major organizational pivot or company-wide restructuring.",
+    "category": "behavioral",
+    "domain": "Leadership & Management",
+    "tags": [
+      "change-management",
+      "crisis-leadership",
+      "communication"
+    ],
+    "difficulty": "lead",
+    "company_archetypes": [
+      "Scaleup",
+      "Enterprise"
+    ],
+    "evaluation_criteria": "Over-communicating the 'Why' behind the change, transparently addressing uncertainties, establishing immediate quick-win milestones, and 1-on-1 emotional support."
+  },
+  {
+    "id": "lead-005",
+    "question": "How do you evaluate and hire senior engineering leaders? What qualities distinguish a great engineering manager from a staff technical architect?",
+    "category": "behavioral",
+    "domain": "Leadership & Management",
+    "tags": [
+      "hiring",
+      "talent-acquisition",
+      "career-tracks",
+      "leadership"
+    ],
+    "difficulty": "lead",
+    "company_archetypes": [
+      "Tech",
+      "Enterprise"
+    ],
+    "evaluation_criteria": "Dual career ladder (management vs individual contributor), people development & organizational design vs deep technical strategy & architectural governance."
+  },
+  {
+    "id": "lead-006",
+    "question": "Describe your strategy for building and maintaining high team velocity across geographically distributed, multi-timezone remote teams.",
+    "category": "behavioral",
+    "domain": "Leadership & Management",
+    "tags": [
+      "remote-work",
+      "async-communication",
+      "productivity",
+      "management"
+    ],
+    "difficulty": "senior",
+    "company_archetypes": [
+      "Remote-First",
+      "Global Tech"
+    ],
+    "evaluation_criteria": "Async-first documentation culture (RFCs/PRDs), minimal synchronous meetings, clear PR review turnaround SLAs, overlap core hours, and cultural inclusivity."
+  },
+  {
+    "id": "lead-007",
+    "question": "How do you handle a toxic high-performer on your team who produces great output but damages team culture and collaboration?",
+    "category": "behavioral",
+    "domain": "Leadership & Management",
+    "tags": [
+      "culture",
+      "conflict-resolution",
+      "team-health",
+      "management"
+    ],
+    "difficulty": "senior",
+    "company_archetypes": [
+      "All"
+    ],
+    "evaluation_criteria": "Clear expectation that 'How' work is done is equally graded with 'What' is done, immediate private feedback with behavioral examples, and willingness to exit if behavior persists."
+  },
+  {
+    "id": "lead-008",
+    "question": "What is your approach to structuring effective 1-on-1 meetings with your direct reports to ensure their continuous professional growth?",
+    "category": "behavioral",
+    "domain": "Leadership & Management",
+    "tags": [
+      "1-on-1s",
+      "career-development",
+      "coaching",
+      "management"
+    ],
+    "difficulty": "junior",
+    "company_archetypes": [
+      "All"
+    ],
+    "evaluation_criteria": "Treating 1-on-1s as the direct report's meeting, focusing on career goals, blockers, and bidirectional feedback rather than simple status updates."
+  },
+  {
+    "id": "sm-001",
+    "question": "Explain Customer Acquisition Cost (CAC) and Lifetime Value (LTV). What is a healthy LTV:CAC ratio for a B2B SaaS business, and how do you improve it?",
+    "category": "technical",
+    "domain": "Sales & Marketing",
+    "tags": [
+      "saas-metrics",
+      "growth",
+      "cac",
+      "ltv",
+      "marketing-analytics"
+    ],
+    "difficulty": "mid",
+    "company_archetypes": [
+      "B2B SaaS",
+      "Tech",
+      "Venture-Backed"
+    ],
+    "evaluation_criteria": "Calculating blended vs paid CAC, net revenue retention (NRR) impact on LTV, 3:1 healthy benchmark, CAC payback period (<12 months), and organic acquisition loops."
+  },
+  {
+    "id": "sm-002",
+    "question": "Walk me through how you handle a prospect's objection in an enterprise sales call when they say your product is 40% more expensive than your competitor.",
+    "category": "behavioral",
+    "domain": "Sales & Marketing",
+    "tags": [
+      "enterprise-sales",
+      "objection-handling",
+      "negotiation",
+      "value-selling"
+    ],
+    "difficulty": "mid",
+    "company_archetypes": [
+      "Enterprise Software",
+      "B2B Sales"
+    ],
+    "evaluation_criteria": "Acknowledge and explore before defending, reframing price to total cost of ownership (TCO) and ROI, sharing case studies with quantifiable savings/revenue gains."
+  },
+  {
+    "id": "sm-003",
+    "question": "How do you design a high-converting B2B Account-Based Marketing (ABM) campaign targeting Tier-1 Fortune 500 enterprise accounts?",
+    "category": "technical",
+    "domain": "Sales & Marketing",
+    "tags": [
+      "abm",
+      "enterprise-marketing",
+      "lead-generation",
+      "b2b"
+    ],
+    "difficulty": "senior",
+    "company_archetypes": [
+      "Enterprise Tech",
+      "SaaS"
+    ],
+    "evaluation_criteria": "Account tiering, multi-touch coordination between sales & marketing, personalized landing pages & collateral, intent data monitoring (Bombora), and multi-threading stakeholders."
+  },
+  {
+    "id": "sm-004",
+    "question": "What is the difference between Product-Led Growth (PLG) and Sales-Led Growth (SLG)? How can a company successfully blend both into a hybrid model?",
+    "category": "technical",
+    "domain": "Sales & Marketing",
+    "tags": [
+      "plg",
+      "growth-strategy",
+      "go-to-market",
+      "sales-motion"
+    ],
+    "difficulty": "senior",
+    "company_archetypes": [
+      "Scaleup",
+      "Tech",
+      "SaaS"
+    ],
+    "evaluation_criteria": "Self-serve onboarding & viral loops vs top-down enterprise procurement, Product-Qualified Leads (PQLs) triggering sales outreach, and expansion sales."
+  },
+  {
+    "id": "sm-005",
+    "question": "How do you structure an effective cold outreach email sequence to a busy VP or C-level executive that achieves a >20% open and >5% reply rate?",
+    "category": "technical",
+    "domain": "Sales & Marketing",
+    "tags": [
+      "sales",
+      "outreach",
+      "copywriting",
+      "lead-generation"
+    ],
+    "difficulty": "junior",
+    "company_archetypes": [
+      "All"
+    ],
+    "evaluation_criteria": "Personalized compelling hook referencing recent company news, concise 3-4 sentence value proposition, zero buzzword fluff, and clear low-friction call to action."
+  },
+  {
+    "id": "sm-006",
+    "question": "How do you build a multi-touch marketing attribution model (First-Touch vs Last-Touch vs Linear vs W-Shaped) to evaluate channel ROI?",
+    "category": "technical",
+    "domain": "Sales & Marketing",
+    "tags": [
+      "attribution",
+      "marketing-analytics",
+      "roi",
+      "data"
+    ],
+    "difficulty": "senior",
+    "company_archetypes": [
+      "E-Commerce",
+      "High-Growth SaaS"
+    ],
+    "evaluation_criteria": "Pros/cons of single-touch vs multi-touch models, recognizing top-of-funnel brand awareness vs bottom-of-funnel conversion drivers, handling offline/dark social traffic."
+  },
+  {
+    "id": "sm-007",
+    "question": "Describe a successful brand positioning campaign you designed to differentiate a product in a crowded, commoditized market.",
+    "category": "behavioral",
+    "domain": "Sales & Marketing",
+    "tags": [
+      "brand-strategy",
+      "positioning",
+      "marketing",
+      "storytelling"
+    ],
+    "difficulty": "lead",
+    "company_archetypes": [
+      "Consumer Brands",
+      "Tech"
+    ],
+    "evaluation_criteria": "Identifying the distinct enemy/status quo, defining a clear category narrative (Category Creation), consistent messaging across channels, and measurable brand lift."
+  },
+  {
+    "id": "sm-008",
+    "question": "How do you optimize an organic SEO strategy for a new web platform to rank for competitive commercial keywords within 6 months?",
+    "category": "technical",
+    "domain": "Sales & Marketing",
+    "tags": [
+      "seo",
+      "content-marketing",
+      "search",
+      "growth"
+    ],
+    "difficulty": "junior",
+    "company_archetypes": [
+      "All"
+    ],
+    "evaluation_criteria": "Topic clusters and pillar pages, technical SEO (crawl budget, core web vitals, structured data), search intent alignment, and high-authority backlink outreach."
+  },
+  {
+    "id": "fin-001",
+    "question": "Explain how the Three Financial Statements (Income Statement, Balance Sheet, Cash Flow Statement) are interconnected. Walk through how a $10 increase in depreciation flows through all three.",
+    "category": "technical",
+    "domain": "Finance & Accounting",
+    "tags": [
+      "accounting",
+      "financial-modeling",
+      "valuation",
+      "finance"
+    ],
+    "difficulty": "junior",
+    "company_archetypes": [
+      "Investment Banking",
+      "Corporate Finance",
+      "Enterprise"
+    ],
+    "evaluation_criteria": "Income statement: Pre-tax income down $10, net income down $10*(1-T). Cash flow: Net income down, add back $10 depreciation, net cash up by $10*T. Balance sheet: Cash up, PP&E down $10, retained earnings down to balance."
+  },
+  {
+    "id": "fin-002",
+    "question": "What is the difference between CapEx (Capital Expenditure) and OpEx (Operational Expenditure)? How does the decision to lease vs buy cloud infrastructure impact EBITDA?",
+    "category": "technical",
+    "domain": "Finance & Accounting",
+    "tags": [
+      "corporate-finance",
+      "ebitda",
+      "accounting",
+      "capex-opex"
+    ],
+    "difficulty": "mid",
+    "company_archetypes": [
+      "Enterprise",
+      "Tech",
+      "Private Equity"
+    ],
+    "evaluation_criteria": "Capitalizing assets depreciated over time vs expensed immediately, EBITDA unaffected by depreciation (CapEx) but reduced by cloud subscriptions (OpEx), cash flow timing."
+  },
+  {
+    "id": "fin-003",
+    "question": "How do you calculate Weighted Average Cost of Capital (WACC), and how is it used as a discount rate in Discounted Cash Flow (DCF) valuation models?",
+    "category": "technical",
+    "domain": "Finance & Accounting",
+    "tags": [
+      "valuation",
+      "wacc",
+      "dcf",
+      "corporate-finance"
+    ],
+    "difficulty": "senior",
+    "company_archetypes": [
+      "Investment Banking",
+      "M&A",
+      "Private Equity"
+    ],
+    "evaluation_criteria": "Cost of equity via CAPM (Risk-free rate + Beta * Market Risk Premium), after-tax cost of debt, capital structure weights, and discounting unlevered free cash flows."
+  },
+  {
+    "id": "fin-004",
+    "question": "How do you identify red flags and audit risk in revenue recognition under ASC 606 / IFRS 15 for multi-year software contracts?",
+    "category": "technical",
+    "domain": "Finance & Accounting",
+    "tags": [
+      "audit",
+      "revenue-recognition",
+      "asc-606",
+      "compliance"
+    ],
+    "difficulty": "senior",
+    "company_archetypes": [
+      "Big 4 Accounting",
+      "Public Companies",
+      "SaaS"
+    ],
+    "evaluation_criteria": "5-step revenue model, identifying distinct performance obligations, variable consideration, customer right of return, and bill-and-hold risks."
+  },
+  {
+    "id": "fin-005",
+    "question": "What metrics and sensitivities do you analyze when conducting a Break-Even Analysis for a new capital-intensive product launch?",
+    "category": "technical",
+    "domain": "Finance & Accounting",
+    "tags": [
+      "financial-planning",
+      "fpa",
+      "break-even",
+      "budgeting"
+    ],
+    "difficulty": "mid",
+    "company_archetypes": [
+      "Manufacturing",
+      "Startups",
+      "Corporate FP&A"
+    ],
+    "evaluation_criteria": "Fixed costs vs variable costs per unit, contribution margin ratio, margin of safety, and scenario modeling against price elasticity."
+  },
+  {
+    "id": "fin-006",
+    "question": "How do you manage corporate cash flow and working capital during a period of rapid inflation and supply chain elongation?",
+    "category": "behavioral",
+    "domain": "Finance & Accounting",
+    "tags": [
+      "treasury",
+      "working-capital",
+      "cash-management",
+      "strategy"
+    ],
+    "difficulty": "lead",
+    "company_archetypes": [
+      "Enterprise",
+      "Multinationals"
+    ],
+    "evaluation_criteria": "Days Sales Outstanding (DSO), Days Payable Outstanding (DPO), inventory holding turnover, dynamic supplier discounting, and currency hedging."
+  },
+  {
+    "id": "hc-001",
+    "question": "How do you prioritize patient care and bed allocation during an unexpected emergency department surge with limited ICU capacity?",
+    "category": "behavioral",
+    "domain": "Healthcare & Medicine",
+    "tags": [
+      "clinical-triage",
+      "emergency",
+      "patient-care",
+      "healthcare-ops"
+    ],
+    "difficulty": "senior",
+    "company_archetypes": [
+      "Hospitals",
+      "Emergency Care",
+      "Healthcare Systems"
+    ],
+    "evaluation_criteria": "Standard triage scoring (ESI scale), vital signs acuity, rapid step-down assessments, interdisciplinary communication, and patient safety protocols."
+  },
+  {
+    "id": "hc-002",
+    "question": "Explain the core requirements of HIPAA compliance when designing workflows for storing and sharing Electronic Protected Health Information (ePHI).",
+    "category": "technical",
+    "domain": "Healthcare & Medicine",
+    "tags": [
+      "hipaa",
+      "compliance",
+      "healthtech",
+      "privacy",
+      "security"
+    ],
+    "difficulty": "mid",
+    "company_archetypes": [
+      "HealthTech",
+      "Hospitals",
+      "Insurers"
+    ],
+    "evaluation_criteria": "Privacy Rule vs Security Rule, technical safeguards (encryption at rest/in transit, audit logs), Business Associate Agreements (BAA), minimum necessary rule."
+  },
+  {
+    "id": "hc-003",
+    "question": "How do you communicate an unexpected negative medical outcome or clinical error to a patient and their family with empathy and transparency?",
+    "category": "behavioral",
+    "domain": "Healthcare & Medicine",
+    "tags": [
+      "communication",
+      "patient-advocacy",
+      "ethics",
+      "empathy"
+    ],
+    "difficulty": "senior",
+    "company_archetypes": [
+      "Clinical Practice",
+      "Hospitals"
+    ],
+    "evaluation_criteria": "SPIKES or similar disclosure protocol, clear non-defensive explanation of facts, expressing genuine empathy, outlining corrective actions, and answering questions without medical jargon."
+  },
+  {
+    "id": "hc-004",
+    "question": "How do you lead a clinical quality improvement initiative (e.g., reducing hospital-acquired infections or medication administration errors)?",
+    "category": "technical",
+    "domain": "Healthcare & Medicine",
+    "tags": [
+      "quality-improvement",
+      "patient-safety",
+      "clinical-operations"
+    ],
+    "difficulty": "lead",
+    "company_archetypes": [
+      "Hospital Networks",
+      "Healthcare Consulting"
+    ],
+    "evaluation_criteria": "Plan-Do-Study-Act (PDSA) cycle, root cause analysis (fishbone diagram), checklist implementations, nurse & physician training, and tracking clinical metric compliance."
+  },
+  {
+    "id": "hc-005",
+    "question": "Describe how you resolve a professional disagreement with a colleague regarding a diagnostic or treatment plan for a patient.",
+    "category": "behavioral",
+    "domain": "Healthcare & Medicine",
+    "tags": [
+      "teamwork",
+      "conflict-resolution",
+      "clinical-ethics"
+    ],
+    "difficulty": "mid",
+    "company_archetypes": [
+      "Hospitals",
+      "Clinics"
+    ],
+    "evaluation_criteria": "Keeping patient outcome as shared priority, objective review of lab results and clinical evidence, seeking second opinions or clinical supervisor guidance without ego."
+  },
+  {
+    "id": "hc-006",
+    "question": "What is the difference between Medicare and Medicaid, and how do Value-Based Care models differ from traditional Fee-For-Service reimbursement?",
+    "category": "technical",
+    "domain": "Healthcare & Medicine",
+    "tags": [
+      "healthcare-economics",
+      "policy",
+      "reimbursement",
+      "healthtech"
+    ],
+    "difficulty": "junior",
+    "company_archetypes": [
+      "Healthcare Systems",
+      "HealthTech",
+      "Insurers"
+    ],
+    "evaluation_criteria": "Federal elderly/disabled program vs state-administered low-income program, incentivizing health outcomes & preventive care (ACOs, capitation) vs volume of procedures."
+  },
+  {
+    "id": "edu-001",
+    "question": "How do you design a lesson plan with Differentiated Instruction to accommodate students with diverse learning speeds and neurodivergent needs in the same classroom?",
+    "category": "technical",
+    "domain": "Education & Coaching",
+    "tags": [
+      "pedagogy",
+      "differentiated-instruction",
+      "curriculum",
+      "teaching"
+    ],
+    "difficulty": "mid",
+    "company_archetypes": [
+      "Schools",
+      "Universities",
+      "EdTech"
+    ],
+    "evaluation_criteria": "Universal Design for Learning (UDL), multi-modal content delivery (visual, auditory, kinesthetic), tiered assignments, scaffolding, and IEP/504 accommodations."
+  },
+  {
+    "id": "edu-002",
+    "question": "How do you rebuild morale, discipline, and trust in a sports team or classroom after a demoralizing loss or team conflict?",
+    "category": "behavioral",
+    "domain": "Education & Coaching",
+    "tags": [
+      "coaching",
+      "motivation",
+      "sports-leadership",
+      "team-dynamics"
+    ],
+    "difficulty": "senior",
+    "company_archetypes": [
+      "Sports Athletics",
+      "Academies",
+      "Schools"
+    ],
+    "evaluation_criteria": "De-escalating emotions, refocusing on controllable processes rather than outcomes, celebrating effort, holding candid 1-on-1 conversations, and establishing shared goals."
+  },
+  {
+    "id": "edu-003",
+    "question": "What is the difference between Formative Assessment and Summative Assessment? Give concrete examples of how you use formative data to modify your teaching in real time.",
+    "category": "technical",
+    "domain": "Education & Coaching",
+    "tags": [
+      "assessment",
+      "pedagogy",
+      "data-driven-teaching"
+    ],
+    "difficulty": "junior",
+    "company_archetypes": [
+      "Schools",
+      "EdTech"
+    ],
+    "evaluation_criteria": "Assessment OF learning vs assessment FOR learning, exit tickets, quick polls, think-pair-share adjustments during the lecture, and rubric design."
+  },
+  {
+    "id": "edu-004",
+    "question": "How do you handle a disruptive student or athlete whose behavior consistently derails group focus without humiliating them in front of peers?",
+    "category": "behavioral",
+    "domain": "Education & Coaching",
+    "tags": [
+      "classroom-management",
+      "behavior-management",
+      "empathy"
+    ],
+    "difficulty": "mid",
+    "company_archetypes": [
+      "Schools",
+      "Coaching Clubs"
+    ],
+    "evaluation_criteria": "Restorative justice principles, private 1-on-1 conversation to understand underlying causes, clear predictable boundaries, positive reinforcement for desired actions."
+  },
+  {
+    "id": "edu-005",
+    "question": "How do you communicate effectively with demanding or hostile parents regarding their child's academic struggles or lack of sports playing time?",
+    "category": "behavioral",
+    "domain": "Education & Coaching",
+    "tags": [
+      "stakeholder-management",
+      "parent-communication",
+      "diplomacy"
+    ],
+    "difficulty": "senior",
+    "company_archetypes": [
+      "Schools",
+      "Private Academies"
+    ],
+    "evaluation_criteria": "Active listening, objective documentation of performance and rubric criteria, clear actionable improvement plan for the student, and de-escalation."
+  },
+  {
+    "id": "edu-006",
+    "question": "How do you integrate generative AI tools responsibly into modern curriculum and student learning without compromising academic integrity?",
+    "category": "technical",
+    "domain": "Education & Coaching",
+    "tags": [
+      "edtech",
+      "ai-in-education",
+      "curriculum-design",
+      "modern-pedagogy"
+    ],
+    "difficulty": "lead",
+    "company_archetypes": [
+      "EdTech",
+      "Universities",
+      "Modern Schools"
+    ],
+    "evaluation_criteria": "Teaching AI literacy and prompt design, redesigning assessments towards critical analysis/oral defense, establishing transparent citations and ethical use policies."
+  },
+  {
+    "id": "hosp-001",
+    "question": "During a busy Friday evening dinner service, three kitchen staff call in sick and the POS system freezes. How do you lead the team through the rush while maintaining food quality and safety?",
+    "category": "behavioral",
+    "domain": "Hospitality & Operations",
+    "tags": [
+      "crisis-management",
+      "culinary-operations",
+      "hospitality",
+      "leadership"
+    ],
+    "difficulty": "senior",
+    "company_archetypes": [
+      "Restaurants",
+      "Hotels",
+      "Event Venues"
+    ],
+    "evaluation_criteria": "Prioritizing kitchen stations, simplifying menu offerings temporarily, manual ticket backup procedures, transparent communication with front-of-house staff, and strict HACCP safety."
+  },
+  {
+    "id": "hosp-002",
+    "question": "How do you calculate Food Cost Percentage in restaurant management, and what concrete actions do you take if food cost spikes from 28% to 36%?",
+    "category": "technical",
+    "domain": "Hospitality & Operations",
+    "tags": [
+      "food-cost",
+      "inventory-management",
+      "culinary-business",
+      "operations"
+    ],
+    "difficulty": "mid",
+    "company_archetypes": [
+      "Hospitality Groups",
+      "Restaurants"
+    ],
+    "evaluation_criteria": "(Beginning Inventory + Purchases - Ending Inventory) / Food Sales, investigating portion control, waste logs, supplier price changes, inventory shrinkage/theft, and menu engineering."
+  },
+  {
+    "id": "hosp-003",
+    "question": "How do you handle an extremely dissatisfied VIP hotel guest who demands a full refund and complains about service quality?",
+    "category": "behavioral",
+    "domain": "Hospitality & Operations",
+    "tags": [
+      "customer-service",
+      "guest-relations",
+      "de-escalation",
+      "hospitality"
+    ],
+    "difficulty": "mid",
+    "company_archetypes": [
+      "Luxury Hotels",
+      "Resorts",
+      "Customer Success"
+    ],
+    "evaluation_criteria": "LAST method (Listen, Apologize, Solve, Thank), active listening without interrupting, immediate empowering recovery actions (room upgrade, dining voucher), follow-through."
+  },
+  {
+    "id": "hosp-004",
+    "question": "What preventive maintenance protocols and safety inspections do you establish for commercial facility HVAC and electrical systems?",
+    "category": "technical",
+    "domain": "Hospitality & Operations",
+    "tags": [
+      "facilities-management",
+      "hvac",
+      "safety-compliance",
+      "operations"
+    ],
+    "difficulty": "junior",
+    "company_archetypes": [
+      "Hotels",
+      "Commercial Real Estate",
+      "Manufacturing"
+    ],
+    "evaluation_criteria": "Scheduled filter and belt replacements, refrigerant pressure checks, OSHA compliance, electrical panel thermal imaging, and emergency generator load testing."
+  },
+  {
+    "id": "hosp-005",
+    "question": "How do you optimize warehouse picking and packing logistics to increase order fulfillment speed while reducing picking errors?",
+    "category": "technical",
+    "domain": "Hospitality & Operations",
+    "tags": [
+      "supply-chain",
+      "warehouse-operations",
+      "logistics",
+      "efficiency"
+    ],
+    "difficulty": "mid",
+    "company_archetypes": [
+      "E-Commerce",
+      "Logistics",
+      "Retail"
+    ],
+    "evaluation_criteria": "Zone picking vs batch picking, ABC velocity slotting (frequently ordered items near dispatch), barcode verification, and ergonomic conveyor layouts."
+  },
+  {
+    "id": "hosp-006",
+    "question": "How do you build a safety-first workplace culture in industrial operations or commercial facilities to achieve zero workplace incidents?",
+    "category": "behavioral",
+    "domain": "Hospitality & Operations",
+    "tags": [
+      "workplace-safety",
+      "osha",
+      "operations-management",
+      "leadership"
+    ],
+    "difficulty": "lead",
+    "company_archetypes": [
+      "Manufacturing",
+      "Construction",
+      "Logistics"
+    ],
+    "evaluation_criteria": "Daily toolbox safety talks, near-miss reporting without punishment, mandatory PPE compliance, regular hazard audits, and management visibility on the floor."
+  },
+  {
+    "id": "cs-001",
+    "question": "How do you design a Customer Health Score for enterprise SaaS accounts to proactively detect churn risk 60 days before contract renewal?",
+    "category": "technical",
+    "domain": "Customer Success",
+    "tags": [
+      "customer-health",
+      "saas-metrics",
+      "retention",
+      "customer-success"
+    ],
+    "difficulty": "senior",
+    "company_archetypes": [
+      "B2B SaaS",
+      "Enterprise Software"
+    ],
+    "evaluation_criteria": "Weighting product adoption metrics (DAU/MAU, feature usage breadth), support ticket volume and sentiment, executive sponsor engagement, and payment history."
+  },
+  {
+    "id": "cs-002",
+    "question": "Walk me through how you lead an escalation meeting with an angry enterprise client whose critical workflow was broken by an unannounced product update.",
+    "category": "behavioral",
+    "domain": "Customer Success",
+    "tags": [
+      "escalation-management",
+      "crisis-communication",
+      "client-retention"
+    ],
+    "difficulty": "senior",
+    "company_archetypes": [
+      "Enterprise SaaS",
+      "Tech"
+    ],
+    "evaluation_criteria": "Taking full ownership without blaming engineering, presenting immediate workaround + permanent fix timeline, scheduling daily progress updates, and conducting a joint post-mortem."
+  },
+  {
+    "id": "cs-003",
+    "question": "What is the difference between Gross Revenue Retention (GRR) and Net Revenue Retention (NRR)? Why is NRR considered the holy grail of SaaS valuation?",
+    "category": "technical",
+    "domain": "Customer Success",
+    "tags": [
+      "saas-metrics",
+      "nrr",
+      "grr",
+      "business-finance"
+    ],
+    "difficulty": "junior",
+    "company_archetypes": [
+      "All SaaS"
+    ],
+    "evaluation_criteria": "GRR capped at 100% (accounting for churn/downgrades), NRR factoring in expansion/upsells (>120% top-tier benchmark), compounding growth from existing customer base."
+  },
+  {
+    "id": "cs-004",
+    "question": "How do you conduct an effective Executive Business Review (EBR / QBR) that delivers strategic business value rather than a boring feature recap?",
+    "category": "technical",
+    "domain": "Customer Success",
+    "tags": [
+      "qbr",
+      "executive-engagement",
+      "relationship-management"
+    ],
+    "difficulty": "mid",
+    "company_archetypes": [
+      "B2B SaaS",
+      "Enterprise"
+    ],
+    "evaluation_criteria": "Reviewing client's high-level business goals and ROI achieved, sharing industry benchmarks, reviewing upcoming product roadmap aligned with their needs, and securing mutual commitments."
+  },
+  {
+    "id": "cs-005",
+    "question": "Describe a situation where you successfully identified an expansion or upsell opportunity during a customer support or check-in interaction.",
+    "category": "behavioral",
+    "domain": "Customer Success",
+    "tags": [
+      "expansion",
+      "upsell",
+      "consultative-selling",
+      "relationship-building"
+    ],
+    "difficulty": "mid",
+    "company_archetypes": [
+      "SaaS",
+      "Tech"
+    ],
+    "evaluation_criteria": "Active listening to understand new department/workflow needs, framing the upsell around solving a concrete bottleneck rather than aggressive sales pushing, seamless collaboration with Account Executive."
+  },
+  {
+    "id": "cs-006",
+    "question": "How do you manage client expectations when a customer demands a custom feature that is not on your company's product roadmap?",
+    "category": "behavioral",
+    "domain": "Customer Success",
+    "tags": [
+      "expectation-management",
+      "product-feedback",
+      "diplomacy"
+    ],
+    "difficulty": "junior",
+    "company_archetypes": [
+      "B2B SaaS"
+    ],
+    "evaluation_criteria": "Understanding the underlying business problem behind the feature request, exploring creative workflows with existing features, logging feedback transparently into product backlog, and setting honest boundaries."
+  },
+  {
+    "id": "beh-001",
+    "question": "Tell me about a time you had a strong technical or strategic disagreement with a senior colleague or manager. How did you handle it and what was the outcome?",
     "category": "behavioral",
     "domain": "Behavioral",
-    "tags": ["behavioral", "proactivity", "ownership", "continuous-improvement", "star-method"],
+    "tags": [
+      "conflict-resolution",
+      "communication",
+      "star",
+      "influence"
+    ],
+    "difficulty": "mid",
+    "company_archetypes": [
+      "All"
+    ],
+    "evaluation_criteria": "STAR format, focusing on objective evidence/data rather than personal emotion, active listening, seeking alignment, committing to team decision (disagree and commit)."
+  },
+  {
+    "id": "beh-002",
+    "question": "Describe a situation where a major mistake or failure occurred under your responsibility. What steps did you take immediately, and what permanent safeguards did you put in place?",
+    "category": "behavioral",
+    "domain": "Behavioral",
+    "tags": [
+      "ownership",
+      "accountability",
+      "failure-recovery",
+      "learning",
+      "star"
+    ],
+    "difficulty": "senior",
+    "company_archetypes": [
+      "All"
+    ],
+    "evaluation_criteria": "Complete ownership without shifting blame, rapid transparent incident communication, systemic root cause analysis, implementing automated guardrails to prevent recurrence."
+  },
+  {
+    "id": "beh-003",
+    "question": "Tell me about a time you had to deliver a critical project under ambiguous requirements and a tight deadline. How did you prioritize and execute?",
+    "category": "behavioral",
+    "domain": "Behavioral",
+    "tags": [
+      "ambiguity",
+      "prioritization",
+      "execution",
+      "problem-solving",
+      "star"
+    ],
+    "difficulty": "mid",
+    "company_archetypes": [
+      "All"
+    ],
+    "evaluation_criteria": "Breaking down ambiguity into testable assumptions, proactive stakeholder alignment, ruthless scoping to MVP, bias for action, and delivering on schedule."
+  },
+  {
+    "id": "beh-004",
+    "question": "Describe a scenario where you stepped outside your official job description to solve an urgent organizational problem or help a struggling peer.",
+    "category": "behavioral",
+    "domain": "Behavioral",
+    "tags": [
+      "initiative",
+      "teamwork",
+      "culture",
+      "leadership",
+      "star"
+    ],
     "difficulty": "junior",
-    "company_archetypes": ["tech", "startup", "faang"],
-    "evaluation_criteria": "STAR structure: Identifying team pain points (e.g. slow CI build times, flaky tests, lack of documentation); creating a working POC on own initiative; measurable productivity improvement for the whole team."
+    "company_archetypes": [
+      "All"
+    ],
+    "evaluation_criteria": "Initiative without waiting to be asked, collaboration, empathy for team success over individual credit, and positive impact achieved."
+  },
+  {
+    "id": "beh-005",
+    "question": "Tell me about a time you received constructive criticism or difficult feedback. How did you process it and what measurable changes did you make?",
+    "category": "behavioral",
+    "domain": "Behavioral",
+    "tags": [
+      "self-awareness",
+      "growth-mindset",
+      "feedback",
+      "star"
+    ],
+    "difficulty": "junior",
+    "company_archetypes": [
+      "All"
+    ],
+    "evaluation_criteria": "Non-defensive reception, thoughtful reflection, creating a concrete self-improvement plan, and following up with the reviewer to demonstrate growth."
+  },
+  {
+    "id": "beh-006",
+    "question": "Describe a project where you had to persuade cross-functional partners (e.g. design, engineering, legal, marketing) who had competing priorities to support your initiative.",
+    "category": "behavioral",
+    "domain": "Behavioral",
+    "tags": [
+      "influence",
+      "cross-functional",
+      "stakeholder-management",
+      "star"
+    ],
+    "difficulty": "senior",
+    "company_archetypes": [
+      "Enterprise",
+      "Tech"
+    ],
+    "evaluation_criteria": "Understanding other departments' KPIs and constraints, building consensus through shared business metrics, negotiating trade-offs, and driving alignment."
+  },
+  {
+    "id": "beh-007",
+    "question": "Tell me about a time you mentored a junior team member or colleague who was struggling with their confidence or technical execution. How did you guide them?",
+    "category": "behavioral",
+    "domain": "Behavioral",
+    "tags": [
+      "mentorship",
+      "empathy",
+      "coaching",
+      "team-growth",
+      "star"
+    ],
+    "difficulty": "senior",
+    "company_archetypes": [
+      "All"
+    ],
+    "evaluation_criteria": "Patient diagnosis of the root blocker, paired problem solving rather than giving direct answers, setting achievable milestones, and celebrating their independent wins."
+  },
+  {
+    "id": "beh-008",
+    "question": "Describe a time when you noticed a potential safety, compliance, or security risk that others had overlooked. How did you bring it to light and ensure it was resolved?",
+    "category": "behavioral",
+    "domain": "Behavioral",
+    "tags": [
+      "integrity",
+      "risk-mitigation",
+      "ethics",
+      "proactiveness",
+      "star"
+    ],
+    "difficulty": "mid",
+    "company_archetypes": [
+      "All"
+    ],
+    "evaluation_criteria": "Attention to detail, courage to speak up, communicating the business and human risk clearly, and collaborating on a practical fix."
+  },
+  {
+    "id": "beh-009",
+    "question": "Tell me about a time you had to adapt quickly to a major unexpected change in your team structure, tools, or company priorities.",
+    "category": "behavioral",
+    "domain": "Behavioral",
+    "tags": [
+      "adaptability",
+      "resilience",
+      "change-management",
+      "star"
+    ],
+    "difficulty": "junior",
+    "company_archetypes": [
+      "All"
+    ],
+    "evaluation_criteria": "Positive attitude towards change, rapid upskilling on new workflows, supporting teammates through the transition, and maintaining productivity."
+  },
+  {
+    "id": "beh-010",
+    "question": "Describe a high-stress situation where everything seemed to be going wrong at once. How did you stay calm and lead yourself or others through it?",
+    "category": "behavioral",
+    "domain": "Behavioral",
+    "tags": [
+      "composure",
+      "crisis-management",
+      "resilience",
+      "star"
+    ],
+    "difficulty": "senior",
+    "company_archetypes": [
+      "All"
+    ],
+    "evaluation_criteria": "Emotional composure under pressure, methodical triaging of issues, clear calm communication to stakeholders, and successful resolution."
+  },
+  {
+    "id": "beh-011",
+    "question": "Tell me about a time when you set an ambitious personal or professional goal and exceeded expectations. What drove your commitment?",
+    "category": "behavioral",
+    "domain": "Behavioral",
+    "tags": [
+      "drive",
+      "ambition",
+      "excellence",
+      "star"
+    ],
+    "difficulty": "junior",
+    "company_archetypes": [
+      "All"
+    ],
+    "evaluation_criteria": "Intrinsic motivation, disciplined execution plan, overcoming unforeseen roadblocks, and measuring the ultimate tangible success."
+  },
+  {
+    "id": "beh-012",
+    "question": "Describe a situation where you had to make a high-consequence decision with incomplete information. How did you weigh risks and decide?",
+    "category": "behavioral",
+    "domain": "Behavioral",
+    "tags": [
+      "decision-making",
+      "critical-thinking",
+      "leadership",
+      "risk",
+      "star"
+    ],
+    "difficulty": "lead",
+    "company_archetypes": [
+      "Leadership",
+      "Tech",
+      "Enterprise"
+    ],
+    "evaluation_criteria": "Identifying irreversible (Type 1) vs reversible (Type 2) decisions, gathering high-signal inputs, evaluating downside risks, and taking timely decisive action."
   }
 ]
