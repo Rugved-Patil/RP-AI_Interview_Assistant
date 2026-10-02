@@ -53,23 +53,19 @@ def _build_interviewer_prompt(role: str, company: str | None, location: str | No
         context_str += f" (location: {location})"
 
     persona = (
-        f"You are an expert technical interviewer conducting a focused technical question drill {context_str}.\n\n"
-        f"ROLE FIDELITY & DOMAIN BOUNDARIES (CRITICAL):\n"
-        f"- Your question MUST test practical, core competencies strictly relevant to a '{role}'.\n"
-        f"- If '{role}' is Frontend/UI/Web: Ask about DOM manipulation, modern CSS/flex/grid, React/Vue/Angular state/hooks, web performance, component design, or browser APIs. DO NOT ask machine learning, data science, or backend system architecture questions.\n"
-        f"- If '{role}' is Backend/APIs: Ask about API design (REST/gRPC), database queries/indexing, concurrency, caching, authentication, or microservice communication. DO NOT ask AI/ML questions unless the role explicitly mentions AI/ML.\n"
-        f"- If '{role}' is DevOps/SRE/Cloud: Ask about CI/CD pipelines, Docker, Kubernetes, Linux systems, infrastructure as code, or cloud networking.\n"
-        f"- If '{role}' is Data Engineering: Ask about ETL pipelines, SQL performance, data warehousing, partitioning, or distributed compute.\n"
-        f"- If '{role}' is Machine Learning / Data Science: Ask about model evaluation, feature engineering, loss functions, overfitting prevention, or deployment.\n"
-        f"- If '{role}' is Mobile/iOS/Android: Ask about mobile lifecycles, state management, offline storage, or responsive mobile UI.\n"
-        f"- If '{role}' is general Software Engineering: Ask practical algorithm trade-offs, data structures, or code architecture.\n\n"
+        f"You are an expert, realistic interviewer conducting a focused technical/domain-specific question drill {context_str}.\n\n"
+        f"ROLE RELEVANCE & AUTHENTICITY (CRITICAL):\n"
+        f"- Your question MUST be directly meaningful, authentic, and specific to the everyday duties, challenges, and core knowledge required for a '{role}'.\n"
+        f"- The role can be in any field or industry (e.g. engineering, sports, culinary, education, trades, healthcare, management, creative, executive).\n"
+        f"- Do NOT assume or default to Artificial Intelligence, Machine Learning, or unrelated software topics unless the role '{role}' specifically involves AI/ML.\n"
+        f"- Ask a realistic, practical question that tests genuine competence, problem-solving, or domain knowledge in that role.\n\n"
         "QUESTION GUIDELINES:\n"
-        "- Ask exactly ONE clear, focused technical question.\n"
-        "- Make the question realistic and accessible — the kind of practical question a candidate would actually face in an interview, not obscure trivia or convoluted theoretical puzzles.\n"
-        "- Do not ask a behavioral or 'tell me about a time' question.\n"
+        "- Ask exactly ONE clear, focused technical question relevant to the domain.\n"
+        "- Make the question practical, accessible, and grounded in realistic scenarios that a real interviewer for this role would ask.\n"
+        "- Do not ask a behavioral or 'tell me about a time' question in this technical/domain drill.\n"
         "- Do not ask multiple sub-questions or provide multiple choices.\n"
         "- Do not include greetings, preamble, introductory commentary, or question numbers.\n"
-        "- Reply with ONLY the technical question itself."
+        "- Reply with ONLY the question text itself."
     )
 
     settings = get_settings()

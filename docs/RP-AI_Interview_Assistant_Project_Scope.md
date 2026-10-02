@@ -180,13 +180,13 @@ Every major enhancement for the next milestone is divided into independent, veri
   - Added official MIT License (`LICENSE`) to repository root.
   - Linked license across `frontend/package.json`, `README.md`, and project documentation.
 
-- [x] **Chunk 1: Role-Fidelity Prompt Engineering & Realistic Calibrated Grading** — ✅ **Completed**
-  - Strict role-fidelity system prompts eliminating AI/DS bias for non-AI domains (Frontend, Backend, DevOps, HR, Mobile, Data Eng).
-  - Realistic seniority-calibrated difficulty tiers (Junior/Fresher foundational pacing vs. Senior architecture).
+- [x] **Chunk 1: Universal Role-Fidelity Prompt Engineering & Realistic Calibrated Grading** — ✅ **Completed**
+  - Universal role relevance allowing *any* role (sports coach, janitor, chef, CEO, software engineer, teacher, etc.) to receive authentic, role-meaningful questions without unwarranted AI/ML bias.
+  - Realistic seniority-calibrated difficulty pacing (Junior/Fresher foundational concepts vs. Senior architecture).
   - Constructive 5-dimension diagnostic grader with calibrated curve (solid answers score 7–8/10; 9-10 reserved for comprehensive mastery with trade-offs).
 
 - [ ] **Chunk 2: Deep Local RAG Activation & Question Bank Grounding** — ⏳ **Scheduled (To Be Built)**
-  - Expand `question_bank.json` across all engineering and HR domains with comprehensive rubrics.
+  - Expand `question_bank.json` across diverse engineering and professional domains with comprehensive rubrics.
   - Dynamically inject relevant retrieved exemplar blueprints into multi-turn interview turns via pure Python BM25/TF-IDF retriever.
 
 - [ ] **Chunk 3: Smart Adaptive Training Engine (Analytics to Action)** — ⏳ **Scheduled (To Be Built)**
@@ -202,7 +202,12 @@ Every major enhancement for the next milestone is divided into independent, veri
   - Smooth page transitions, shimmer skeleton loaders, animated score meters, and tactile card interactions.
 
 - [ ] **Chunk 6: Professional PDF Report & Analytics Export Engine** — ⏳ **Scheduled (To Be Built)**
-  - Downloadable editorial PDF reports for single drills, full mocks, coding sandbox submissions, and lifetime analytics portfolios.
+  - Downloadable editorial PDF reports for single drills, full mocks, coding submissions, and lifetime analytics portfolios.
+
+- [ ] **Chunk 7: Embedded Live Coding in Mock Interviews & Code Editor Ergonomics** — ⏳ **Scheduled (To Be Built)**
+  - Remove standalone LeetCode-style sandbox card from the Home page.
+  - Seamlessly embed interactive coding questions *inside* Technical Mock Interviews when relevant.
+  - Side-by-side interactive code writing window with proper formatting: Tab spacing / indentation, automatic bracket/quote closing (`()`, `[]`, `{}`, `""`, `''`), line numbers, and syntax color coding (green comments, keywords, strings).
 
 ---
 

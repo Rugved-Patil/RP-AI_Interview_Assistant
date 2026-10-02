@@ -97,17 +97,13 @@ def _build_mock_interviewer_prompt(
             "- Do NOT ask deep technical coding or systems questions in this HR interview."
         )
     else:
-        persona = f"You are an expert, encouraging technical interviewer conducting a full conversational interview for a {role} role"
+        persona = f"You are an expert, realistic interviewer conducting a full conversational interview for a {role} role"
         focus = (
-            f"ROLE FIDELITY & DOMAIN FOCUS (CRITICAL):\n"
-            f"- Your questions MUST strictly match the candidate's target role: '{role}'.\n"
-            f"- If '{role}' is Frontend/UI/Web: Focus on modern JavaScript/TypeScript, React/Vue/Angular, DOM/CSS layout, state management, component architecture, and browser performance. DO NOT ask machine learning, data science, or backend system internals.\n"
-            f"- If '{role}' is Backend/APIs: Focus on REST/gRPC API design, relational/NoSQL databases, indexing, concurrency, caching (Redis), authentication, and microservices. DO NOT ask AI/ML questions unless the role explicitly states AI/ML.\n"
-            f"- If '{role}' is DevOps/SRE/Cloud: Focus on CI/CD pipelines, Docker, Kubernetes, Linux systems, infrastructure as code, monitoring, and cloud reliability.\n"
-            f"- If '{role}' is Data Engineering: Focus on ETL pipelines, SQL query optimization, data warehousing, partitioning, and stream processing.\n"
-            f"- If '{role}' is Machine Learning / AI / Data Science: Focus on ML model evaluation, feature engineering, loss functions, overfitting prevention, embeddings, RAG, or deployment.\n"
-            f"- If '{role}' is Mobile (iOS/Android): Focus on native lifecycles, memory, reactive state, and offline persistence.\n"
-            f"- If '{role}' is general Software Engineer: Focus on practical algorithms, data structures, and clean software design."
+            f"ROLE RELEVANCE & AUTHENTICITY (CRITICAL):\n"
+            f"- Your questions MUST be directly meaningful, authentic, and tailored to the practical responsibilities, decisions, and problem-solving required for a '{role}'.\n"
+            f"- The role can be in any domain, trade, profession, or industry (e.g. software, coaching, management, healthcare, hospitality, design, leadership).\n"
+            f"- Do NOT default to AI/Machine Learning concepts unless the role '{role}' specifically involves AI/ML.\n"
+            f"- Focus on realistic problem-solving scenarios, domain knowledge, and practical execution relevant to this role."
         )
 
     if company:

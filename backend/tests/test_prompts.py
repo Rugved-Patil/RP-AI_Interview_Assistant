@@ -168,9 +168,10 @@ def test_mock_grader_prompt_focuses_appropriately_for_interview_type():
 def test_interviewer_prompt_enforces_role_fidelity_and_avoids_ai_bias_for_web_roles():
     from app.api.routes.sessions import _build_interviewer_prompt
 
-    prompt = _build_interviewer_prompt("Frontend Engineer", None, None)
-    assert "Frontend/UI" in prompt
-    assert "DO NOT ask machine learning" in prompt
+    prompt = _build_interviewer_prompt("Basketball Coach", None, None)
+    assert "Basketball Coach" in prompt
+    assert "ROLE RELEVANCE & AUTHENTICITY" in prompt
+    assert "Do NOT assume or default to Artificial Intelligence" in prompt
     assert "ONE clear, focused technical question" in prompt
 
 
