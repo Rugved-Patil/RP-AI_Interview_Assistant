@@ -172,6 +172,40 @@ Both practice formats support browser-native voice interaction (STT speech recog
 
 ---
 
+### Phase 6 — Modular Feature Chunks (Roadmap towards v1.1.0)
+
+Every major enhancement for the next milestone is divided into independent, verifiable execution chunks that update from `⏳ Scheduled` to `✅ Completed` upon implementation:
+
+- [x] **Chunk 0: MIT License & Legal / Housekeeping** — ✅ **Completed**
+  - Added official MIT License (`LICENSE`) to repository root.
+  - Linked license across `frontend/package.json`, `README.md`, and project documentation.
+
+- [ ] **Chunk 1: Role-Fidelity Prompt Engineering & Realistic Calibrated Grading** — ⏳ **Scheduled (To Be Built)**
+  - Strict role-fidelity system prompts eliminating AI/DS bias for non-AI domains (Frontend, Backend, DevOps, HR).
+  - Realistic seniority-calibrated difficulty tiers (Fresher, Mid-Level, Senior, Lead).
+  - Constructive 5-dimension diagnostic grader with calibrated curve (solid answers score 7–8/10; 10/10 reserved for mastery).
+
+- [ ] **Chunk 2: Deep Local RAG Activation & Question Bank Grounding** — ⏳ **Scheduled (To Be Built)**
+  - Expand `question_bank.json` across all engineering and HR domains with comprehensive rubrics.
+  - Dynamically inject relevant retrieved exemplar blueprints into multi-turn interview turns via pure Python BM25/TF-IDF retriever.
+
+- [ ] **Chunk 3: Smart Adaptive Training Engine (Analytics to Action)** — ⏳ **Scheduled (To Be Built)**
+  - Replace arbitrary unlock gates ("5 mocks unlock") with instant, dynamic weak-spot analytics.
+  - Generate personalized 1-click drill cards (role, domain, difficulty, and targeted blueprint).
+
+- [ ] **Chunk 4: Multilingual Voice (STT/TTS) & UI Localization (i18n)** — ⏳ **Scheduled (To Be Built)**
+  - Regional and international STT/TTS voice selection via Web Speech API (Hindi, Marathi, German, Spanish, French, etc.).
+  - Client-side zero-dependency UI localization (i18n) dictionary with global language switcher.
+
+- [ ] **Chunk 5: UI/UX Fluidity, Micro-Animations & Clean Editorial Polish** — ⏳ **Scheduled (To Be Built)**
+  - Eliminate backend/internal jargon across all UI copy.
+  - Smooth page transitions, shimmer skeleton loaders, animated score meters, and tactile card interactions.
+
+- [ ] **Chunk 6: Professional PDF Report & Analytics Export Engine** — ⏳ **Scheduled (To Be Built)**
+  - Downloadable editorial PDF reports for single drills, full mocks, coding sandbox submissions, and lifetime analytics portfolios.
+
+---
+
 ## 7. Decisions Log
 
 ### 7.1 Resolved Architectural Decisions

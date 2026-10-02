@@ -341,4 +341,6 @@ npm run build
 
 ## License & Attribution
 
+This project is licensed under the [MIT License](LICENSE).
+
 Designed and built by **Rugved Patil** as a portfolio project demonstrating end-to-end full-stack engineering, prompt design, local RAG architectures, and AI-assisted software development.
