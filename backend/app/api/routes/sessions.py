@@ -40,34 +40,36 @@ def _build_interviewer_prompt(role: str, company: str | None, location: str | No
     """
     Builds the interviewer persona prompt around whatever context the user
     supplied (scope doc Section 3.4: personalization by role/company/
-    location via prompt parameters). `role` is validated non-blank on the
-    request schema, so it's always safe to interpolate here; company/
-    location are optional and simply omitted from the sentence rather than
-    leaving an awkward blank when not given.
+    location via prompt parameters).
 
-    The prompt asks for a *technical* question only, to match the mode's
-    "Technical questions" label. An earlier version said "a single
-    behavioral or technical question", so the label was only accidentally
-    true (the "technical interviewer" persona happened to win every time).
-    Because `role` is free text, "technical" is defined as role-specific
-    knowledge or problem-solving, not "coding" - so it still makes sense for
-    a role that isn't software-related.
-
-    Phase 3: When RAG is enabled, retrieves relevant exemplar questions from
-    the curated question bank to ground question generation.
+    Phase 6: Strict role-fidelity guardrails to prevent AI/DS bias when the role
+    is Frontend, Backend, DevOps, Mobile, QA, etc., with realistic and accessible
+    question difficulty.
     """
-    persona = f"You are a technical interviewer for a {role} role"
+    context_str = f"for a {role} role"
     if company:
-        persona += f" at {company}"
+        context_str += f" at {company}"
     if location:
-        persona += f" (location: {location})"
-    persona += (
-        ". Ask exactly ONE clear, focused technical question - one that "
-        "tests role-specific knowledge or problem-solving skills relevant "
-        "to this role. Do not ask a behavioral or 'tell me about a time' "
-        "question. Keep the question difficulty medium. Do not ask multiple "
-        "questions, do not number them, do not add preamble, explanation, or "
-        "commentary. Reply with nothing but the question itself."
+        context_str += f" (location: {location})"
+
+    persona = (
+        f"You are an expert technical interviewer conducting a focused technical question drill {context_str}.\n\n"
+        f"ROLE FIDELITY & DOMAIN BOUNDARIES (CRITICAL):\n"
+        f"- Your question MUST test practical, core competencies strictly relevant to a '{role}'.\n"
+        f"- If '{role}' is Frontend/UI/Web: Ask about DOM manipulation, modern CSS/flex/grid, React/Vue/Angular state/hooks, web performance, component design, or browser APIs. DO NOT ask machine learning, data science, or backend system architecture questions.\n"
+        f"- If '{role}' is Backend/APIs: Ask about API design (REST/gRPC), database queries/indexing, concurrency, caching, authentication, or microservice communication. DO NOT ask AI/ML questions unless the role explicitly mentions AI/ML.\n"
+        f"- If '{role}' is DevOps/SRE/Cloud: Ask about CI/CD pipelines, Docker, Kubernetes, Linux systems, infrastructure as code, or cloud networking.\n"
+        f"- If '{role}' is Data Engineering: Ask about ETL pipelines, SQL performance, data warehousing, partitioning, or distributed compute.\n"
+        f"- If '{role}' is Machine Learning / Data Science: Ask about model evaluation, feature engineering, loss functions, overfitting prevention, or deployment.\n"
+        f"- If '{role}' is Mobile/iOS/Android: Ask about mobile lifecycles, state management, offline storage, or responsive mobile UI.\n"
+        f"- If '{role}' is general Software Engineering: Ask practical algorithm trade-offs, data structures, or code architecture.\n\n"
+        "QUESTION GUIDELINES:\n"
+        "- Ask exactly ONE clear, focused technical question.\n"
+        "- Make the question realistic and accessible — the kind of practical question a candidate would actually face in an interview, not obscure trivia or convoluted theoretical puzzles.\n"
+        "- Do not ask a behavioral or 'tell me about a time' question.\n"
+        "- Do not ask multiple sub-questions or provide multiple choices.\n"
+        "- Do not include greetings, preamble, introductory commentary, or question numbers.\n"
+        "- Reply with ONLY the technical question itself."
     )
 
     settings = get_settings()
@@ -91,21 +93,24 @@ def _build_behavioral_interviewer_prompt(role: str, company: str | None, locatio
     Builds the behavioral interviewer persona prompt around role/company/location.
     Generates a single open-ended behavioral question (e.g. STAR prompt).
 
-    Phase 3: When RAG is enabled, retrieves relevant behavioral exemplars to ground question generation.
+    Phase 6: Tailored workplace situational drills testing core behavioral competencies.
     """
-    persona = f"You are a behavioral interviewer conducting an interview for a {role} role"
+    context_str = f"for a {role} role"
     if company:
-        persona += f" at {company}"
+        context_str += f" at {company}"
     if location:
-        persona += f" (location: {location})"
-    persona += (
-        ". Ask exactly ONE realistic, open-ended behavioral interview question — "
-        "such as a 'Tell me about a time when...', 'Describe a situation where...', "
-        "or 'Give an example of...' prompt that tests interpersonal skills, teamwork, "
-        "conflict resolution, ownership, handling failure, or adaptability relevant to this role. "
-        "Do not ask a technical or coding question. Keep the question difficulty medium and focused. "
-        "Do not ask multiple questions, do not number them, do not add preamble, explanation, or "
-        "commentary. Reply with nothing but the question itself."
+        context_str += f" (location: {location})"
+
+    persona = (
+        f"You are an expert behavioral interviewer conducting a situational drill {context_str}.\n\n"
+        f"INSTRUCTIONS:\n"
+        f"- Ask exactly ONE clear, realistic, open-ended behavioral interview question tailored to the real-world situations and interpersonal dynamics typical for a '{role}'.\n"
+        f"- Use proven STAR frameworks such as: 'Tell me about a time when...', 'Describe a challenging situation where...', or 'Give an example of how you handled...'.\n"
+        f"- Focus on core behavioral dimensions: problem ownership, cross-functional collaboration, resolving technical or interpersonal conflicts, prioritization under tight deadlines, recovering from mistakes, or navigating ambiguity.\n"
+        f"- Ground the scenario in realistic industry situations relevant to {role}.\n"
+        f"- Do NOT ask technical coding or trivia questions.\n"
+        f"- Do NOT ask multiple questions, do not number them, and do not add greetings, preamble, or commentary.\n"
+        f"- Reply with ONLY the behavioral question itself."
     )
 
     settings = get_settings()

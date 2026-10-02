@@ -41,10 +41,10 @@ _FEEDBACK_RE = re.compile(r"FEEDBACK\**\s*:\s*\**\s*(.+)", re.IGNORECASE | re.DO
 def _build_grader_prompt(role: str, company: str | None, location: str | None) -> str:
     """
     Builds the grading persona prompt using the same role/company/location
-    context the question was generated with (stored on the session - see
-    session_store.TechnicalSession), so the bar for "good answer" reflects
-    what this specific role/company/location context would need rather
-    than a role-agnostic average.
+    context the question was generated with.
+
+    Phase 6: Encouraging, constructive, and realistically calibrated grading curve
+    (solid answers score 7-8/10, reserving 9-10 for comprehensive mastery with trade-offs).
     """
     context = f"a {role} role"
     if company:
@@ -53,10 +53,15 @@ def _build_grader_prompt(role: str, company: str | None, location: str | None) -
         context += f" (location: {location})"
 
     return (
-        f"You are grading a candidate's answer to a single technical interview question for {context}. "
-        "Keep the grading harsh but realistic, and calibrate your expectations to what would "
-        "actually be expected for this role (and this company/location, if given) rather than "
-        "grading in the abstract. "
+        f"You are an encouraging, objective, and experienced technical interviewer grading a candidate's answer to a single technical interview question for {context}.\n\n"
+        "GRADING CRITERIA & SCORE CALIBRATION:\n"
+        "- 9-10: Exceptional / Masterful. Completely accurate, mentions nuances, edge cases, or practical trade-offs.\n"
+        "- 7-8: Solid / Competent. Accurate core answer with good understanding that comfortably meets the real-world hiring bar.\n"
+        "- 5-6: Developing / Partial. Basic premise understood, but contains minor inaccuracies, hand-waving, or missing key aspects.\n"
+        "- 3-4: Substantial Gaps. Significant factual errors or fundamentally flawed reasoning.\n"
+        "- 0-2: Inadequate / Off-topic.\n\n"
+        "FEEDBACK PRINCIPLES:\n"
+        "- Be constructive, direct, and actionable. First acknowledge what the candidate explained correctly, then clearly identify the missing nuance or trade-off they can add to level up.\n\n"
         "Reply with EXACTLY this format and nothing else:\n"
         "SCORE: <an integer from 0 to 10>\n"
         "FEEDBACK: <two or three sentences of specific, constructive feedback>"
@@ -66,7 +71,7 @@ def _build_grader_prompt(role: str, company: str | None, location: str | None) -
 def _build_behavioral_grader_prompt(role: str, company: str | None, location: str | None) -> str:
     """
     Builds the STAR-method grading prompt for behavioral interview questions.
-    Evaluates Situation, Task, Action, and Result thoroughly.
+    Evaluates Situation, Task, Action, and Result with constructive, encouraging guidance.
     """
     context = f"a {role} role"
     if company:
@@ -75,12 +80,19 @@ def _build_behavioral_grader_prompt(role: str, company: str | None, location: st
         context += f" (location: {location})"
 
     return (
-        f"You are an expert interviewer evaluating a candidate's response to a behavioral interview question for {context}.\n\n"
-        "Evaluate the response rigorously using the STAR framework:\n"
-        "- Situation & Task: Did the candidate set up clear context and outline the challenge?\n"
-        "- Action: Did they focus on their OWN concrete actions and decisions (using 'I' vs vague 'we')?\n"
-        "- Result: Did they quantify the outcome, impact, or key lessons learned?\n\n"
-        "Calibrate your scoring to what is expected for this specific role.\n\n"
+        f"You are an expert, encouraging behavioral interviewer evaluating a candidate's response to a behavioral interview question for {context}.\n\n"
+        "EVALUATION CRITERIA (STAR METHODOLOGY):\n"
+        "- Situation & Task: Did the candidate establish clear context and define the challenge?\n"
+        "- Action: Did they focus on their personal decisions and contributions (using 'I' vs vague team 'we')?\n"
+        "- Result: Did they describe tangible impact, measurable outcomes, or lessons learned?\n\n"
+        "SCORING CALIBRATION:\n"
+        "- 9-10: Complete STAR story with clear personal agency, conflict/challenge resolution, and quantified or tangible impact.\n"
+        "- 7-8: Strong STAR structure with clear actions and outcome; meets the real-world behavioral hiring bar.\n"
+        "- 5-6: Partial story (e.g. good context but vague on personal action, or missing a clear outcome).\n"
+        "- 3-4: Generic statements or purely theoretical responses without a specific real-world situation.\n"
+        "- 0-2: Off-topic or non-responsive.\n\n"
+        "FEEDBACK PRINCIPLES:\n"
+        "- Provide personalized, encouraging feedback highlighting what worked in their delivery and offering one specific tip to strengthen their storytelling.\n\n"
         "Reply with EXACTLY this format and nothing else:\n"
         "SCORE: <an integer from 0 to 10>\n"
         "FEEDBACK: <two to four sentences of constructive feedback explicitly referencing their STAR structure and impact>"

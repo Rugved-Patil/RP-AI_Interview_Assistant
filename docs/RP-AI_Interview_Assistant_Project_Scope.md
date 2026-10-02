@@ -96,7 +96,7 @@ Both practice formats support browser-native voice interaction (STT speech recog
 | **RAG Engine** | Pure Python TF-IDF + BM25 Vector Store | Offline, zero-dependency, $0 cost |
 | **Database** | SQLite via SQLAlchemy ORM | Lightweight, zero-config local persistence |
 | **Voice I/O** | Web Speech API | Client-side STT dictation and TTS playback |
-| **Testing** | pytest, pytest-asyncio (222 tests) | Complete backend test coverage with mock providers |
+| **Testing** | pytest, pytest-asyncio (226 tests) | Complete backend test coverage with mock providers |
 | **DevOps & Sharing** | One-Command Launcher (`./run.sh` / `start.py`), Remote HTTPS Tunneling (`--share`) | Frictionless single-command local boot and remote zero-config live peer testing |
 
 ---
@@ -117,8 +117,8 @@ Both practice formats support browser-native voice interaction (STT speech recog
                             ▼
 ┌────────────────────────────────────────────────────────┐
 │                  Backend (FastAPI)                     │
-│  ├── API Routes: sessions, interviews, grading,       │
-│  │               reports, presets, questions, analytics │
+│  ├── API Routes: sessions, interviews, grading,        │
+│  │   reports, presets, questions, sandbox, analytics   │
 │  ├── In-Memory Stores: Technical & Mock Sessions       │
 │  ├── Local Offline RAG Engine (TF-IDF / BM25)          │
 │  ├── Provider-Agnostic LLM Wrapper & Retry Backoff     │
@@ -180,10 +180,10 @@ Every major enhancement for the next milestone is divided into independent, veri
   - Added official MIT License (`LICENSE`) to repository root.
   - Linked license across `frontend/package.json`, `README.md`, and project documentation.
 
-- [ ] **Chunk 1: Role-Fidelity Prompt Engineering & Realistic Calibrated Grading** — ⏳ **Scheduled (To Be Built)**
-  - Strict role-fidelity system prompts eliminating AI/DS bias for non-AI domains (Frontend, Backend, DevOps, HR).
-  - Realistic seniority-calibrated difficulty tiers (Fresher, Mid-Level, Senior, Lead).
-  - Constructive 5-dimension diagnostic grader with calibrated curve (solid answers score 7–8/10; 10/10 reserved for mastery).
+- [x] **Chunk 1: Role-Fidelity Prompt Engineering & Realistic Calibrated Grading** — ✅ **Completed**
+  - Strict role-fidelity system prompts eliminating AI/DS bias for non-AI domains (Frontend, Backend, DevOps, HR, Mobile, Data Eng).
+  - Realistic seniority-calibrated difficulty tiers (Junior/Fresher foundational pacing vs. Senior architecture).
+  - Constructive 5-dimension diagnostic grader with calibrated curve (solid answers score 7–8/10; 9-10 reserved for comprehensive mastery with trade-offs).
 
 - [ ] **Chunk 2: Deep Local RAG Activation & Question Bank Grounding** — ⏳ **Scheduled (To Be Built)**
   - Expand `question_bank.json` across all engineering and HR domains with comprehensive rubrics.

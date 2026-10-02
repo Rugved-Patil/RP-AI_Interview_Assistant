@@ -71,7 +71,7 @@ Everything runs locally on your machine with a **\$0 budget** using free-tier LL
 | **Retrieval Engine** | Pure Python TF-IDF + BM25 Vector Store | Offline local RAG ($0 cost, no external vector DB) |
 | **Persistence** | SQLite via SQLAlchemy | Opt-in report storage and preset management |
 | **Voice I/O** | Web Speech API | Client-side STT dictation and TTS synthesis |
-| **Testing** | pytest, pytest-asyncio (222 tests) | 100% backend test suite with fake LLM providers |
+| **Testing** | pytest, pytest-asyncio (226 tests) | 100% backend test suite with fake LLM providers |
 
 ---
 
@@ -91,8 +91,8 @@ Everything runs locally on your machine with a **\$0 budget** using free-tier LL
                             ▼
 ┌────────────────────────────────────────────────────────┐
 │                  Backend (FastAPI)                     │
-│  ├── API Routes: sessions, interviews, grading,       │
-│  │               reports, presets, questions, analytics │
+│  ├── API Routes: sessions, interviews, grading,        │
+│  │   reports, presets, questions, sandbox, analytics   │
 │  ├── In-Memory Stores: Technical & Mock Sessions       │
 │  ├── Local Offline RAG Engine (TF-IDF / BM25)          │
 │  ├── Provider-Agnostic LLM Wrapper & Retry Backoff     │
@@ -294,7 +294,7 @@ The backend test suite covers all API routes, RAG vector retrieval, prompt gener
 cd backend
 pytest -v
 ```
-*(All 222 tests passing)*
+*(All 226 tests passing)*
 
 ### Frontend Verification
 Verify TypeScript types and ESLint conformance:

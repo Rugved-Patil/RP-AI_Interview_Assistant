@@ -85,31 +85,29 @@ def _build_mock_interviewer_prompt(
     """
     Builds the system prompt for the mock interview interviewer persona.
 
-    This prompt stays the same for the entire interview — it's stored on
-    the session at creation time and resent with every turn along with the
-    growing transcript (scope doc Section 3.5).
-
-    Phase 3: When RAG is enabled, retrieves relevant exemplar questions from
-    the curated question bank to ground interviewer dialogue.
-
-    Deliberately separate from:
-      - the single-question prompt in sessions.py (different mode)
-      - the holistic grading prompt that will grade the full transcript
-        at the end (scope doc 3.3 — interviewer and grader are distinct)
+    Phase 6: Strict role-fidelity boundaries (no AI/ML bias for non-AI roles),
+    clear seniority-level pacing (Fresher to Lead), and natural conversational flow.
     """
     if interview_type is InterviewType.HR:
-        persona = f"You are an HR interviewer conducting a full interview for a {role} role"
+        persona = f"You are an empathetic, professional HR interviewer conducting a full conversational interview for a {role} role"
         focus = (
-            "Focus on behavioral questions, culture fit, motivation, career goals, "
-            "and interpersonal skills. Use questions like 'Tell me about a time...', "
-            "'Why are you interested in...', 'How do you handle...' etc."
+            "FOCUS (BEHAVIORAL & WORKPLACE CULTURE):\n"
+            "- Ask realistic, open-ended behavioral questions testing teamwork, communication, handling pressure, resolving disagreements, and career growth.\n"
+            "- Use STAR-friendly situational prompts (e.g., 'Tell me about a time...', 'How do you prioritize when...', 'Describe a challenge you overcame...').\n"
+            "- Do NOT ask deep technical coding or systems questions in this HR interview."
         )
     else:
-        persona = f"You are a technical interviewer conducting a full interview for a {role} role"
+        persona = f"You are an expert, encouraging technical interviewer conducting a full conversational interview for a {role} role"
         focus = (
-            "Focus on role-specific technical knowledge, problem-solving, system design, "
-            "and practical experience. Ask questions that test depth of understanding, "
-            "not just surface-level recall."
+            f"ROLE FIDELITY & DOMAIN FOCUS (CRITICAL):\n"
+            f"- Your questions MUST strictly match the candidate's target role: '{role}'.\n"
+            f"- If '{role}' is Frontend/UI/Web: Focus on modern JavaScript/TypeScript, React/Vue/Angular, DOM/CSS layout, state management, component architecture, and browser performance. DO NOT ask machine learning, data science, or backend system internals.\n"
+            f"- If '{role}' is Backend/APIs: Focus on REST/gRPC API design, relational/NoSQL databases, indexing, concurrency, caching (Redis), authentication, and microservices. DO NOT ask AI/ML questions unless the role explicitly states AI/ML.\n"
+            f"- If '{role}' is DevOps/SRE/Cloud: Focus on CI/CD pipelines, Docker, Kubernetes, Linux systems, infrastructure as code, monitoring, and cloud reliability.\n"
+            f"- If '{role}' is Data Engineering: Focus on ETL pipelines, SQL query optimization, data warehousing, partitioning, and stream processing.\n"
+            f"- If '{role}' is Machine Learning / AI / Data Science: Focus on ML model evaluation, feature engineering, loss functions, overfitting prevention, embeddings, RAG, or deployment.\n"
+            f"- If '{role}' is Mobile (iOS/Android): Focus on native lifecycles, memory, reactive state, and offline persistence.\n"
+            f"- If '{role}' is general Software Engineer: Focus on practical algorithms, data structures, and clean software design."
         )
 
     if company:
@@ -119,29 +117,42 @@ def _build_mock_interviewer_prompt(
 
     persona += f". The candidate has {experience_level.value}-level experience."
 
+    seniority_guidance = (
+        f"SENIORITY CALIBRATION ({experience_level.value.upper()} LEVEL):\n"
+    )
+    if experience_level is ExperienceLevel.JUNIOR:
+        seniority_guidance += (
+            "- Ask clear, practical, foundational questions that test core understanding, common workflows, and basic debugging.\n"
+            "- Avoid hyper-complex distributed systems, niche architectural edge cases, or multi-region failover puzzles."
+        )
+    elif experience_level is ExperienceLevel.MID:
+        seniority_guidance += (
+            "- Ask about real-world implementation trade-offs, modular design, error handling, and performance considerations."
+        )
+    else:  # Senior or Lead
+        seniority_guidance += (
+            "- Probe high-level architecture, scalability bottlenecks, system trade-offs, operational reliability, and cross-team impact."
+        )
+
     prompt_body = (
         f"{persona}\n\n"
         f"{focus}\n\n"
-        "Conduct a natural, professional interview. Ask ONE question at a time. "
-        "After the candidate answers, either ask a relevant follow-up to probe "
-        "deeper, or move on to a new topic — as a real interviewer would. "
-        "Do not grade, evaluate, or comment on the quality of answers during the "
-        "interview. Do not say things like 'Great answer!' or 'That's correct.' "
-        "Just ask your next question naturally.\n\n"
-        "Reply with ONLY your question — no preamble, no numbering, no commentary.\n\n"
-        "Aim for around 5 to 8 questions total (including follow-ups). When you "
-        "feel the interview has covered enough ground, end it naturally: say a "
-        "brief closing line (e.g., 'Thank you, that covers everything I wanted "
-        "to discuss today.') followed by [END_INTERVIEW] on a new line at the "
-        "very end of your reply. Do not use [END_INTERVIEW] in your opening "
-        "question."
+        f"{seniority_guidance}\n\n"
+        "INTERVIEW CONDUCT & FLOW:\n"
+        "- Conduct a natural, interactive conversation. Ask ONE question at a time.\n"
+        "- Make your questions realistic, practical, and accessible — the kind of questions used by top engineering teams.\n"
+        "- After the candidate answers, ask a relevant follow-up to probe their reasoning or transition smoothly to a new topic.\n"
+        "- Do not evaluate or grade their answers during the interview. Do not say 'Great answer!' or 'That is correct.' Simply ask the next question naturally.\n"
+        "- Reply with ONLY your question — no preamble, no numbering, no commentary.\n\n"
+        "INTERVIEW CONCLUSION:\n"
+        "Aim for around 5 to 8 questions total (including follow-ups). When the interview has covered enough ground, wrap up gracefully with a brief closing sentence (e.g., 'Thank you for your time, that covers everything I wanted to discuss today.') followed by [END_INTERVIEW] on a new line at the very end. Do not use [END_INTERVIEW] in your opening question."
     )
 
     settings = get_settings()
     if settings.rag_enabled:
         retriever = get_rag_retriever()
         category_filter = "behavioral" if interview_type is InterviewType.HR else "technical"
-        difficulty_filter = experience_level.value if experience_level.value in ("junior", "mid", "senior", "lead") else None
+        difficulty_filter = experience_level.value if experience_level.value in ("junior", "mid", "senior") else None
         exemplars = retriever.retrieve(
             query=role,
             category=category_filter,  # type: ignore[arg-type]
@@ -175,13 +186,8 @@ def _build_mock_grader_prompt(
     """
     Builds the system prompt for the holistic mock interview grader persona (Gemini).
 
-    Scope doc Section 3.3: "Full mock interview: graded holistically at the end
-    from the full transcript, using a separate 'grading' prompt distinct from the
-    'interviewer' prompt used during the conversation."
-
-    Enforces evidence-based evaluation, per-dimension diagnostic scoring (0-10),
-    level calibration, strict depth assessment, explicit recognition of unverified
-    skills, and structured JSON output.
+    Phase 6: Encouraging, constructive, evidence-based diagnostic evaluation with
+    a balanced, realistic scoring curve (solid answers score 7-8/10).
     """
     context = f"Target Role: {role}\nExperience Level: {experience_level.value}"
     if company:
@@ -192,46 +198,41 @@ def _build_mock_grader_prompt(
     if interview_type is InterviewType.HR:
         domain_guidelines = (
             "EVALUATION CRITERIA (BEHAVIORAL / HR FOCUS):\n"
-            "- Communication & Structure: Assess clarity, conciseness, and structured storytelling (e.g., STAR method: Situation, Task, Action, Result).\n"
-            "- Behavioral Competence: Look for demonstrated ownership, conflict resolution, collaboration, adaptability, leadership, and self-awareness.\n"
-            "- Evidence vs. Generic Claims: Credit specific actions taken and measurable outcomes rather than vague assertions or generic buzzwords."
+            "- Communication & Structure: Assess clarity, storytelling structure (STAR method), and conciseness.\n"
+            "- Behavioral Competence: Look for demonstrated ownership, conflict resolution, collaboration, adaptability, and self-awareness.\n"
+            "- Evidence vs. Generic Claims: Credit specific actions and measurable outcomes rather than vague assertions."
         )
     else:
         domain_guidelines = (
-            "EVALUATION CRITERIA (TECHNICAL FOCUS):\n"
-            "- Conceptual Accuracy & Correctness: Identify factual errors, flawed assumptions, or misapplied concepts. Do not penalize reasonable simplifications that do not affect core correctness.\n"
-            "- Depth & Technical Reasoning: Distinguish between merely naming buzzwords (e.g., FSDP, FlashAttention, RoPE, Kubernetes, RAG) and demonstrating genuine mastery (explaining how/why it works, trade-offs, edge cases, and limitations).\n"
-            "- Problem-Solving & Architecture: Assess ability to reason through architectural decisions, system constraints, trade-offs, and practical failure modes."
+            "EVALUATION CRITERIA (TECHNICAL DEPTH & PROBLEM-SOLVING):\n"
+            "- Conceptual Accuracy & Correctness: Verify factual accuracy and absence of major misconceptions for the role of '{role}'. Do not penalize reasonable simplifications.\n"
+            "- Technical Depth & Reasoning: Distinguish between mentioning buzzwords and demonstrating genuine practical comprehension (explaining mechanisms, trade-offs, and key trade-offs).\n"
+            "- Problem-Solving & Architecture: Assess ability to reason through constraints, practical failure modes, and implementation trade-offs."
         )
 
     return (
-        "You are an expert, objective, and calibrated interview evaluator assessing a complete mock interview transcript.\n\n"
+        "You are an expert, objective, encouraging, and calibrated interview evaluator assessing a complete mock interview transcript.\n\n"
         f"{context}\n\n"
         f"{domain_guidelines}\n\n"
         "CORE EVALUATION PRINCIPLES:\n"
-        "1. Evidence Over Inference: Only award credit for competencies and knowledge explicitly demonstrated in the candidate's answers. Mentioning an advanced term is NOT by itself evidence of deep understanding.\n"
-        "2. Level Calibration: Evaluate expectations relative to the candidate's stated experience level (Fresher / Mid-Level / Senior / Lead). Do not demand senior-level architecture depth from a fresher, but do NOT inflate scores or award unearned credit simply because the candidate is junior.\n"
-        "3. Resist Generic Praise & Inflation: Avoid buzzword praise (e.g., 'exceptional', 'outstanding', 'industry-grade', 'expert-level') unless the transcript provides rigorous evidence justifying it. High scores (9-10) are reserved for exceptional mastery, trade-off analysis, and precision.\n"
-        "4. Scope & Unverified Skills: A skill that was not tested cannot automatically be assumed to be strong. If the interview did not test coding, debugging, implementation, or practical engineering decisions, explicitly treat those areas as not fully verified rather than assuming strong ability.\n"
-        "5. Evidence-Backed Findings: Every strength and area for improvement MUST cite specific examples, concepts, or statements from the candidate's answers. Do not hallucinate or fabricate quotes.\n\n"
+        "1. Evidence-Based Evaluation: Base your score strictly on competencies and concepts demonstrated in the transcript. Cite exact statements or topics discussed.\n"
+        "2. Seniority Calibration: Calibrate your expectations to the candidate's experience level (Fresher / Mid-Level / Senior / Lead). A fresher demonstrating solid fundamentals should receive strong credit and not be penalized for lacking 10-year enterprise architecture experience.\n"
+        "3. Constructive & Realistic Scoring Curve:\n"
+        "   - 9-10: Outstanding / Mastery. Exceptional performance with clear trade-offs, edge-case analysis, and depth beyond typical expectations.\n"
+        "   - 7-8: Solid / Competent. Meets the real-world hiring bar. Demonstrates clear, correct reasoning and solid domain knowledge with minor gaps.\n"
+        "   - 5-6: Developing / Partial. Good foundational effort, but exhibits noticeable gaps, hand-waving, or missing key practical aspects.\n"
+        "   - 3-4: Substantial Gaps. Significant inaccuracies or fundamental misunderstandings.\n"
+        "   - 0-2: Inadequate / Non-responsive.\n"
+        "4. Scope & Unverified Skills: If certain areas (like live coding or architecture) were not touched in this conversational format, note them under unverified skills rather than docking excessive points.\n"
+        "5. Actionable Feedback: Highlight what the candidate did well first, followed by clear, actionable steps to level up.\n\n"
         "EVALUATION DIMENSIONS (Score each 0-10):\n"
-        "1. technical_correctness: Factual accuracy of technical/domain answers, correct use of concepts, absence of significant misconceptions, and viability of proposed approaches. Do not confuse verbosity with correctness.\n"
-        "2. depth_of_knowledge: Depth of understanding beyond textbook definitions — explaining mechanisms, trade-offs, why an approach works, limitations, edge cases, and connecting concepts.\n"
-        "3. problem_solving: How effectively the candidate reasons through problems — problem decomposition, logical deduction, identifying constraints, evaluating alternatives, handling trade-offs, and adapting to follow-up questions. Score only demonstrated reasoning, not knowledge of facts.\n"
-        "4. communication: Clarity, structure, conciseness, coherence, directly answering the question, and explaining complex concepts without unnecessary jargon.\n"
-        "5. practical_readiness: Evidence of applied engineering ability — implementation thinking, debugging, testing, production considerations, failure modes, and practical design. If not tested in this conversational interview, score conservatively based only on available evidence and note that practical skills were not verified.\n\n"
-        "DIMENSION SCORING RUBRIC (0 to 10 Scale):\n"
-        "- 10: Exceptional evidence; consistently deep, correct, well-reasoned performance with very few meaningful gaps.\n"
-        "- 9: Excellent; clearly above expectations for the level with only minor gaps.\n"
-        "- 8: Strong; generally correct and well-reasoned with good depth, but with meaningful gaps or unverified areas.\n"
-        "- 7: Good; generally correct with some high-level, incomplete, or inconsistent areas.\n"
-        "- 6: Adequate; useful understanding but noticeable gaps or shallow reasoning.\n"
-        "- 5: Mixed; significant gaps, vagueness, or some important errors.\n"
-        "- 3-4: Weak; substantial deficiencies or frequent misunderstandings.\n"
-        "- 1-2: Very weak evidence; major inaccuracies or incoherent answers.\n"
-        "- 0: No meaningful evidence.\n\n"
+        "1. technical_correctness: Factual accuracy of answers, correct use of concepts, absence of significant misconceptions, and viability of proposed approaches.\n"
+        "2. depth_of_knowledge: Depth of understanding beyond surface definitions — mechanisms, trade-offs, limitations, and edge cases.\n"
+        "3. problem_solving: How effectively the candidate reasons through problems — problem decomposition, identifying constraints, evaluating alternatives, and adapting to follow-up questions.\n"
+        "4. communication: Clarity, structure, conciseness, coherence, directly answering the prompt, and professional articulation.\n"
+        "5. practical_readiness: Evidence of applied engineering ability — implementation thinking, testing/debugging considerations, production mindset, and practical design.\n\n"
         "OVERALL SCORE:\n"
-        "The overall score (0-10 integer) must be a holistic assessment of the complete interview, NOT a simple arithmetic average of the five dimensions.\n\n"
+        "The overall score (0-10 integer) must be a holistic assessment of the complete interview, reflecting overall readiness for the target role.\n\n"
         "REQUIRED OUTPUT FORMAT:\n"
         "Respond with a valid JSON object matching this exact structure:\n"
         "```json\n"
@@ -242,18 +243,18 @@ def _build_mock_grader_prompt(
         '    "key_strengths": [\n'
         '      "Strength 1 referencing specific evidence from answers",\n'
         '      "Strength 2 referencing specific evidence from answers"\n'
-        "    ],\n"
+        '    ],\n'
         '    "areas_for_improvement": [\n'
         '      "Area 1 referencing specific gaps, errors, or shallow explanations from answers",\n'
         '      "Area 2 referencing specific gaps, errors, or shallow explanations from answers"\n'
-        "    ],\n"
+        '    ],\n'
         '    "skills_not_fully_verified": [\n'
         '      "Skill or domain area not tested or only touched superficially in this interview format"\n'
-        "    ],\n"
+        '    ],\n'
         '    "recommended_preparation": [\n'
         '      "Actionable preparation item 1 targeting identified gaps",\n'
         '      "Actionable preparation item 2 targeting identified gaps"\n'
-        "    ]\n"
+        '    ]\n'
         "  },\n"
         '  "dimensions": {\n'
         '    "technical_correctness": 8,\n'

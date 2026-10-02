@@ -163,3 +163,54 @@ def test_mock_grader_prompt_focuses_appropriately_for_interview_type():
         "ML Engineer", None, None,
     ).lower()
     assert "technical depth" in tech_prompt or "problem-solving" in tech_prompt
+
+
+def test_interviewer_prompt_enforces_role_fidelity_and_avoids_ai_bias_for_web_roles():
+    from app.api.routes.sessions import _build_interviewer_prompt
+
+    prompt = _build_interviewer_prompt("Frontend Engineer", None, None)
+    assert "Frontend/UI" in prompt
+    assert "DO NOT ask machine learning" in prompt
+    assert "ONE clear, focused technical question" in prompt
+
+
+def test_behavioral_prompts_enforce_star_framework():
+    from app.api.routes.grading import _build_behavioral_grader_prompt
+    from app.api.routes.sessions import _build_behavioral_interviewer_prompt
+
+    interview_prompt = _build_behavioral_interviewer_prompt("Product Manager", "Stripe", "San Francisco")
+    assert "STAR" in interview_prompt
+    assert "Product Manager" in interview_prompt
+    assert "Stripe" in interview_prompt
+
+    grader_prompt = _build_behavioral_grader_prompt("Product Manager", "Stripe", "San Francisco")
+    assert "STAR METHODOLOGY" in grader_prompt
+    assert "Situation & Task" in grader_prompt
+    assert "Action" in grader_prompt
+    assert "Result" in grader_prompt
+
+
+def test_grader_prompts_include_calibrated_scoring_curve():
+    from app.api.routes.grading import _build_grader_prompt
+
+    grader_prompt = _build_grader_prompt("Backend Developer", "Uber", "Seattle")
+    assert "GRADING CRITERIA & SCORE CALIBRATION:" in grader_prompt
+    assert "9-10" in grader_prompt
+    assert "7-8" in grader_prompt
+    assert "harsh" not in grader_prompt.lower()  # Verified replaced with constructive calibration
+
+
+def test_mock_interviewer_prompt_calibrates_seniority_pacing():
+    from app.api.routes.interviews import _build_mock_interviewer_prompt
+
+    junior_prompt = _build_mock_interviewer_prompt(
+        InterviewType.TECHNICAL, ExperienceLevel.JUNIOR, "DevOps Engineer", None, None
+    )
+    assert "SENIORITY CALIBRATION (JUNIOR LEVEL)" in junior_prompt
+    assert "foundational questions" in junior_prompt
+
+    senior_prompt = _build_mock_interviewer_prompt(
+        InterviewType.TECHNICAL, ExperienceLevel.SENIOR, "DevOps Engineer", None, None
+    )
+    assert "SENIORITY CALIBRATION (SENIOR LEVEL)" in senior_prompt
+    assert "high-level architecture" in senior_prompt
