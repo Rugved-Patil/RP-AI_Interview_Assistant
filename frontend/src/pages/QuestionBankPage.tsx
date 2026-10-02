@@ -159,7 +159,21 @@ export function QuestionBankPage() {
       <section className="qb-search-section">
         <div className="qb-search-row">
           <div className="qb-search-input-wrap">
-            <span className="qb-search-icon">🔍</span>
+            <svg
+              className="qb-search-icon"
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <circle cx="11" cy="11" r="8" />
+              <line x1="21" y1="21" x2="16.65" y2="16.65" />
+            </svg>
             <input
               type="text"
               className="qb-search-input"
@@ -298,7 +312,12 @@ export function QuestionBankPage() {
                           type="button"
                         >
                           <span>Evaluation Rubric & Key Concepts</span>
-                          <span>{expandedCriteria[q.id] ? '▲ Hide' : '▼ View Rubric'}</span>
+                          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}>
+                            {expandedCriteria[q.id] ? 'Hide Rubric' : 'View Rubric'}
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                              <polyline points={expandedCriteria[q.id] ? "18 15 12 9 6 15" : "6 9 12 15 18 9"} />
+                            </svg>
+                          </span>
                         </button>
                         {expandedCriteria[q.id] && (
                           <div className="qb-criteria-content">{q.evaluation_criteria}</div>
@@ -312,14 +331,32 @@ export function QuestionBankPage() {
                         className="qb-practice-btn"
                         onClick={() => handlePracticeQuestion(q)}
                       >
-                        ▶ Practice This Question
+                        <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor">
+                          <polygon points="5 3 19 12 5 21 5 3" />
+                        </svg>
+                        <span>Practice Question</span>
                       </button>
                       <button
                         type="button"
                         className="qb-copy-btn"
                         onClick={() => handleCopyQuestion(q.id, q.question)}
                       >
-                        {copiedId === q.id ? '✓ Copied' : '📋 Copy'}
+                        {copiedId === q.id ? (
+                          <>
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                              <polyline points="20 6 9 17 4 12" />
+                            </svg>
+                            <span>Copied</span>
+                          </>
+                        ) : (
+                          <>
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                              <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                            </svg>
+                            <span>Copy</span>
+                          </>
+                        )}
                       </button>
                     </div>
                   </article>
@@ -362,7 +399,12 @@ export function QuestionBankPage() {
                           type="button"
                         >
                           <span>Evaluation Rubric & Key Concepts</span>
-                          <span>{expandedCriteria[q.id] ? '▲ Hide' : '▼ View Rubric'}</span>
+                          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}>
+                            {expandedCriteria[q.id] ? 'Hide Rubric' : 'View Rubric'}
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                              <polyline points={expandedCriteria[q.id] ? "18 15 12 9 6 15" : "6 9 12 15 18 9"} />
+                            </svg>
+                          </span>
                         </button>
                         {expandedCriteria[q.id] && (
                           <div className="qb-criteria-content">{q.evaluation_criteria}</div>
@@ -376,14 +418,32 @@ export function QuestionBankPage() {
                         className="qb-practice-btn"
                         onClick={() => handlePracticeQuestion(q)}
                       >
-                        ▶ Practice This Question
+                        <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor">
+                          <polygon points="5 3 19 12 5 21 5 3" />
+                        </svg>
+                        <span>Practice Question</span>
                       </button>
                       <button
                         type="button"
                         className="qb-copy-btn"
                         onClick={() => handleCopyQuestion(q.id, q.question)}
                       >
-                        {copiedId === q.id ? '✓ Copied' : '📋 Copy'}
+                        {copiedId === q.id ? (
+                          <>
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                              <polyline points="20 6 9 17 4 12" />
+                            </svg>
+                            <span>Copied</span>
+                          </>
+                        ) : (
+                          <>
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                              <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                            </svg>
+                            <span>Copy</span>
+                          </>
+                        )}
                       </button>
                     </div>
                   </article>

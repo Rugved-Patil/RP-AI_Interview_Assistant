@@ -106,12 +106,14 @@
 
 .qb-search-icon {
   position: absolute;
-  left: 1rem;
+  left: 0.9rem;
   top: 50%;
   transform: translateY(-50%);
   color: var(--ink-muted);
-  font-size: 0.95rem;
+  width: 16px;
+  height: 16px;
   pointer-events: none;
+  opacity: 0.75;
 }
 
 .qb-search-input {

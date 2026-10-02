@@ -37,7 +37,7 @@ def list_questions(
     difficulty: DifficultyLevel | None = Query(None, description="Filter by difficulty"),
     tag: str | None = Query(None, description="Filter by tag keyword"),
     search: str | None = Query(None, description="Optional text search query"),
-    limit: int = Query(50, ge=1, le=100, description="Page size limit"),
+    limit: int = Query(100, ge=1, le=1000, description="Page size limit"),
     offset: int = Query(0, ge=0, description="Offset for pagination"),
 ) -> QuestionListResponse:
     """Lists questions in the curated question bank with optional filtering and pagination."""
