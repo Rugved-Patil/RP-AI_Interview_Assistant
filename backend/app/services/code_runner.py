@@ -33,13 +33,15 @@ EXECUTION_TIMEOUT_SECONDS = 4.0
 
 # Curated catalog of coding challenges
 CODING_PROBLEMS: list[CodingProblem] = [
-    CodingProblem(
+CodingProblem(
         id="two-sum",
         title="Two Sum",
         domain="Data Structures & Algorithms",
         difficulty="junior",
         tags=["Array", "Hash Table", "Two Pointers"],
-        description="Given an array of integers `nums` and an integer `target`, return indices of the two numbers such that they add up to `target`.\n\nYou may assume that each input would have exactly one solution, and you may not use the same element twice. You can return the answer in any order.",
+        description="""Given an array of integers `nums` and an integer `target`, return indices of the two numbers such that they add up to `target`.
+
+You may assume that each input would have exactly one solution, and you may not use the same element twice. You can return the answer in any order.""",
         constraints=[
             "2 <= nums.length <= 10^4",
             "-10^9 <= nums[i] <= 10^9",
@@ -82,7 +84,12 @@ CODING_PROBLEMS: list[CodingProblem] = [
         domain="Data Structures & Algorithms",
         difficulty="junior",
         tags=["Stack", "String"],
-        description="Given a string `s` containing just the characters `'('`, `')'`, `'{'`, `'}'`, `'['` and `']'`, determine if the input string is valid.\n\nAn input string is valid if:\n1. Open brackets must be closed by the same type of brackets.\n2. Open brackets must be closed in the correct order.\n3. Every close bracket has a corresponding open bracket of the same type.",
+        description="""Given a string `s` containing just the characters `'('`, `')'`, `'{'`, `'}'`, `'['` and `']'`, determine if the input string is valid.
+
+An input string is valid if:
+1. Open brackets must be closed by the same type of brackets.
+2. Open brackets must be closed in the correct order.
+3. Every close bracket has a corresponding open bracket of the same type.""",
         constraints=[
             "1 <= s.length <= 10^4",
             "s consists of parentheses only '()[]{}'.",
@@ -112,12 +119,325 @@ CODING_PROBLEMS: list[CodingProblem] = [
         ],
     ),
     CodingProblem(
+        id="longest-substring-without-repeating",
+        title="Longest Substring Without Repeating Characters",
+        domain="Data Structures & Algorithms",
+        difficulty="mid",
+        tags=["String", "Sliding Window", "Hash Table"],
+        description="""Given a string `s`, find the length of the longest substring without duplicate characters.""",
+        constraints=[
+            "0 <= s.length <= 5 * 10^4",
+            "s consists of English letters, digits, symbols and spaces.",
+        ],
+        examples=[
+            ExampleCase(input='s = "abcabcbb"', output="3", explanation='The answer is "abc", with the length of 3.'),
+            ExampleCase(input='s = "bbbbb"', output="1", explanation='The answer is "b", with the length of 1.'),
+            ExampleCase(input='s = "pwwkew"', output="3", explanation='The answer is "wke", with the length of 3.'),
+        ],
+        entry_function="length_of_longest_substring",
+        starter_code={
+            "python": """def length_of_longest_substring(s: str) -> int:
+    # Your implementation here
+    pass
+""",
+            "javascript": """function lengthOfLongestSubstring(s) {
+    // Your implementation here
+}
+""",
+        },
+        test_cases=[
+            TestCase(id=1, input_data='"abcabcbb"', expected_output="3"),
+            TestCase(id=2, input_data='"bbbbb"', expected_output="1"),
+            TestCase(id=3, input_data='"pwwkew"', expected_output="3"),
+            TestCase(id=4, input_data='""', expected_output="0"),
+            TestCase(id=5, input_data='"dvdf"', expected_output="3"),
+        ],
+    ),
+    CodingProblem(
+        id="group-anagrams",
+        title="Group Anagrams",
+        domain="Data Structures & Algorithms",
+        difficulty="mid",
+        tags=["Array", "Hash Table", "String", "Sorting"],
+        description="""Given an array of strings `strs`, group the anagrams together. You can return the answer in any order.
+
+An Anagram is a word or phrase formed by rearranging the letters of a different word or phrase, typically using all the original letters exactly once.""",
+        constraints=[
+            "1 <= strs.length <= 10^4",
+            "0 <= strs[i].length <= 100",
+            "strs[i] consists of lowercase English letters.",
+        ],
+        examples=[
+            ExampleCase(
+                input='strs = ["eat","tea","tan","ate","nat","bat"]',
+                output='[["bat"],["nat","tan"],["ate","eat","tea"]]',
+            ),
+            ExampleCase(input='strs = [""]', output='[[""]]'),
+            ExampleCase(input='strs = ["a"]', output='[["a"]]'),
+        ],
+        entry_function="group_anagrams",
+        starter_code={
+            "python": """def group_anagrams(strs: list[str]) -> list[list[str]]:
+    # Your implementation here
+    pass
+""",
+            "javascript": """function groupAnagrams(strs) {
+    // Your implementation here
+}
+""",
+        },
+        test_cases=[
+            TestCase(id=1, input_data='["eat", "tea", "tan", "ate", "nat", "bat"]', expected_output='[["eat", "tea", "ate"], ["tan", "nat"], ["bat"]]'),
+            TestCase(id=2, input_data='[""]', expected_output='[[""]]'),
+            TestCase(id=3, input_data='["a"]', expected_output='[["a"]]'),
+        ],
+    ),
+    CodingProblem(
+        id="coin-change",
+        title="Coin Change (Fewest Coins)",
+        domain="Data Structures & Algorithms",
+        difficulty="mid",
+        tags=["Dynamic Programming", "Array", "Breadth-First Search"],
+        description="""You are given an integer array `coins` representing coins of different denominations and an integer `amount` representing a total amount of money.
+
+Return the fewest number of coins that you need to make up that amount. If that amount of money cannot be made up by any combination of the coins, return -1.
+
+You may assume that you have an infinite number of each kind of coin.""",
+        constraints=[
+            "1 <= coins.length <= 12",
+            "1 <= coins[i] <= 2^31 - 1",
+            "0 <= amount <= 10^4",
+        ],
+        examples=[
+            ExampleCase(input="coins = [1,2,5], amount = 11", output="3", explanation="11 = 5 + 5 + 1"),
+            ExampleCase(input="coins = [2], amount = 3", output="-1"),
+            ExampleCase(input="coins = [1], amount = 0", output="0"),
+        ],
+        entry_function="coin_change",
+        starter_code={
+            "python": """def coin_change(coins: list[int], amount: int) -> int:
+    # Your implementation here
+    pass
+""",
+            "javascript": """function coinChange(coins, amount) {
+    // Your implementation here
+}
+""",
+        },
+        test_cases=[
+            TestCase(id=1, input_data="[1, 2, 5], 11", expected_output="3"),
+            TestCase(id=2, input_data="[2], 3", expected_output="-1"),
+            TestCase(id=3, input_data="[1], 0", expected_output="0"),
+            TestCase(id=4, input_data="[1, 3, 4, 5], 7", expected_output="2"),
+        ],
+    ),
+    CodingProblem(
+        id="top-k-frequent-elements",
+        title="Top K Frequent Elements",
+        domain="Data Structures & Algorithms",
+        difficulty="mid",
+        tags=["Array", "Hash Table", "Heap", "Bucket Sort"],
+        description="""Given an integer array `nums` and an integer `k`, return the `k` most frequent elements. You may return the answer in any order.""",
+        constraints=[
+            "1 <= nums.length <= 10^5",
+            "-10^4 <= nums[i] <= 10^4",
+            "k is in the range [1, the number of unique elements in the array].",
+            "It is guaranteed that the answer is unique.",
+        ],
+        examples=[
+            ExampleCase(input="nums = [1,1,1,2,2,3], k = 2", output="[1,2]"),
+            ExampleCase(input="nums = [1], k = 1", output="[1]"),
+        ],
+        entry_function="top_k_frequent",
+        starter_code={
+            "python": """def top_k_frequent(nums: list[int], k: int) -> list[int]:
+    # Your implementation here
+    pass
+""",
+            "javascript": """function topKFrequent(nums, k) {
+    // Your implementation here
+}
+""",
+        },
+        test_cases=[
+            TestCase(id=1, input_data="[1, 1, 1, 2, 2, 3], 2", expected_output="[1, 2]"),
+            TestCase(id=2, input_data="[1], 1", expected_output="[1]"),
+            TestCase(id=3, input_data="[4, 1, -1, 2, -1, 2, 3], 2", expected_output="[-1, 2]"),
+        ],
+    ),
+    CodingProblem(
+        id="search-rotated-sorted-array",
+        title="Search in Rotated Sorted Array",
+        domain="Data Structures & Algorithms",
+        difficulty="mid",
+        tags=["Array", "Binary Search"],
+        description="""There is an integer array `nums` sorted in ascending order (with distinct values).
+
+Prior to being passed to your function, `nums` is possibly rotated at an unknown pivot index `k` (`1 <= k < nums.length`).
+
+Given the array `nums` after the possible rotation and an integer `target`, return the index of `target` if it is in `nums`, or `-1` if it is not in `nums`.
+
+You must write an algorithm with `O(log n)` runtime complexity.""",
+        constraints=[
+            "1 <= nums.length <= 5000",
+            "-10^4 <= nums[i] <= 10^4",
+            "All values of nums are unique.",
+            "nums is an ascending array that is possibly rotated.",
+            "-10^4 <= target <= 10^4",
+        ],
+        examples=[
+            ExampleCase(input="nums = [4,5,6,7,0,1,2], target = 0", output="4"),
+            ExampleCase(input="nums = [4,5,6,7,0,1,2], target = 3", output="-1"),
+            ExampleCase(input="nums = [1], target = 0", output="-1"),
+        ],
+        entry_function="search_rotated",
+        starter_code={
+            "python": """def search_rotated(nums: list[int], target: int) -> int:
+    # Your implementation here
+    pass
+""",
+            "javascript": """function searchRotated(nums, target) {
+    // Your implementation here
+}
+""",
+        },
+        test_cases=[
+            TestCase(id=1, input_data="[4, 5, 6, 7, 0, 1, 2], 0", expected_output="4"),
+            TestCase(id=2, input_data="[4, 5, 6, 7, 0, 1, 2], 3", expected_output="-1"),
+            TestCase(id=3, input_data="[1], 0", expected_output="-1"),
+            TestCase(id=4, input_data="[1, 3], 3", expected_output="1"),
+        ],
+    ),
+    CodingProblem(
+        id="merge-intervals",
+        title="Merge Overlapping Intervals",
+        domain="Data Structures & Algorithms",
+        difficulty="mid",
+        tags=["Array", "Sorting", "Intervals"],
+        description="""Given an array of `intervals` where `intervals[i] = [start_i, end_i]`, merge all overlapping intervals, and return an array of the non-overlapping intervals that cover all the intervals in the input.""",
+        constraints=[
+            "1 <= intervals.length <= 10^4",
+            "intervals[i].length == 2",
+            "0 <= start_i <= end_i <= 10^4",
+        ],
+        examples=[
+            ExampleCase(input="intervals = [[1,3],[2,6],[8,10],[15,18]]", output="[[1,6],[8,10],[15,18]]", explanation="Since intervals [1,3] and [2,6] overlap, merge them into [1,6]."),
+            ExampleCase(input="intervals = [[1,4],[4,5]]", output="[[1,5]]", explanation="Intervals [1,4] and [4,5] are considered overlapping."),
+        ],
+        entry_function="merge_intervals",
+        starter_code={
+            "python": """def merge_intervals(intervals: list[list[int]]) -> list[list[int]]:
+    # Your implementation here
+    pass
+""",
+            "javascript": """function mergeIntervals(intervals) {
+    // Your implementation here
+}
+""",
+        },
+        test_cases=[
+            TestCase(id=1, input_data="[[1, 3], [2, 6], [8, 10], [15, 18]]", expected_output="[[1, 6], [8, 10], [15, 18]]"),
+            TestCase(id=2, input_data="[[1, 4], [4, 5]]", expected_output="[[1, 5]]"),
+            TestCase(id=3, input_data="[[1, 4], [0, 4]]", expected_output="[[0, 4]]"),
+            TestCase(id=4, input_data="[[1, 4], [2, 3]]", expected_output="[[1, 4]]"),
+        ],
+    ),
+    CodingProblem(
+        id="trapping-rain-water",
+        title="Trapping Rain Water",
+        domain="Data Structures & Algorithms",
+        difficulty="senior",
+        tags=["Array", "Two Pointers", "Dynamic Programming", "Stack"],
+        description="""Given `n` non-negative integers representing an elevation map where the width of each bar is `1`, compute how much water it can trap after raining.""",
+        constraints=[
+            "n == height.length",
+            "1 <= n <= 2 * 10^4",
+            "0 <= height[i] <= 10^5",
+        ],
+        examples=[
+            ExampleCase(input="height = [0,1,0,2,1,0,1,3,2,1,2,1]", output="6", explanation="The elevation map can trap 6 units of rain water."),
+            ExampleCase(input="height = [4,2,0,3,2,5]", output="9"),
+        ],
+        entry_function="trap_rain_water",
+        starter_code={
+            "python": """def trap_rain_water(height: list[int]) -> int:
+    # Your implementation here (Two pointer O(n) time, O(1) space)
+    pass
+""",
+            "javascript": """function trapRainWater(height) {
+    // Your implementation here
+}
+""",
+        },
+        test_cases=[
+            TestCase(id=1, input_data="[0, 1, 0, 2, 1, 0, 1, 3, 2, 1, 2, 1]", expected_output="6"),
+            TestCase(id=2, input_data="[4, 2, 0, 3, 2, 5]", expected_output="9"),
+            TestCase(id=3, input_data="[3, 0, 2, 0, 4]", expected_output="7"),
+            TestCase(id=4, input_data="[2, 0, 2]", expected_output="2"),
+        ],
+    ),
+    CodingProblem(
+        id="merge-k-sorted-lists",
+        title="Merge k Sorted Arrays",
+        domain="Data Structures & Algorithms",
+        difficulty="senior",
+        tags=["Heap", "Divide and Conquer", "Priority Queue"],
+        description="""You are given an array of `k` sorted integer arrays `lists`, each sorted in ascending order.
+
+Merge all the sorted arrays into one single sorted array and return it.
+
+Optimize for `O(N log k)` time complexity using a min-heap or divide-and-conquer approach.""",
+        constraints=[
+            "k == lists.length",
+            "0 <= k <= 10^4",
+            "0 <= lists[i].length <= 500",
+            "-10^4 <= lists[i][j] <= 10^4",
+            "lists[i] is sorted in ascending order.",
+            "The sum of lists[i].length will not exceed 10^4.",
+        ],
+        examples=[
+            ExampleCase(
+                input="lists = [[1,4,5],[1,3,4],[2,6]]",
+                output="[1,1,2,3,4,4,5,6]",
+                explanation="The arrays are merged into one sorted array: [1, 1, 2, 3, 4, 4, 5, 6].",
+            ),
+            ExampleCase(input="lists = []", output="[]"),
+            ExampleCase(input="lists = [[]]", output="[]"),
+        ],
+        entry_function="merge_k_sorted",
+        starter_code={
+            "python": """import heapq
+
+def merge_k_sorted(lists: list[list[int]]) -> list[int]:
+    # Your implementation here (using min-heap or divide and conquer)
+    pass
+""",
+            "javascript": """function mergeKSorted(lists) {
+    // Your implementation here
+}
+""",
+        },
+        test_cases=[
+            TestCase(id=1, input_data="[[1, 4, 5], [1, 3, 4], [2, 6]]", expected_output="[1, 1, 2, 3, 4, 4, 5, 6]"),
+            TestCase(id=2, input_data="[]", expected_output="[]"),
+            TestCase(id=3, input_data="[[]]", expected_output="[]"),
+            TestCase(id=4, input_data="[[-2, -1, 0], [-3, 2, 4], [-1, 1]]", expected_output="[-3, -2, -1, -1, 0, 1, 2, 4]"),
+        ],
+    ),
+    CodingProblem(
         id="lru-cache",
         title="LRU Cache Implementation",
         domain="System Design",
         difficulty="mid",
         tags=["Hash Table", "Linked List", "Design"],
-        description="Design a data structure that follows the constraints of a Least Recently Used (LRU) cache.\n\nImplement the `LRUCache` class:\n- `LRUCache(int capacity)` Initialize the LRU cache with positive size capacity.\n- `int get(int key)` Return the value of the key if the key exists, otherwise return -1.\n- `void put(int key, int value)` Update the value of the key if the key exists. Otherwise, add the key-value pair to the cache. If the number of keys exceeds the capacity from this operation, evict the least recently used key.\n\nThe functions `get` and `put` must each run in O(1) average time complexity.",
+        description="""Design a data structure that follows the constraints of a Least Recently Used (LRU) cache.
+
+Implement the `LRUCache` class:
+- `LRUCache(int capacity)` Initialize the LRU cache with positive size capacity.
+- `int get(int key)` Return the value of the key if the key exists, otherwise return -1.
+- `void put(int key, int value)` Update the value of the key if the key exists. Otherwise, add the key-value pair to the cache. If the number of keys exceeds the capacity from this operation, evict the least recently used key.
+
+The functions `get` and `put` must each run in O(1) average time complexity.""",
         constraints=[
             "1 <= capacity <= 3000",
             "0 <= key <= 10^4",
@@ -126,7 +446,8 @@ CODING_PROBLEMS: list[CodingProblem] = [
         ],
         examples=[
             ExampleCase(
-                input='["LRUCache", "put", "put", "get", "put", "get", "put", "get", "get", "get"]\n[[2], [1, 1], [2, 2], [1], [3, 3], [2], [4, 4], [1], [3], [4]]',
+                input="""["LRUCache", "put", "put", "get", "put", "get", "put", "get", "get", "get"]
+[[2], [1, 1], [2, 2], [1], [3, 3], [2], [4, 4], [1], [3], [4]]""",
                 output="[null, null, null, 1, null, -1, null, -1, 3, 4]",
             )
         ],
@@ -155,7 +476,6 @@ CODING_PROBLEMS: list[CodingProblem] = [
     }
 
     put(key, value) {
-        // Implementation
     }
 }
 """,
@@ -163,48 +483,9 @@ CODING_PROBLEMS: list[CodingProblem] = [
         test_cases=[
             TestCase(
                 id=1,
-                input_data='["LRUCache", "put", "put", "get", "put", "get", "put", "get", "get", "get"], [[2], [1, 1], [2, 2], [1], [3, 3], [2], [4, 4], [1], [3], [4]]',
+                input_data='(["LRUCache", "put", "put", "get", "put", "get", "put", "get", "get", "get"], [[2], [1, 1], [2, 2], [1], [3, 3], [2], [4, 4], [1], [3], [4]])',
                 expected_output="[null, null, null, 1, null, -1, null, -1, 3, 4]",
             )
-        ],
-    ),
-    CodingProblem(
-        id="merge-k-sorted-lists",
-        title="Merge k Sorted Lists",
-        domain="Data Structures & Algorithms",
-        difficulty="senior",
-        tags=["Linked List", "Divide and Conquer", "Heap (Priority Queue)"],
-        description="You are given an array of `k` linked-lists `lists`, each linked-list is sorted in ascending order.\n\nMerge all the linked-lists into one sorted linked-list and return its head (as a python list for verification).",
-        constraints=[
-            "k == lists.length",
-            "0 <= k <= 10^4",
-            "0 <= lists[i].length <= 500",
-            "-10^4 <= lists[i][j] <= 10^4",
-            "lists[i] is sorted in ascending order.",
-        ],
-        examples=[
-            ExampleCase(
-                input="lists = [[1,4,5],[1,3,4],[2,6]]",
-                output="[1,1,2,3,4,4,5,6]",
-            ),
-            ExampleCase(input="lists = []", output="[]"),
-        ],
-        entry_function="merge_k_lists",
-        starter_code={
-            "python": """def merge_k_lists(lists: list[list[int]]) -> list[int]:
-    # Merge k sorted lists into a single sorted list
-    pass
-""",
-            "javascript": """function mergeKLists(lists) {
-    // Implementation
-}
-""",
-        },
-        test_cases=[
-            TestCase(id=1, input_data="[[1, 4, 5], [1, 3, 4], [2, 6]]", expected_output="[1, 1, 2, 3, 4, 4, 5, 6]"),
-            TestCase(id=2, input_data="[]", expected_output="[]"),
-            TestCase(id=3, input_data="[[]]", expected_output="[]"),
-            TestCase(id=4, input_data="[[2], [-1], [0]]", expected_output="[-1, 0, 2]"),
         ],
     ),
     CodingProblem(
@@ -212,40 +493,49 @@ CODING_PROBLEMS: list[CodingProblem] = [
         title="Token Bucket Rate Limiter",
         domain="System Design",
         difficulty="senior",
-        tags=["System Design", "Concurrency", "Algorithms"],
-        description="Implement a Token Bucket Rate Limiter.\n\nThe class `TokenBucket` is initialized with:\n- `capacity`: Maximum number of tokens the bucket can hold.\n- `refill_rate`: Tokens added to the bucket per second.\n\nImplement `allow_request(tokens=1, current_timestamp=None) -> bool`:\nIf enough tokens are available, consume `tokens` and return `True`. Otherwise, return `False` without consuming tokens. Refill tokens proportionally based on elapsed time since the last request.",
+        tags=["Rate Limiting", "System Design", "Concurrency"],
+        description="""Implement a memory-efficient Token Bucket rate limiter algorithm used in production API gateways.
+
+Implement `TokenBucket`:
+- `__init__(capacity: int, refill_rate_per_second: float)` Initialize bucket.
+- `allow_request(tokens_requested: int, current_timestamp: float) -> bool` Returns True if the bucket has enough tokens for the request, deducts the tokens, and updates state. Tokens refill continuously over time up to capacity.""",
         constraints=[
-            "capacity >= 1",
-            "refill_rate > 0",
-            "current_timestamp is monotonic in seconds.",
+            "1 <= capacity <= 10^6",
+            "0.1 <= refill_rate_per_second <= 10^6",
+            "Timestamps are non-decreasing floats in seconds.",
         ],
         examples=[
             ExampleCase(
-                input="capacity = 3, refill_rate = 1.0 (tokens/sec)\nallow_request(1, t=0) -> True\nallow_request(1, t=0) -> True\nallow_request(1, t=0) -> True\nallow_request(1, t=0) -> False (exhausted)\nallow_request(1, t=1.0) -> True (1 refilled)",
+                input="""capacity = 3, refill_rate = 1.0/sec
+Requests at t=0: 1 token (True), 1 token (True), 1 token (True), 1 token (False)
+Request at t=1.0: 1 token (True)""",
                 output="[True, True, True, False, True]",
             )
         ],
         entry_function="test_token_bucket",
         starter_code={
             "python": """class TokenBucket:
-    def __init__(self, capacity: int, refill_rate: float):
+    def __init__(self, capacity: int, refill_rate_per_second: float):
         self.capacity = capacity
-        self.refill_rate = refill_rate
+        self.refill_rate = refill_rate_per_second
         self.tokens = float(capacity)
         self.last_timestamp = 0.0
 
-    def allow_request(self, tokens: int = 1, current_time: float = 0.0) -> bool:
-        # Implement token replenishment and consumption
+    def allow_request(self, tokens: int, current_timestamp: float) -> bool:
+        # Refill tokens based on elapsed time and check capacity
         pass
 """,
             "javascript": """class TokenBucket {
-    constructor(capacity, refillRate) {
+    constructor(capacity, refillRatePerSecond) {
         this.capacity = capacity;
-        this.refillRate = refillRate;
+        this.refillRate = refillRatePerSecond;
+        this.tokens = capacity;
+        this.lastTimestamp = 0.0;
     }
 
-    allowRequest(tokens = 1, currentTime = 0) {
-        // Implementation
+    allowRequest(tokens, currentTimestamp) {
+        // Refill tokens and check capacity
+        return false;
     }
 }
 """,
@@ -259,12 +549,141 @@ CODING_PROBLEMS: list[CodingProblem] = [
         ],
     ),
     CodingProblem(
+        id="flatten-nested-json",
+        title="Flatten Nested Dictionary / JSON",
+        domain="Data Engineering",
+        difficulty="junior",
+        tags=["Recursion", "JSON", "Dictionary", "Data Processing"],
+        description="""Given a nested dictionary `d`, flatten it into a single-level dictionary where keys are joined by a dot delimiter `.`
+
+Empty dictionaries should be mapped to an empty dict.""",
+        constraints=[
+            "Dictionary depth <= 10",
+            "Keys are alphanumeric strings.",
+            "Values can be strings, numbers, booleans, or nested dicts.",
+        ],
+        examples=[
+            ExampleCase(
+                input='{"user": {"name": "Alice", "address": {"city": "Berlin"}}}',
+                output='{"user.address.city": "Berlin", "user.name": "Alice"}',
+            )
+        ],
+        entry_function="flatten_dictionary",
+        starter_code={
+            "python": """def flatten_dictionary(d: dict) -> dict:
+    # Your implementation here
+    pass
+""",
+            "javascript": """function flattenDictionary(d) {
+    // Your implementation here
+}
+""",
+        },
+        test_cases=[
+            TestCase(
+                id=1,
+                input_data='{"user": {"name": "Alice", "address": {"city": "Berlin"}}}',
+                expected_output='{"user.address.city": "Berlin", "user.name": "Alice"}',
+            ),
+            TestCase(
+                id=2,
+                input_data='{"a": 1, "b": {"c": 2, "d": {"e": 3}}}',
+                expected_output='{"a": 1, "b.c": 2, "b.d.e": 3}',
+            ),
+            TestCase(
+                id=3,
+                input_data='{"simple": "value"}',
+                expected_output='{"simple": "value"}',
+            ),
+        ],
+    ),
+    CodingProblem(
+        id="sliding-event-window-counter",
+        title="Sliding Event Window Counter",
+        domain="Data Engineering",
+        difficulty="mid",
+        tags=["Sliding Window", "Queue", "Stream Processing"],
+        description="""Given a list of sorted timestamp events `events` (in seconds) and a window size `window_duration`, return the maximum number of events that occurred within any contiguous time window of length `window_duration`.""",
+        constraints=[
+            "1 <= events.length <= 10^5",
+            "events is sorted in non-decreasing order.",
+            "0 <= events[i] <= 10^9",
+            "1 <= window_duration <= 10^6",
+        ],
+        examples=[
+            ExampleCase(input="events = [1, 2, 3, 7, 8, 9, 10, 15], window_duration = 3", output="4", explanation="Window [7, 10] has length 3 and contains 4 events (7, 8, 9, 10)."),
+            ExampleCase(input="events = [10, 20, 30], window_duration = 5", output="1"),
+        ],
+        entry_function="max_events_in_window",
+        starter_code={
+            "python": """def max_events_in_window(events: list[int], window_duration: int) -> int:
+    # Your implementation here using sliding window O(n)
+    pass
+""",
+            "javascript": """function maxEventsInWindow(events, windowDuration) {
+    // Your implementation here
+}
+""",
+        },
+        test_cases=[
+            TestCase(id=1, input_data="[1, 2, 3, 7, 8, 9, 10, 15], 3", expected_output="4"),
+            TestCase(id=2, input_data="[10, 20, 30], 5", expected_output="1"),
+            TestCase(id=3, input_data="[1, 1, 1, 1, 1], 0", expected_output="5"),
+            TestCase(id=4, input_data="[1, 5, 6, 7, 12, 13, 14, 15, 16], 4", expected_output="5"),
+        ],
+    ),
+    CodingProblem(
+        id="cosine-similarity",
+        title="Vector Cosine Similarity",
+        domain="Machine Learning",
+        difficulty="junior",
+        tags=["Linear Algebra", "Vector Search", "Machine Learning"],
+        description="""Compute the cosine similarity between two n-dimensional vectors `vec_a` and `vec_b`.
+
+Cosine similarity is defined as: `(A · B) / (||A|| * ||B||)`.
+
+If the norm of either vector is zero, return `0.0`. Round the result to 4 decimal places.""",
+        constraints=[
+            "vec_a.length == vec_b.length",
+            "1 <= vec_a.length <= 10^4",
+            "-1000.0 <= vec_a[i], vec_b[i] <= 1000.0",
+        ],
+        examples=[
+            ExampleCase(input="vec_a = [1.0, 2.0, 3.0], vec_b = [1.0, 2.0, 3.0]", output="1.0"),
+            ExampleCase(input="vec_a = [1.0, 0.0], vec_b = [0.0, 1.0]", output="0.0"),
+        ],
+        entry_function="cosine_similarity",
+        starter_code={
+            "python": """import math
+
+def cosine_similarity(vec_a: list[float], vec_b: list[float]) -> float:
+    # Your implementation here
+    pass
+""",
+            "javascript": """function cosineSimilarity(vecA, vecB) {
+    // Your implementation here
+}
+""",
+        },
+        test_cases=[
+            TestCase(id=1, input_data="[1.0, 2.0, 3.0], [1.0, 2.0, 3.0]", expected_output="1.0"),
+            TestCase(id=2, input_data="[1.0, 0.0], [0.0, 1.0]", expected_output="0.0"),
+            TestCase(id=3, input_data="[1.0, 2.0, -1.0], [2.0, 4.0, -2.0]", expected_output="1.0"),
+            TestCase(id=4, input_data="[0.0, 0.0], [1.0, 2.0]", expected_output="0.0"),
+        ],
+    ),
+    CodingProblem(
         id="softmax-temperature",
         title="Softmax with Temperature Scaling",
         domain="Machine Learning",
         difficulty="mid",
         tags=["Machine Learning", "Mathematics", "Deep Learning"],
-        description="In neural text generation (LLMs), temperature scaling controls output randomness before applying the softmax function.\n\nGiven an array of logits `logits` and a positive float `temperature`:\n1. Scale the logits: `z_i = logits_i / temperature`\n2. Compute numerically stable softmax (subtract `max(z)` to prevent overflow)\n3. Return the probability distribution array rounded to 4 decimal places.",
+        description="""In neural text generation (LLMs), temperature scaling controls output randomness before applying the softmax function.
+
+Given an array of logits `logits` and a positive float `temperature`:
+1. Scale the logits: `z_i = logits_i / temperature`
+2. Compute numerically stable softmax (subtract `max(z)` to prevent overflow)
+3. Return the probability distribution array rounded to 4 decimal places.""",
         constraints=[
             "1 <= logits.length <= 1000",
             "temperature > 0.0",
@@ -299,6 +718,159 @@ def softmax_temperature(logits: list[float], temperature: float = 1.0) -> list[f
             TestCase(id=3, input_data="[10.0, 0.0], 1.0", expected_output="[0.9999, 0.0001]"),
         ],
     ),
+    CodingProblem(
+        id="cross-entropy-loss",
+        title="Categorical Cross-Entropy Loss",
+        domain="Machine Learning",
+        difficulty="mid",
+        tags=["Deep Learning", "Mathematics", "Loss Functions"],
+        description="""Compute the categorical cross-entropy loss between predicted probabilities `y_pred` (array of floats summing to 1) and true class label index `y_true` (int).
+
+Loss formula: `L = -log(y_pred[y_true] + 1e-15)`
+
+Return the loss float rounded to 4 decimal places.""",
+        constraints=[
+            "y_pred.length >= 2",
+            "0 <= y_true < y_pred.length",
+            "sum(y_pred) == 1.0",
+        ],
+        examples=[
+            ExampleCase(input="y_pred = [0.7, 0.2, 0.1], y_true = 0", output="0.3567", explanation="-log(0.7) = 0.3567"),
+            ExampleCase(input="y_pred = [0.1, 0.8, 0.1], y_true = 1", output="0.2231", explanation="-log(0.8) = 0.2231"),
+        ],
+        entry_function="cross_entropy_loss",
+        starter_code={
+            "python": """import math
+
+def cross_entropy_loss(y_pred: list[float], y_true: int) -> float:
+    # Your implementation here
+    pass
+""",
+            "javascript": """function crossEntropyLoss(yPred, yTrue) {
+    // Your implementation here
+}
+""",
+        },
+        test_cases=[
+            TestCase(id=1, input_data="[0.7, 0.2, 0.1], 0", expected_output="0.3567"),
+            TestCase(id=2, input_data="[0.1, 0.8, 0.1], 1", expected_output="0.2231"),
+            TestCase(id=3, input_data="[0.5, 0.5], 1", expected_output="0.6931"),
+        ],
+    ),
+    CodingProblem(
+        id="retry-exponential-backoff",
+        title="Compute Exponential Backoff Delays",
+        domain="Backend & Reliability",
+        difficulty="junior",
+        tags=["Backend", "Reliability", "Networking"],
+        description="""Given an initial delay `base_delay_ms` in milliseconds, a float `backoff_factor`, a maximum delay ceiling `max_delay_ms`, and `max_retries`, calculate the sequence of retry delays in milliseconds (capped at `max_delay_ms`).
+
+Formula for attempt `i` (0-indexed): `min(max_delay_ms, int(base_delay_ms * (backoff_factor ** i)))`""",
+        constraints=[
+            "1 <= base_delay_ms <= 10^5",
+            "1.0 <= backoff_factor <= 10.0",
+            "base_delay_ms <= max_delay_ms <= 10^7",
+            "1 <= max_retries <= 20",
+        ],
+        examples=[
+            ExampleCase(input="base_delay_ms = 100, backoff_factor = 2.0, max_delay_ms = 1000, max_retries = 5", output="[100, 200, 400, 800, 1000]"),
+            ExampleCase(input="base_delay_ms = 50, backoff_factor = 3.0, max_delay_ms = 500, max_retries = 4", output="[50, 150, 450, 500]"),
+        ],
+        entry_function="compute_backoff_delays",
+        starter_code={
+            "python": """def compute_backoff_delays(base_delay_ms: int, backoff_factor: float, max_delay_ms: int, max_retries: int) -> list[int]:
+    # Your implementation here
+    pass
+""",
+            "javascript": """function computeBackoffDelays(baseDelayMs, backoffFactor, maxDelayMs, maxRetries) {
+    // Your implementation here
+}
+""",
+        },
+        test_cases=[
+            TestCase(id=1, input_data="100, 2.0, 1000, 5", expected_output="[100, 200, 400, 800, 1000]"),
+            TestCase(id=2, input_data="50, 3.0, 500, 4", expected_output="[50, 150, 450, 500]"),
+            TestCase(id=3, input_data="200, 2.0, 2000, 1", expected_output="[200]"),
+        ],
+    ),
+
+    CodingProblem(
+        id="parse-query-string",
+        title="URL Query String Parser",
+        domain="Backend & Reliability",
+        difficulty="junior",
+        tags=["Backend", "Parsing", "Web", "String"],
+        description="""Write a parser function `parse_query_string(query: str) -> dict[str, str | list[str]]` that parses a URL query parameter string.
+
+Requirements:
+1. Split parameters by `&` and key-value by `=`. Ignore empty pairs.
+2. If a key appears multiple times, aggregate values into a list of strings.
+3. If a key appears once, store as a single string.
+4. If a key has no value (e.g., `key` or `key=`), store empty string \"\".
+5. Return an empty dict for empty inputs.""",
+        constraints=[
+            "0 <= query.length <= 10^4",
+            "Valid URI characters.",
+        ],
+        examples=[
+            ExampleCase(input='query = "page=1&limit=20&sort=desc"', output='{"limit": "20", "page": "1", "sort": "desc"}'),
+            ExampleCase(input='query = "tag=python&tag=backend&tag=fastapi"', output='{"tag": ["python", "backend", "fastapi"]}'),
+        ],
+        entry_function="parse_query_string",
+        starter_code={
+            "python": """def parse_query_string(query: str) -> dict:
+    # Your implementation here
+    pass
+""",
+            "javascript": """function parseQueryString(query) {
+    // Your implementation here
+}
+""",
+        },
+        test_cases=[
+            TestCase(id=1, input_data='"page=1&limit=20&sort=desc"', expected_output='{"limit": "20", "page": "1", "sort": "desc"}'),
+            TestCase(id=2, input_data='"tag=python&tag=backend&tag=fastapi"', expected_output='{"tag": ["python", "backend", "fastapi"]}'),
+            TestCase(id=3, input_data='""', expected_output='{}'),
+            TestCase(id=4, input_data='"flag&status="', expected_output='{"flag": "", "status": ""}'),
+        ],
+    ),
+    CodingProblem(
+        id="matrix-transpose-and-multiply",
+        title="Matrix Transpose",
+        domain="Machine Learning",
+        difficulty="junior",
+        tags=["Linear Algebra", "Matrix", "Machine Learning"],
+        description="""Given a 2D matrix `matrix` (list of lists of numbers) of shape `(M, N)`:
+Compute and return the matrix transpose `M^T` of shape `(N, M)`.
+
+Each row in the output must correspond to the respective column of the input.""",
+        constraints=[
+            "1 <= M, N <= 500",
+            "-10^4 <= matrix[i][j] <= 10^4",
+            "All rows have equal length.",
+        ],
+        examples=[
+            ExampleCase(input="matrix = [[1, 2, 3], [4, 5, 6]]", output="[[1, 4], [2, 5], [3, 6]]"),
+            ExampleCase(input="matrix = [[1]]", output="[[1]]"),
+        ],
+        entry_function="transpose_matrix",
+        starter_code={
+            "python": """def transpose_matrix(matrix: list[list[float]]) -> list[list[float]]:
+    # Compute the transpose of the matrix
+    pass
+""",
+            "javascript": """function transposeMatrix(matrix) {
+    // Your implementation here
+}
+""",
+        },
+        test_cases=[
+            TestCase(id=1, input_data="[[1, 2, 3], [4, 5, 6]]", expected_output="[[1, 4], [2, 5], [3, 6]]"),
+            TestCase(id=2, input_data="[[1]]", expected_output="[[1]]"),
+            TestCase(id=3, input_data="[[1, 2], [3, 4], [5, 6]]", expected_output="[[1, 3, 5], [2, 4, 6]]"),
+        ],
+    ),
+
 ]
 
 
