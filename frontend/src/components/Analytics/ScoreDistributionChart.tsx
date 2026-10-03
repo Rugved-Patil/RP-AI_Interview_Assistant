@@ -71,7 +71,8 @@ export function ScoreDistributionChart({ distribution }: ScoreDistributionChartP
                   style={{
                     width: `${pct}%`,
                     backgroundColor: tier.color,
-                  }}
+                    '--target-width': `${pct}%`,
+                  } as React.CSSProperties}
                 />
               </div>
 

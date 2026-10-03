@@ -142,7 +142,7 @@ export function ScoreTrajectoryChart({ timeline }: ScoreTrajectoryChartProps) {
           </text>
 
           {/* Area Fill */}
-          {areaPath && <path d={areaPath} fill="url(#scoreAreaGradient)" />}
+          {areaPath && <path d={areaPath} className="trajectory-area" fill="url(#scoreAreaGradient)" />}
 
           {/* Line Path */}
           {linePath && <path d={linePath} className="trajectory-line" fill="none" />}
@@ -154,6 +154,7 @@ export function ScoreTrajectoryChart({ timeline }: ScoreTrajectoryChartProps) {
               <g
                 key={p.idx}
                 className="point-group"
+                style={{ '--pt-idx': p.idx } as React.CSSProperties}
                 onMouseEnter={() => setHoveredIndex(p.idx)}
                 onMouseLeave={() => setHoveredIndex(null)}
                 tabIndex={0}

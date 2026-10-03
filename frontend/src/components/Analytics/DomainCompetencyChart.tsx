@@ -66,7 +66,8 @@ export function DomainCompetencyChart({ domains }: DomainCompetencyChartProps) {
                   style={{
                     width: `${percentage}%`,
                     backgroundColor: getMeterColor(d.average_score),
-                  }}
+                    '--target-width': `${percentage}%`,
+                  } as React.CSSProperties}
                 />
               </div>
 

@@ -10,11 +10,13 @@ import { DomainCompetencyChart } from '../components/Analytics/DomainCompetencyC
 import { ScoreDistributionChart } from '../components/Analytics/ScoreDistributionChart'
 import { CommunicationInsightsCard } from '../components/Analytics/CommunicationInsightsCard'
 import { WeakSpotsCard } from '../components/Analytics/WeakSpotsCard'
+import { useTranslation } from '../i18n/LanguageContext'
 import '../components/Analytics/AnalyticsCharts.css'
 import './AnalyticsPage.css'
 
 export function AnalyticsPage() {
   const navigate = useNavigate()
+  const { t, formatDomain } = useTranslation()
   const [loading, setLoading] = useState<boolean>(true)
   const [error, setError] = useState<string | null>(null)
   const [data, setData] = useState<AnalyticsDashboardResponse | null>(null)
@@ -82,18 +84,18 @@ export function AnalyticsPage() {
       {/* Page Header */}
       <header className="analytics-header">
         <div>
-          <h1 className="analytics-title">Analytics & Progress Tracking</h1>
+          <h1 className="analytics-title">{t('nav.analytics', undefined, 'Analytics & Progress Tracking')}</h1>
           <p className="analytics-subtitle">
-            Track your interview performance trajectory, analyze domain competencies, and discover high-yield improvement areas.
+            {t('analytics.page_subtitle', undefined, 'Track your interview performance trajectory, analyze domain competencies, and discover high-yield improvement areas.')}
           </p>
         </div>
       </header>
 
-      {/* Filter Control Bar */}
+      {/* Unified Single-Row Filter Control Bar */}
       <div className="analytics-filter-bar">
         <div className="filter-group">
-          <span className="filter-label">Timeframe:</span>
-          <div className="filter-buttons">
+          <span className="filter-label">Time:</span>
+          <div className="filter-segmented" data-active={timeframe === undefined ? 'all' : timeframe === 30 ? '30' : '7'}>
             <button
               type="button"
               className={`filter-btn ${timeframe === undefined ? 'filter-btn--active' : ''}`}
@@ -106,27 +108,29 @@ export function AnalyticsPage() {
               className={`filter-btn ${timeframe === 30 ? 'filter-btn--active' : ''}`}
               onClick={() => handleTimeframeChange(30)}
             >
-              Last 30 Days
+              30 Days
             </button>
             <button
               type="button"
               className={`filter-btn ${timeframe === 7 ? 'filter-btn--active' : ''}`}
               onClick={() => handleTimeframeChange(7)}
             >
-              Last 7 Days
+              7 Days
             </button>
           </div>
         </div>
 
+        <div className="filter-separator" />
+
         <div className="filter-group">
-          <span className="filter-label">Session Type:</span>
-          <div className="filter-buttons">
+          <span className="filter-label">Type:</span>
+          <div className="filter-segmented" data-active={sessionType}>
             <button
               type="button"
               className={`filter-btn ${sessionType === 'all' ? 'filter-btn--active' : ''}`}
               onClick={() => handleSessionTypeChange('all')}
             >
-              All Practices
+              All
             </button>
             <button
               type="button"
@@ -247,13 +251,13 @@ export function AnalyticsPage() {
                     <div className="domain-pill domain-pill--strength">
                       <span className="domain-pill__label">Top:</span>
                       <span className="domain-pill__name">
-                        {data.summary.top_strength_domain || 'N/A'}
+                        {data.summary.top_strength_domain ? formatDomain(data.summary.top_strength_domain) : 'N/A'}
                       </span>
                     </div>
                     <div className="domain-pill domain-pill--focus">
                       <span className="domain-pill__label">Focus:</span>
                       <span className="domain-pill__name">
-                        {data.summary.focus_domain || 'Mastery Achieved'}
+                        {data.summary.focus_domain ? formatDomain(data.summary.focus_domain) : 'Mastery Achieved'}
                       </span>
                     </div>
                   </div>
