@@ -7,6 +7,7 @@ import {
 } from '../api/practiceApi'
 import type { PresetIn, PresetSummary } from '../api/practiceApi'
 import { getActivePresetId, setActivePresetId } from '../activePreset'
+import { PresetsIcon } from './Icons'
 import { useTranslation } from '../i18n/LanguageContext'
 import './InterviewPresets.css'
 
@@ -69,14 +70,23 @@ export function InterviewPresets() {
 
   return (
     <section className="interview-presets">
-      <p className="interview-presets__eyebrow">{t('preset.eyebrow', undefined, 'Interview presets')}</p>
-      <p className="interview-presets__lede">
-        {t(
-          'preset.presets_lede',
-          undefined,
-          "Save the role, company, and location you're practicing for. Whichever preset is marked Active is used to build your practice questions, until you change it here.",
-        )}
-      </p>
+      <header className="page-header" style={{ marginBottom: '1.5rem', borderBottom: '1px solid var(--rule)', paddingBottom: '1rem' }}>
+        <div className="page-title-row">
+          <div className="page-title-icon page-title-icon--presets">
+            <PresetsIcon width={24} height={24} />
+          </div>
+          <div>
+            <h1 className="page-title">{t('preset.eyebrow', undefined, 'Interview Presets')}</h1>
+            <p className="page-subtitle">
+              {t(
+                'preset.presets_lede',
+                undefined,
+                "Save the role, company, and location you're practicing for. Whichever preset is marked Active is used to build your practice questions, until you change it here.",
+              )}
+            </p>
+          </div>
+        </div>
+      </header>
 
       <NewPresetForm onCreated={handleCreated} />
 

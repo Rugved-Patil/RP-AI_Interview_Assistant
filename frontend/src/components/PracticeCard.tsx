@@ -14,7 +14,7 @@ import { getActivePresetId, setActivePresetId } from '../activePreset'
 import { UnsavedSessionModal } from './UnsavedSessionModal'
 import { useSpeechRecognition } from '../hooks/useSpeechRecognition'
 import { useSpeechSynthesis } from '../hooks/useSpeechSynthesis'
-import { MicIcon, SpeakerIcon, StopIcon } from './Icons'
+import { MicIcon, SpeakerIcon, SparklesIcon, StopIcon } from './Icons'
 import { FormattedFeedback } from './FormattedFeedback'
 import { useTranslation } from '../i18n/LanguageContext'
 import './PracticeCard.css'
@@ -225,7 +225,17 @@ export function PracticeCard() {
         onCancel={() => setPendingExitAction(null)}
       />
 
-      <p className="practice-card__eyebrow">{t('practice.technical_eyebrow', undefined, 'Technical questions')}</p>
+      <header className="page-header" style={{ marginBottom: '1.5rem', borderBottom: 'none', paddingBottom: 0 }}>
+        <div className="page-title-row">
+          <div className="page-title-icon page-title-icon--practice">
+            <SparklesIcon width={24} height={24} />
+          </div>
+          <div>
+            <h1 className="page-title">{t('practice.technical_heading', undefined, 'Technical Practice')}</h1>
+            <p className="page-subtitle">{t('practice.technical_eyebrow', undefined, 'Single technical question practice with instant AI evaluation')}</p>
+          </div>
+        </div>
+      </header>
 
       {stage.name === 'idle' && (
         <div className="practice-card__panel">

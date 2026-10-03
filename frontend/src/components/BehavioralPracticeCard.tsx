@@ -14,7 +14,7 @@ import { getActivePresetId, setActivePresetId } from '../activePreset'
 import { UnsavedSessionModal } from './UnsavedSessionModal'
 import { useSpeechRecognition } from '../hooks/useSpeechRecognition'
 import { useSpeechSynthesis } from '../hooks/useSpeechSynthesis'
-import { MicIcon, SpeakerIcon, StopIcon } from './Icons'
+import { MicIcon, SpeakerIcon, SparklesIcon, StopIcon } from './Icons'
 import { FormattedFeedback } from './FormattedFeedback'
 import { useTranslation } from '../i18n/LanguageContext'
 import './BehavioralPracticeCard.css'
@@ -222,7 +222,17 @@ export function BehavioralPracticeCard() {
         onCancel={() => setPendingExitAction(null)}
       />
 
-      <p className="behavioral-card__eyebrow">{t('practice.behavioral_eyebrow', undefined, 'Behavioral Questions')}</p>
+      <header className="page-header" style={{ marginBottom: '1.5rem', borderBottom: 'none', paddingBottom: 0 }}>
+        <div className="page-title-row">
+          <div className="page-title-icon page-title-icon--practice">
+            <SparklesIcon width={24} height={24} />
+          </div>
+          <div>
+            <h1 className="page-title">{t('practice.behavioral_heading', undefined, 'Behavioral Practice')}</h1>
+            <p className="page-subtitle">{t('practice.behavioral_eyebrow', undefined, 'STAR-method practice with AI evaluation')}</p>
+          </div>
+        </div>
+      </header>
 
       {stage.name === 'idle' && (
         <div className="behavioral-card__panel">

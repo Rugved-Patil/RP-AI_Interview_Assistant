@@ -10,6 +10,7 @@ import { DomainCompetencyChart } from '../components/Analytics/DomainCompetencyC
 import { ScoreDistributionChart } from '../components/Analytics/ScoreDistributionChart'
 import { CommunicationInsightsCard } from '../components/Analytics/CommunicationInsightsCard'
 import { WeakSpotsCard } from '../components/Analytics/WeakSpotsCard'
+import { AnalyticsIcon } from '../components/Icons'
 import { useTranslation } from '../i18n/LanguageContext'
 import '../components/Analytics/AnalyticsCharts.css'
 import './AnalyticsPage.css'
@@ -82,12 +83,17 @@ export function AnalyticsPage() {
       </button>
 
       {/* Page Header */}
-      <header className="analytics-header">
-        <div>
-          <h1 className="analytics-title">{t('nav.analytics', undefined, 'Analytics & Progress Tracking')}</h1>
-          <p className="analytics-subtitle">
-            {t('analytics.page_subtitle', undefined, 'Track your interview performance trajectory, analyze domain competencies, and discover high-yield improvement areas.')}
-          </p>
+      <header className="page-header">
+        <div className="page-title-row">
+          <div className="page-title-icon page-title-icon--analytics">
+            <AnalyticsIcon width={24} height={24} />
+          </div>
+          <div>
+            <h1 className="page-title">{t('nav.analytics', undefined, 'Analytics & Progress Tracking')}</h1>
+            <p className="page-subtitle">
+              {t('analytics.page_subtitle', undefined, 'Track your interview performance trajectory, analyze domain competencies, and discover high-yield improvement areas.')}
+            </p>
+          </div>
         </div>
       </header>
 

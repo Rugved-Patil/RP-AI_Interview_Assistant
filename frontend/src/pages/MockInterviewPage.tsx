@@ -15,7 +15,7 @@ import { getActivePresetId, setActivePresetId } from '../activePreset'
 import { UnsavedSessionModal } from '../components/UnsavedSessionModal'
 import { useSpeechRecognition } from '../hooks/useSpeechRecognition'
 import { useSpeechSynthesis } from '../hooks/useSpeechSynthesis'
-import { MicIcon, SpeakerIcon, SpeakerOffIcon, StopIcon } from '../components/Icons'
+import { MicIcon, PlayIcon, SpeakerIcon, SpeakerOffIcon, StopIcon } from '../components/Icons'
 import { FormattedFeedback } from '../components/FormattedFeedback'
 import { useTranslation } from '../i18n/LanguageContext'
 import './MockInterviewPage.css'
@@ -405,13 +405,29 @@ export function MockInterviewPage() {
       </button>
 
       <div className="mock-card">
-        <p className="mock-card__eyebrow">
-          {t(
-            'mock.full_mock_eyebrow',
-            { type: interviewType === 'hr' ? t('mock.focus_hr', undefined, 'HR & Behavioral') : t('mock.focus_technical', undefined, 'Technical') },
-            `Full Mock Interview · ${interviewType === 'hr' ? 'HR & Behavioral' : 'Technical'}`,
-          )}
-        </p>
+        <header className="page-header" style={{ marginBottom: '1.5rem', borderBottom: 'none', paddingBottom: 0 }}>
+          <div className="page-title-row">
+            <div className="page-title-icon page-title-icon--mock">
+              <PlayIcon width={24} height={24} />
+            </div>
+            <div>
+              <h1 className="page-title">
+                {stage.name === 'setup'
+                  ? t('mock.setup_heading', undefined, 'Full Mock Interview')
+                  : stage.name === 'graded'
+                  ? t('mock.report_heading', undefined, 'Interview Report')
+                  : t('mock.session_heading', undefined, 'Live Mock Interview')}
+              </h1>
+              <p className="page-subtitle">
+                {t(
+                  'mock.full_mock_eyebrow',
+                  { type: interviewType === 'hr' ? t('mock.focus_hr', undefined, 'HR & Behavioral') : t('mock.focus_technical', undefined, 'Technical') },
+                  `Full Mock Interview · ${interviewType === 'hr' ? 'HR & Behavioral' : 'Technical'}`,
+                )}
+              </p>
+            </div>
+          </div>
+        </header>
 
         {stage.name === 'setup' && (
           <div className="mock-card__panel">

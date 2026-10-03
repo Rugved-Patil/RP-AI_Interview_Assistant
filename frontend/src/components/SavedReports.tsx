@@ -6,7 +6,7 @@ import {
   listReports,
 } from '../api/practiceApi'
 import type { ReportSummary, SavedInterviewReportSummary } from '../api/practiceApi'
-import { FilterIcon } from './Icons'
+import { FilterIcon, SavedReportsIcon } from './Icons'
 import { FormattedFeedback } from './FormattedFeedback'
 import { useTranslation } from '../i18n/LanguageContext'
 import './SavedReports.css'
@@ -188,9 +188,14 @@ export function SavedReports() {
   return (
     <section className="saved-reports">
       <div className="saved-reports__header">
-        <div>
-          <p className="saved-reports__eyebrow">{t('reports.eyebrow', undefined, 'Practice History & Reports')}</p>
-          <h2 className="saved-reports__heading">{t('reports.heading', undefined, 'Saved Interview Reports')}</h2>
+        <div className="page-title-row">
+          <div className="page-title-icon page-title-icon--reports">
+            <SavedReportsIcon width={24} height={24} />
+          </div>
+          <div>
+            <h1 className="page-title">{t('reports.heading', undefined, 'Saved Interview Reports')}</h1>
+            <p className="page-subtitle">{t('reports.eyebrow', undefined, 'Practice History & Reports')}</p>
+          </div>
         </div>
 
         <button

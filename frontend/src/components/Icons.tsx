@@ -34,8 +34,8 @@ export function AnalyticsIcon(props: SVGProps<SVGSVGElement>) {
       {...props}
     >
       <path d="M3 3v18h18" />
-      <path className="nav-analytics-line" d="M18 9l-5 5-3-3-4 4" />
-      <path className="nav-analytics-arrow" d="M14 9h4v4" />
+      <path d="M18 9l-5 5-3-3-4 4" />
+      <path d="M14 9h4v4" />
     </svg>
   )
 }
@@ -53,12 +53,10 @@ export function QuestionBankIcon(props: SVGProps<SVGSVGElement>) {
       strokeLinejoin="round"
       {...props}
     >
-      {/* Center Spine */}
-      <line x1="12" y1="5" x2="12" y2="19" />
-      {/* Left Book Page */}
-      <path className="nav-book-page nav-book-page--left" d="M12 5C9 3.5 4.5 4 2 5v14c2.5-1 7-1.5 10 0" />
-      {/* Right Book Page */}
-      <path className="nav-book-page nav-book-page--right" d="M12 5c3-1.5 7.5-1 10 0v14c-2.5-1-7-1.5-10 0" />
+      <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+      <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+      <line x1="9" y1="7" x2="15" y2="7" />
+      <line x1="9" y1="11" x2="13" y2="11" />
     </svg>
   )
 }
@@ -95,13 +93,8 @@ export function SavedReportsIcon(props: SVGProps<SVGSVGElement>) {
       strokeLinejoin="round"
       {...props}
     >
-      {/* Folder Back Tab */}
-      <path className="nav-folder-back" d="M2 5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2v2H2V5z" />
-      {/* Inner File/Report Sheet (slides up on hover) */}
-      <path className="nav-folder-sheet" d="M6 10h12v7H6z" />
-      {/* Folder Front Cover (opens on hover) */}
-      <path className="nav-folder-front" d="M2 10h20l-2 9a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2L2 10z" />
-      <line className="nav-folder-line" x1="9" y1="15" x2="15" y2="15" />
+      <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
+      <line x1="9" y1="14" x2="15" y2="14" />
     </svg>
   )
 }

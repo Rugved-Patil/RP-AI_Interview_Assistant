@@ -8,6 +8,7 @@ import {
   type QuestionDoc,
   type RetrievedQuestion,
 } from '../api/practiceApi'
+import { QuestionBankIcon } from '../components/Icons'
 import { useTranslation } from '../i18n/LanguageContext'
 import './QuestionBankPage.css'
 
@@ -143,18 +144,25 @@ export function QuestionBankPage() {
       </button>
 
       {/* Header */}
-      <header className="qb-header">
-        <div className="qb-title-row">
-          <h1 className="qb-title">{t('qb.title', undefined, 'Question Bank')}</h1>
-          {stats && (
-            <div className="qb-count-pill">
-              {stats.total_questions} Curated Questions • {stats.domains.length} Domains
+      <header className="page-header">
+        <div className="page-title-row">
+          <div className="page-title-icon page-title-icon--questions">
+            <QuestionBankIcon width={24} height={24} />
+          </div>
+          <div style={{ flex: 1 }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.75rem' }}>
+              <h1 className="page-title">{t('qb.title', undefined, 'Question Bank')}</h1>
+              {stats && (
+                <div className="qb-count-pill">
+                  {stats.total_questions} Curated Questions • {stats.domains.length} Domains
+                </div>
+              )}
             </div>
-          )}
+            <p className="page-subtitle">
+              {t('qb.subtitle', undefined, 'Explore vetted interview questions frequently asked across diverse industries and roles. Practice with instant feedback or inspect detailed evaluation rubrics.')}
+            </p>
+          </div>
         </div>
-        <p className="qb-subtitle">
-          {t('qb.subtitle', undefined, 'Explore vetted interview questions frequently asked across diverse industries and roles. Practice with instant feedback or inspect detailed evaluation rubrics.')}
-        </p>
       </header>
 
       {/* Search & Filter Controls */}

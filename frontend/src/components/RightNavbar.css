@@ -174,93 +174,32 @@
 
 /* 2. Home Bounce */
 .right-nav__link--home:hover .right-nav__link-icon--home {
-  transform: translateY(-2px) scale(1.12);
+  transform: translateY(-2px) scale(1.08);
 }
 
 /* 3. Sandbox / Code Bracket Shift */
 .right-nav__link--sandbox:hover .right-nav__link-icon--sandbox {
-  transform: scale(1.12) rotate(-6deg);
+  transform: scale(1.08) rotate(-4deg);
 }
 
-/* 4. Analytics Graph Go Up (Subtle) */
-.nav-analytics-line,
-.nav-analytics-arrow {
-  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-  transform-origin: center bottom;
-}
-
+/* 4. Analytics */
 .right-nav__link--analytics:hover .right-nav__link-icon--analytics {
-  transform: scale(1.08);
+  transform: translateY(-2px) scale(1.08);
 }
 
-.right-nav__link--analytics:hover .nav-analytics-line {
-  transform: translateY(-3.5px) scaleY(1.15);
-}
-
-.right-nav__link--analytics:hover .nav-analytics-arrow {
-  transform: translate(1px, -4px);
-}
-
-/* 5. Question Bank Book Open Up */
-.nav-book-page {
-  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-
-.nav-book-page--left {
-  transform-origin: 12px center;
-}
-
-.nav-book-page--right {
-  transform-origin: 12px center;
-}
-
+/* 5. Question Bank */
 .right-nav__link--questions:hover .right-nav__link-icon--questions {
-  transform: scale(1.12);
+  transform: translateY(-2px) scale(1.08);
 }
 
-.right-nav__link--questions:hover .nav-book-page--left {
-  transform: rotate(-18deg) skewY(-6deg) scaleX(0.92);
-}
-
-.right-nav__link--questions:hover .nav-book-page--right {
-  transform: rotate(18deg) skewY(6deg) scaleX(0.92);
-}
-
-/* 6. Presets Bookmark Bob */
+/* 6. Presets */
 .right-nav__link--presets:hover .right-nav__link-icon--presets {
-  transform: translateY(-2px) scale(1.12);
+  transform: translateY(-2px) scale(1.08);
 }
 
-/* 7. Saved Reports Folder Open & Files Show (Subtle) */
-.nav-folder-sheet {
-  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.2s ease;
-  transform-origin: center bottom;
-}
-
-.nav-folder-front {
-  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
-  transform-origin: center bottom;
-}
-
-.nav-folder-line {
-  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
-  transform-origin: center bottom;
-}
-
+/* 7. Saved Reports */
 .right-nav__link--reports:hover .right-nav__link-icon--reports {
-  transform: scale(1.1);
-}
-
-.right-nav__link--reports:hover .nav-folder-sheet {
-  transform: translateY(-5px) scale(1.05);
-}
-
-.right-nav__link--reports:hover .nav-folder-front {
-  transform: skewX(-14deg) scaleY(0.85);
-}
-
-.right-nav__link--reports:hover .nav-folder-line {
-  transform: translateY(-5px);
+  transform: translateY(-2px) scale(1.08);
 }
 
 .right-nav__link-label {

@@ -51,8 +51,111 @@
   color: var(--ink-muted);
   text-decoration: none;
   align-self: flex-start;
+  transition: color 0.15s ease;
 }
 
 .page-back:hover {
   color: var(--ink);
+}
+
+/* Universal Page Header with Animated Icon */
+.page-header {
+  margin-bottom: 2rem;
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid var(--rule);
+  width: 100%;
+}
+
+.page-title-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 1.25rem;
+}
+
+.page-title-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  background-color: var(--paper-card);
+  border: 1px solid var(--rule);
+  border-radius: 10px;
+  color: var(--olive-deep);
+  flex-shrink: 0;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(48, 51, 41, 0.05);
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
+              box-shadow 0.3s ease,
+              background-color 0.2s ease,
+              border-color 0.2s ease;
+}
+
+.page-title-icon:hover {
+  transform: translateY(-2px) scale(1.1);
+  box-shadow: 0 6px 18px rgba(48, 51, 41, 0.12);
+  background-color: var(--canvas);
+  border-color: var(--olive-deep);
+}
+
+.page-title-icon:active {
+  transform: translateY(0) scale(0.95);
+}
+
+/* Specific icon hover effects */
+.page-title-icon--settings:hover svg {
+  transform: rotate(90deg);
+  transition: transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.page-title-icon--analytics:hover svg {
+  transform: scale(1.15) translateY(-1px);
+  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.page-title-icon--questions:hover svg {
+  transform: scale(1.15) rotate(4deg);
+  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.page-title-icon--reports:hover svg {
+  transform: scale(1.15) translateY(-1px);
+  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.page-title-icon--presets:hover svg {
+  transform: scale(1.15) rotate(-6deg);
+  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.page-title-icon--practice:hover svg {
+  transform: scale(1.15) rotate(8deg);
+  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.page-title-icon--mock:hover svg {
+  transform: scale(1.18) translateX(1px);
+  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.page-title-icon--code:hover svg {
+  transform: scale(1.15) rotate(-6deg);
+  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.page-title {
+  font-family: var(--font-serif);
+  font-size: 1.85rem;
+  font-weight: 600;
+  color: var(--ink);
+  margin: 0 0 0.4rem;
+  letter-spacing: -0.02em;
+}
+
+.page-subtitle {
+  font-family: var(--font-mono);
+  font-size: 0.88rem;
+  color: var(--ink-muted);
+  margin: 0;
+  line-height: 1.45;
 }
