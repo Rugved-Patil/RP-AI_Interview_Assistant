@@ -8,6 +8,7 @@ import {
 import type { ReportSummary, SavedInterviewReportSummary } from '../api/practiceApi'
 import { FilterIcon } from './Icons'
 import { FormattedFeedback } from './FormattedFeedback'
+import { useTranslation } from '../i18n/LanguageContext'
 import './SavedReports.css'
 
 export type UnifiedReport =
@@ -22,6 +23,7 @@ interface AllReportsState {
 }
 
 export function SavedReports() {
+  const { t } = useTranslation()
   const [state, setState] = useState<AllReportsState>({
     status: 'loading',
     singleReports: [],
@@ -114,8 +116,6 @@ export function SavedReports() {
       }
 
       // 3. Search query filter with prioritization:
-      // Tier 1 (High priority): Role, Company, Location, or Score exact match
-      // Tier 2 (Secondary priority): Feedback, Questions, Answers, Transcripts
       if (q) {
         const role = (item.data.role || '').toLowerCase()
         const comp = (item.data.company || '').toLowerCase()
@@ -189,8 +189,8 @@ export function SavedReports() {
     <section className="saved-reports">
       <div className="saved-reports__header">
         <div>
-          <p className="saved-reports__eyebrow">Practice History &amp; Reports</p>
-          <h2 className="saved-reports__heading">Saved Interview Reports</h2>
+          <p className="saved-reports__eyebrow">{t('reports.eyebrow', undefined, 'Practice History & Reports')}</p>
+          <h2 className="saved-reports__heading">{t('reports.heading', undefined, 'Saved Interview Reports')}</h2>
         </div>
 
         <button
@@ -215,40 +215,40 @@ export function SavedReports() {
         <div className="saved-reports__filter-drawer">
           <div className="filter-drawer__row">
             <div className="filter-drawer__group filter-drawer__group--search">
-              <label htmlFor="report-search" className="filter-drawer__label">Search</label>
+              <label htmlFor="report-search" className="filter-drawer__label">{t('reports.search_label', undefined, 'Search')}</label>
               <input
                 id="report-search"
                 type="text"
                 className="filter-drawer__input"
-                placeholder="Search by role, company, score, keyword…"
+                placeholder={t('reports.search_placeholder', undefined, 'Search by role, company, score, keyword…')}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
             </div>
 
             <div className="filter-drawer__group">
-              <label htmlFor="report-type-select" className="filter-drawer__label">Report Type</label>
+              <label htmlFor="report-type-select" className="filter-drawer__label">{t('reports.type_label', undefined, 'Report Type')}</label>
               <select
                 id="report-type-select"
                 className="filter-drawer__select"
                 value={typeFilter}
                 onChange={(e) => setTypeFilter(e.target.value as 'all' | 'mock' | 'single')}
               >
-                <option value="all">All Records ({unifiedReports.length})</option>
-                <option value="mock">Full Mocks ({state.mockReports.length})</option>
-                <option value="single">Single Drills ({state.singleReports.length})</option>
+                <option value="all">{t('reports.type_all', { count: unifiedReports.length }, `All Records (${unifiedReports.length})`)}</option>
+                <option value="mock">{t('reports.type_mock', { count: state.mockReports.length }, `Full Mocks (${state.mockReports.length})`)}</option>
+                <option value="single">{t('reports.type_single', { count: state.singleReports.length }, `Single Drills (${state.singleReports.length})`)}</option>
               </select>
             </div>
 
             <div className="filter-drawer__group">
-              <label htmlFor="report-score-select" className="filter-drawer__label">Score</label>
+              <label htmlFor="report-score-select" className="filter-drawer__label">{t('reports.score_label', undefined, 'Score')}</label>
               <select
                 id="report-score-select"
                 className="filter-drawer__select"
                 value={scoreFilter}
                 onChange={(e) => setScoreFilter(e.target.value)}
               >
-                <option value="all">All Scores</option>
+                <option value="all">{t('reports.score_all', undefined, 'All Scores')}</option>
                 <option value="10">10 / 10</option>
                 <option value="9">9 / 10</option>
                 <option value="8">8 / 10</option>
@@ -266,7 +266,7 @@ export function SavedReports() {
 
           <div className="filter-drawer__footer">
             <span className="filter-drawer__count">
-              Showing {filteredReports.length} of {unifiedReports.length} reports
+              {t('reports.showing_count', { filtered: filteredReports.length, total: unifiedReports.length }, `Showing ${filteredReports.length} of ${unifiedReports.length} reports`)}
             </span>
             {activeFilterCount > 0 && (
               <button
@@ -274,14 +274,14 @@ export function SavedReports() {
                 className="filter-drawer__reset-btn"
                 onClick={handleResetFilters}
               >
-                Reset Filters
+                {t('reports.reset_filters', undefined, 'Reset Filters')}
               </button>
             )}
           </div>
         </div>
       )}
 
-      {state.status === 'loading' && <p className="saved-reports__meta">Loading saved reports…</p>}
+      {state.status === 'loading' && <p className="saved-reports__meta">{t('reports.loading', undefined, 'Loading saved reports…')}</p>}
       {state.status === 'error' && <p className="saved-reports__meta">{state.errorMessage}</p>}
 
       {state.status === 'loaded' && (
@@ -290,17 +290,17 @@ export function SavedReports() {
             <div className="saved-reports__empty">
               {unifiedReports.length === 0 ? (
                 <p className="saved-reports__meta">
-                  No saved reports yet. Complete a practice drill or mock interview and click &quot;Save this report&quot; to archive it here.
+                  {t('reports.empty_no_saved', undefined, 'No saved reports yet. Complete a practice drill or mock interview and click "Save this report" to archive it here.')}
                 </p>
               ) : (
                 <p className="saved-reports__meta">
-                  No reports matched your active filter criteria.{' '}
+                  {t('reports.empty_no_match', undefined, 'No reports matched your active filter criteria.')}{' '}
                   <button
                     type="button"
                     className="saved-reports__link-btn"
                     onClick={handleResetFilters}
                   >
-                    Clear filters
+                    {t('reports.clear_filters', undefined, 'Clear filters')}
                   </button>
                 </p>
               )}
@@ -337,6 +337,7 @@ function MockReportRow({
   report: SavedInterviewReportSummary
   onDelete: (id: number) => Promise<void>
 }) {
+  const { t } = useTranslation()
   const [expanded, setExpanded] = useState(false)
   const [confirming, setConfirming] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
@@ -359,7 +360,7 @@ function MockReportRow({
     }
   }
 
-  const roleText = report.role || 'Mock Interview'
+  const roleText = report.role || t('reports.mock_badge', undefined, 'Mock Interview')
   const companyText = report.company ? ` · ${report.company}` : ''
 
   return (
@@ -371,7 +372,7 @@ function MockReportRow({
         aria-expanded={expanded}
       >
         <span className="report-row__score">{report.score}/10</span>
-        <span className="report-row__badge report-row__badge--mock">Mock Interview</span>
+        <span className="report-row__badge report-row__badge--mock">{t('reports.mock_badge', undefined, 'Mock Interview')}</span>
         <span className="report-row__primary-info" title={`${roleText}${companyText}`}>
           <span className="report-row__role">{roleText}</span>
           {report.company && <span className="report-row__company">{companyText}</span>}
@@ -386,33 +387,33 @@ function MockReportRow({
         <div className="report-row__detail">
           <div className="report-row__tags-row">
             <span className="report-row__subbadge">
-              Track: {report.interview_type === 'hr' ? 'HR / Behavioral' : 'Technical'}
+              {t('reports.track_label', { track: report.interview_type === 'hr' ? 'HR / Behavioral' : 'Technical' }, `Track: ${report.interview_type === 'hr' ? 'HR / Behavioral' : 'Technical'}`)}
             </span>
             <span className="report-row__subbadge">
-              Level: {report.experience_level.toUpperCase()}
+              {t('reports.level_label', { level: report.experience_level.toUpperCase() }, `Level: ${report.experience_level.toUpperCase()}`)}
             </span>
             {context && <span className="report-row__context-text">{context}</span>}
           </div>
 
           <div className="report-row__section">
-            <p className="report-row__label">Diagnostic Feedback &amp; Assessment</p>
+            <p className="report-row__label">{t('reports.diag_feedback', undefined, 'Diagnostic Feedback & Assessment')}</p>
             <FormattedFeedback content={report.feedback} className="report-row__text" />
           </div>
 
           <div className="report-row__section">
             <p className="report-row__label">
-              Full Conversation Transcript ({report.transcript.length} turns)
+              {t('reports.full_transcript', { count: report.transcript.length }, `Full Conversation Transcript (${report.transcript.length} turns)`)}
             </p>
             <div className="report-row__transcript">
-              {report.transcript.map((t, idx) => (
+              {report.transcript.map((tTurn, idx) => (
                 <div
                   key={idx}
-                  className={`report-row__turn report-row__turn--${t.role}`}
+                  className={`report-row__turn report-row__turn--${tTurn.role}`}
                 >
                   <div className="report-row__turn-sender">
-                    {t.role === 'interviewer' ? 'AI Interviewer' : 'You (Candidate)'}
+                    {tTurn.role === 'interviewer' ? t('reports.ai_interviewer', undefined, 'AI Interviewer') : t('reports.you_candidate', undefined, 'You (Candidate)')}
                   </div>
-                  <div className="report-row__turn-content">{t.content}</div>
+                  <div className="report-row__turn-content">{tTurn.content}</div>
                 </div>
               ))}
             </div>
@@ -425,7 +426,7 @@ function MockReportRow({
                 className="report-row__delete"
                 onClick={() => setConfirming(true)}
               >
-                Delete report
+                {t('reports.delete_report', undefined, 'Delete report')}
               </button>
             ) : (
               <span className="report-row__confirm-group">
@@ -435,7 +436,7 @@ function MockReportRow({
                   onClick={handleConfirmDelete}
                   disabled={isDeleting}
                 >
-                  {isDeleting ? 'Deleting…' : 'Confirm delete'}
+                  {isDeleting ? t('preset.deleting', undefined, 'Deleting…') : t('preset.confirm_delete', undefined, 'Confirm delete')}
                 </button>
                 <button
                   type="button"
@@ -443,7 +444,7 @@ function MockReportRow({
                   onClick={() => setConfirming(false)}
                   disabled={isDeleting}
                 >
-                  Cancel
+                  {t('preset.cancel', undefined, 'Cancel')}
                 </button>
               </span>
             )}
@@ -462,6 +463,7 @@ function ReportRow({
   report: ReportSummary
   onDelete: (id: number) => Promise<void>
 }) {
+  const { t } = useTranslation()
   const [expanded, setExpanded] = useState(false)
   const [confirming, setConfirming] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
@@ -492,9 +494,9 @@ function ReportRow({
       >
         <span className="report-row__score">{report.score}/10</span>
         {isCoding ? (
-          <span className="report-row__badge report-row__badge--coding">Coding</span>
+          <span className="report-row__badge report-row__badge--coding">{t('reports.coding_badge', undefined, 'Coding')}</span>
         ) : (
-          <span className="report-row__badge report-row__badge--single">Single Drill</span>
+          <span className="report-row__badge report-row__badge--single">{t('reports.single_badge', undefined, 'Single Drill')}</span>
         )}
         <span
           className="report-row__primary-info"
@@ -519,20 +521,20 @@ function ReportRow({
         <div className="report-row__detail">
           {context && (
             <div className="report-row__section">
-              <p className="report-row__label">Target Role &amp; Context</p>
+              <p className="report-row__label">{t('reports.target_role_ctx', undefined, 'Target Role & Context')}</p>
               <p className="report-row__text">{context}</p>
             </div>
           )}
 
           <div className="report-row__section">
-            <p className="report-row__label">{isCoding ? 'Challenge & Code Submission' : 'Question & Candidate Response'}</p>
+            <p className="report-row__label">{isCoding ? t('reports.challenge_submission', undefined, 'Challenge & Code Submission') : t('reports.question_response', undefined, 'Question & Candidate Response')}</p>
             <div className="report-row__transcript">
               <div className="report-row__turn report-row__turn--interviewer">
-                <div className="report-row__turn-sender">{isCoding ? 'Coding Problem' : 'Drill Question'}</div>
+                <div className="report-row__turn-sender">{isCoding ? t('reports.coding_problem', undefined, 'Coding Problem') : t('reports.drill_question', undefined, 'Drill Question')}</div>
                 <div className="report-row__turn-content">{report.question}</div>
               </div>
               <div className="report-row__turn report-row__turn--candidate">
-                <div className="report-row__turn-sender">{isCoding ? `Code Submission (${report.location || 'Code'})` : 'Your Response'}</div>
+                <div className="report-row__turn-sender">{isCoding ? t('reports.code_submission', { lang: report.location || 'Code' }, `Code Submission (${report.location || 'Code'})`) : t('reports.your_response', undefined, 'Your Response')}</div>
                 {isCoding ? (
                   <pre className="report-row__code-content"><code>{report.answer}</code></pre>
                 ) : (
@@ -544,7 +546,7 @@ function ReportRow({
 
 
           <div className="report-row__section">
-            <p className="report-row__label">Feedback &amp; Evaluation</p>
+            <p className="report-row__label">{t('reports.feedback_eval', undefined, 'Feedback & Evaluation')}</p>
             <FormattedFeedback content={report.feedback} className="report-row__text" />
           </div>
 
@@ -555,7 +557,7 @@ function ReportRow({
                 className="report-row__delete"
                 onClick={() => setConfirming(true)}
               >
-                Delete report
+                {t('reports.delete_report', undefined, 'Delete report')}
               </button>
             ) : (
               <span className="report-row__confirm-group">
@@ -565,7 +567,7 @@ function ReportRow({
                   onClick={handleConfirmDelete}
                   disabled={isDeleting}
                 >
-                  {isDeleting ? 'Deleting…' : 'Confirm delete'}
+                  {isDeleting ? t('preset.deleting', undefined, 'Deleting…') : t('preset.confirm_delete', undefined, 'Confirm delete')}
                 </button>
                 <button
                   type="button"
@@ -573,7 +575,7 @@ function ReportRow({
                   onClick={() => setConfirming(false)}
                   disabled={isDeleting}
                 >
-                  Cancel
+                  {t('preset.cancel', undefined, 'Cancel')}
                 </button>
               </span>
             )}

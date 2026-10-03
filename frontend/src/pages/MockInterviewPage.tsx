@@ -68,7 +68,7 @@ type MockStage =
 
 export function MockInterviewPage() {
   const navigate = useNavigate()
-  const { t, currentLanguage } = useTranslation()
+  const { t, currentLanguage, formatDifficulty } = useTranslation()
   const [searchParams] = useSearchParams()
   const urlType: InterviewType = searchParams.get('type') === 'hr' ? 'hr' : 'technical'
   const [overrideType, setOverrideType] = useState<InterviewType | null>(null)
@@ -406,7 +406,11 @@ export function MockInterviewPage() {
 
       <div className="mock-card">
         <p className="mock-card__eyebrow">
-          Full Mock Interview · {interviewType === 'hr' ? 'HR & Behavioral' : 'Technical'}
+          {t(
+            'mock.full_mock_eyebrow',
+            { type: interviewType === 'hr' ? t('mock.focus_hr', undefined, 'HR & Behavioral') : t('mock.focus_technical', undefined, 'Technical') },
+            `Full Mock Interview · ${interviewType === 'hr' ? 'HR & Behavioral' : 'Technical'}`,
+          )}
         </p>
 
         {stage.name === 'setup' && (
@@ -414,7 +418,7 @@ export function MockInterviewPage() {
             <ActivePresetBanner state={activePreset} />
 
             <div className="mock-form__group">
-              <label className="mock-form__label">Interview Focus</label>
+              <label className="mock-form__label">{t('mock.focus_label', undefined, 'Interview Focus')}</label>
               <div className="mock-form__segmented">
                 <button
                   type="button"
@@ -423,7 +427,7 @@ export function MockInterviewPage() {
                   }`}
                   onClick={() => setOverrideType('technical')}
                 >
-                  Technical
+                  {t('mock.focus_technical', undefined, 'Technical')}
                 </button>
                 <button
                   type="button"
@@ -432,13 +436,13 @@ export function MockInterviewPage() {
                   }`}
                   onClick={() => setOverrideType('hr')}
                 >
-                  HR & Behavioral
+                  {t('mock.focus_hr', undefined, 'HR & Behavioral')}
                 </button>
               </div>
             </div>
 
             <div className="mock-form__group">
-              <label className="mock-form__label">Experience Level</label>
+              <label className="mock-form__label">{t('mock.exp_label', undefined, 'Experience Level')}</label>
               <div className="mock-form__segmented">
                 {(['junior', 'mid', 'senior'] as ExperienceLevel[]).map((level) => (
                   <button
@@ -449,7 +453,7 @@ export function MockInterviewPage() {
                     }`}
                     onClick={() => setExperienceLevel(level)}
                   >
-                    {level.charAt(0).toUpperCase() + level.slice(1)}
+                    {formatDifficulty(level)}
                   </button>
                 ))}
               </div>
@@ -461,7 +465,7 @@ export function MockInterviewPage() {
                 onClick={handleStart}
                 disabled={activePreset.status !== 'loaded'}
               >
-                Start Mock Interview
+                {t('mock.start_btn', undefined, 'Start Mock Interview')}
               </button>
             </div>
           </div>
@@ -473,8 +477,8 @@ export function MockInterviewPage() {
               <div className="mock-chat__header-left">
                 <span className="mock-chat__badge">
                   {stage.name === 'in_progress'
-                    ? `${stage.interviewType.toUpperCase()} • ${stage.experienceLevel.toUpperCase()}`
-                    : 'CONCLUDED'}
+                    ? `${stage.interviewType === 'hr' ? t('mock.focus_hr', undefined, 'HR & Behavioral').toUpperCase() : t('mock.focus_technical', undefined, 'Technical').toUpperCase()} • ${formatDifficulty(stage.experienceLevel).toUpperCase()}`
+                    : t('mock.concluded', undefined, 'CONCLUDED')}
                 </span>
                 {isTtsSupported && (
                   <button
@@ -483,8 +487,8 @@ export function MockInterviewPage() {
                       isMuted ? 'mock-voice__toggle-btn--muted' : ''
                     }`}
                     onClick={toggleMute}
-                    title={isMuted ? 'Unmute AI Voice' : 'Mute AI Voice'}
-                    aria-label={isMuted ? 'Unmute AI Voice' : 'Mute AI Voice'}
+                    title={isMuted ? t('mock.unmute', undefined, 'Unmute AI Voice') : t('mock.mute', undefined, 'Mute AI Voice')}
+                    aria-label={isMuted ? t('mock.unmute', undefined, 'Unmute AI Voice') : t('mock.mute', undefined, 'Mute AI Voice')}
                   >
                     {isMuted ? <SpeakerOffIcon width={15} height={15} /> : <SpeakerIcon width={15} height={15} />}
                   </button>
@@ -497,7 +501,7 @@ export function MockInterviewPage() {
                   onClick={handleEndInterviewEarly}
                   disabled={stage.submitting}
                 >
-                  End interview early
+                  {t('mock.end_early_btn', undefined, 'End interview early')}
                 </button>
               )}
             </div>
@@ -510,15 +514,15 @@ export function MockInterviewPage() {
                 >
                   <div className="mock-chat__sender-line">
                     <div className="mock-chat__sender">
-                      {msg.role === 'interviewer' ? 'AI Interviewer' : 'You'}
+                      {msg.role === 'interviewer' ? t('reports.ai_interviewer', undefined, 'AI Interviewer') : t('reports.you_candidate', undefined, 'You')}
                     </div>
                     {msg.role === 'interviewer' && isTtsSupported && (
                       <button
                         type="button"
                         className="mock-voice__replay-btn"
                         onClick={() => speak(msg.content)}
-                        title="Replay audio"
-                        aria-label="Replay audio"
+                        title={t('mock.replay_audio', undefined, 'Replay audio')}
+                        aria-label={t('mock.replay_audio', undefined, 'Replay audio')}
                       >
                         <SpeakerIcon width={13} height={13} />
                       </button>
@@ -530,7 +534,7 @@ export function MockInterviewPage() {
 
               {stage.name === 'in_progress' && stage.submitting && (
                 <div className="mock-chat__bubble mock-chat__bubble--interviewer">
-                  <div className="mock-chat__sender">AI Interviewer</div>
+                  <div className="mock-chat__sender">{t('reports.ai_interviewer', undefined, 'AI Interviewer')}</div>
                   <div className="mock-chat__typing">
                     <span>•</span>
                     <span>•</span>
@@ -546,7 +550,7 @@ export function MockInterviewPage() {
               <div className="mock-chat__input-area">
                 <div className="mock-chat__textarea-wrapper">
                   <label htmlFor="mock-answer" className="sr-only">
-                    Your answer
+                    {t('practice.your_answer', undefined, 'Your response')}
                   </label>
                   <textarea
                     id="mock-answer"
@@ -557,8 +561,8 @@ export function MockInterviewPage() {
                     }
                     placeholder={
                       isListening
-                        ? 'Listening… Speak your response'
-                        : 'Type your response to the interviewer...'
+                        ? t('mock.listening_placeholder', undefined, 'Listening… Speak your response')
+                        : t('mock.type_placeholder', undefined, 'Type your response to the interviewer...')
                     }
                     rows={4}
                     maxLength={MAX_ANSWER_LENGTH}
@@ -568,7 +572,7 @@ export function MockInterviewPage() {
                   {isListening && (
                     <div className="mock-voice__listening-badge">
                       <span className="mock-voice__pulse-dot" aria-hidden="true" />
-                      <span>Recording…</span>
+                      <span>{t('common.recording', undefined, 'Recording…')}</span>
                     </div>
                   )}
 
@@ -576,14 +580,14 @@ export function MockInterviewPage() {
                     <div className="mock-voice__speaking-badge">
                       <div className="mock-voice__speaking-indicator">
                         <SpeakerIcon width={13} height={13} />
-                        <span>Speaking…</span>
+                        <span>{t('mock.speaking_badge', undefined, 'Speaking…')}</span>
                       </div>
                       <button
                         type="button"
                         className="mock-voice__stop-speech-btn"
                         onClick={cancelSpeech}
-                        title="Stop audio"
-                        aria-label="Stop audio"
+                        title={t('mock.stop_audio', undefined, 'Stop audio')}
+                        aria-label={t('mock.stop_audio', undefined, 'Stop audio')}
                       >
                         <StopIcon width={12} height={12} />
                       </button>
@@ -606,8 +610,8 @@ export function MockInterviewPage() {
                         toggleListening()
                       }}
                       disabled={stage.submitting}
-                      title={isListening ? 'Stop recording' : 'Dictate response'}
-                      aria-label={isListening ? 'Stop recording' : 'Dictate response'}
+                      title={isListening ? t('mock.stop_dictation', undefined, 'Stop recording') : t('mock.dictate_response', undefined, 'Dictate response')}
+                      aria-label={isListening ? t('mock.stop_dictation', undefined, 'Stop recording') : t('mock.dictate_response', undefined, 'Dictate response')}
                     >
                       <MicIcon width={16} height={16} />
                     </button>
@@ -618,7 +622,7 @@ export function MockInterviewPage() {
                     onClick={handleSubmitAnswer}
                     disabled={stage.submitting || stage.currentAnswer.trim().length === 0}
                   >
-                    {stage.submitting ? 'Sending…' : 'Send response'}
+                    {stage.submitting ? t('mock.sending', undefined, 'Sending…') : t('mock.send_btn', undefined, 'Send response')}
                   </button>
                 </div>
               </div>
@@ -627,9 +631,9 @@ export function MockInterviewPage() {
             {stage.name === 'concluded' && (
               <div className="mock-concluded__panel">
                 <div className="mock-concluded__header">
-                  <h2 className="mock-concluded__title">Interview Complete</h2>
+                  <h2 className="mock-concluded__title">{t('mock.complete_title', undefined, 'Interview Complete')}</h2>
                   <p className="mock-concluded__desc">
-                    Ready to evaluate your full conversation across all questions with the diagnostic assessment engine.
+                    {t('mock.complete_desc', undefined, 'Ready to evaluate your full conversation across all questions with the diagnostic assessment engine.')}
                   </p>
                 </div>
 
@@ -641,14 +645,14 @@ export function MockInterviewPage() {
                     onClick={handleGradeInterview}
                     disabled={stage.grading}
                   >
-                    {stage.grading ? 'Generating diagnostic assessment…' : 'Grade interview transcript'}
+                    {stage.grading ? t('mock.generating_diag', undefined, 'Generating diagnostic assessment…') : t('mock.grade_btn', undefined, 'Grade interview transcript')}
                   </button>
                   <button
                     className="mock-card__button mock-card__button--ghost"
                     onClick={() => setStage({ name: 'setup' })}
                     disabled={stage.grading}
                   >
-                    Start over
+                    {t('practice.start_over', undefined, 'Start over')}
                   </button>
                 </div>
               </div>
@@ -662,12 +666,12 @@ export function MockInterviewPage() {
 
             {stage.dimensions && <DimensionsBreakdown dimensions={stage.dimensions} />}
 
-            <h2 className="mock-graded__title">Holistic Feedback</h2>
+            <h2 className="mock-graded__title">{t('mock.holistic_title', undefined, 'Holistic Feedback')}</h2>
             <FormattedFeedback content={stage.feedback} className="mock-graded__feedback" />
 
             <details className="mock-graded__transcript-details">
               <summary className="mock-graded__transcript-summary">
-                View full transcript ({stage.transcript.length} messages)
+                {t('mock.view_transcript_btn', { count: stage.transcript.length }, `View full transcript (${stage.transcript.length} messages)`)}
               </summary>
               <div className="mock-chat__transcript mock-chat__transcript--compact">
                 {stage.transcript.map((msg, idx) => (
@@ -676,7 +680,7 @@ export function MockInterviewPage() {
                     className={`mock-chat__bubble mock-chat__bubble--${msg.role}`}
                   >
                     <div className="mock-chat__sender">
-                      {msg.role === 'interviewer' ? 'AI Interviewer' : 'You'}
+                      {msg.role === 'interviewer' ? t('reports.ai_interviewer', undefined, 'AI Interviewer') : t('reports.you_candidate', undefined, 'You')}
                     </div>
                     <div className="mock-chat__message">{msg.content}</div>
                   </div>
@@ -692,16 +696,16 @@ export function MockInterviewPage() {
                 disabled={stage.saving || stage.saved}
               >
                 {stage.saved
-                  ? '✓ Saved to reports'
+                  ? t('mock.saved_btn', undefined, '✓ Saved to reports')
                   : stage.saving
-                    ? 'Saving report…'
-                    : 'Save this interview report'}
+                    ? t('mock.saving_btn', undefined, 'Saving report…')
+                    : t('mock.save_report_btn', undefined, 'Save this interview report')}
               </button>
               <button
                 className="mock-card__button mock-card__button--ghost"
                 onClick={() => guardedExit(() => setStage({ name: 'setup' }))}
               >
-                Start another interview
+                {t('mock.start_another', undefined, 'Start another interview')}
               </button>
             </div>
 
@@ -713,7 +717,7 @@ export function MockInterviewPage() {
           <div className="mock-card__panel">
             <p className="mock-card__error">{stage.message}</p>
             <button className="mock-card__button" onClick={() => setStage({ name: 'setup' })}>
-              Try again
+              {t('practice.try_again', undefined, 'Try again')}
             </button>
           </div>
         )}

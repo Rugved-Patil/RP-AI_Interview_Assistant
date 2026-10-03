@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import type { RecommendedDrill, WeakSpotItem } from '../../api/practiceApi'
 import { FormattedFeedback } from '../FormattedFeedback'
+import { useTranslation } from '../../i18n/LanguageContext'
 
 interface WeakSpotsCardProps {
   weakSpots: WeakSpotItem[]
@@ -16,6 +17,7 @@ export function WeakSpotsCard({
   trainingUnlocked = true,
   sessionsUntilUnlock = 0,
 }: WeakSpotsCardProps) {
+  const { t, formatDomain, formatDifficulty } = useTranslation()
   const [expandedModelAnswers, setExpandedModelAnswers] = useState<Record<string, boolean>>({})
 
   const toggleModelAnswer = (id: string) => {
@@ -53,9 +55,9 @@ export function WeakSpotsCard({
       {/* 1. Weak Spots Gap Analysis */}
       <div className="weak-spots-header">
         <div>
-          <h3 className="weak-spots-title">Targeted Weak-Spot Discovery</h3>
+          <h3 className="weak-spots-title">{t('analytics.weak_spots_title', undefined, 'Targeted Weak-Spot Discovery')}</h3>
           <p className="weak-spots-subtitle">
-            Competency gaps and topics with recurring critical feedback across your attempts
+            {t('analytics.weak_spots_subtitle', undefined, 'Competency gaps and topics with recurring critical feedback across your attempts')}
           </p>
         </div>
       </div>
@@ -66,12 +68,12 @@ export function WeakSpotsCard({
             <div key={ws.domain} className="weak-spot-card">
               <div className="weak-spot-card__header">
                 <div>
-                  <span className="weak-spot-card__domain">{ws.domain}</span>
+                  <span className="weak-spot-card__domain">{formatDomain(ws.domain)}</span>
                   <h4 className="weak-spot-card__topic">{ws.topic}</h4>
                 </div>
                 <div className="weak-spot-card__score-badge">
                   <span className="ws-score-val">{ws.average_score.toFixed(1)}</span>
-                  <span className="ws-score-label">avg score</span>
+                  <span className="ws-score-label">{t('common.avg', undefined, 'avg')}</span>
                 </div>
               </div>
 
@@ -90,9 +92,9 @@ export function WeakSpotsCard({
         <div className="weak-spots-well-done">
           <span className="well-done-icon">★</span>
           <div>
-            <h4>Strong Performance Consistency</h4>
+            <h4>{t('analytics.strong_perf_title', undefined, 'Strong Performance Consistency')}</h4>
             <p>
-              No severe competency gaps detected across your recorded practice sessions. Keep drilling to maintain mastery!
+              {t('analytics.strong_perf_desc', undefined, 'No severe competency gaps detected across your recorded practice sessions. Keep drilling to maintain mastery!')}
             </p>
           </div>
         </div>
@@ -103,17 +105,17 @@ export function WeakSpotsCard({
         <div className="recommended-header">
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', flexWrap: 'wrap' }}>
-              <h4 className="recommended-title">Recommended Targeted Practice &amp; Model Answers</h4>
+              <h4 className="recommended-title">{t('analytics.rec_title', undefined, 'Recommended Targeted Practice & Model Answers')}</h4>
               {trainingUnlocked && (
-                <span className="training-active-tag">Personalized Training Active</span>
+                <span className="training-active-tag">{t('home.rec_badge_pill', undefined, 'Personalized Training Active')}</span>
               )}
             </div>
             <p className="recommended-subtitle">
-              Curated questions from the Question Bank with calibrated 8/10 benchmark answers to reinforce your focus areas
+              {t('analytics.rec_subtitle', undefined, 'Curated questions from the Question Bank with calibrated 8/10 benchmark answers to reinforce your focus areas')}
             </p>
           </div>
           <Link to="/questions" className="view-bank-link">
-            Explore All Questions →
+            {t('home.rec_view_all_bank', undefined, 'Explore All Questions →')}
           </Link>
         </div>
 
@@ -122,10 +124,10 @@ export function WeakSpotsCard({
             <div className="training-locked-icon">🎯</div>
             <div>
               <h5 className="training-locked-title">
-                Personalized Training Unlocks in {sessionsUntilUnlock} More Session{sessionsUntilUnlock === 1 ? '' : 's'}
+                {t('analytics.training_unlock_title', { count: sessionsUntilUnlock }, `Personalized Training Unlocks in ${sessionsUntilUnlock} More Session${sessionsUntilUnlock === 1 ? '' : 's'}`)}
               </h5>
               <p className="training-locked-desc">
-                Complete and save {sessionsUntilUnlock} more practice session to calibrate your targeted training recommendations and unlock deep weak-spot diagnostics. Below are general recommended questions.
+                {t('analytics.training_unlock_desc', { count: sessionsUntilUnlock }, `Complete and save ${sessionsUntilUnlock} more practice session to calibrate your targeted training recommendations and unlock deep weak-spot diagnostics. Below are general recommended questions.`)}
               </p>
             </div>
           </div>
@@ -140,9 +142,9 @@ export function WeakSpotsCard({
               <div key={drill.question_id} className="drill-recommendation-card">
                 <div className="drill-rec-header">
                   <div className="drill-rec-badges">
-                    <span className="drill-domain-badge">{drill.domain}</span>
+                    <span className="drill-domain-badge">{formatDomain(drill.domain)}</span>
                     <span className={`drill-diff-badge ${getDifficultyBadgeClass(drill.difficulty)}`}>
-                      {drill.difficulty}
+                      {formatDifficulty(drill.difficulty)}
                     </span>
                     {drill.recommended_test_label && (
                       <span className="drill-directive-badge">
@@ -175,10 +177,10 @@ export function WeakSpotsCard({
                     >
                       <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}>
                         <span>★</span>
-                        <span>8/10 Benchmark Model Answer</span>
+                        <span>{t('home.rec_model_btn', undefined, '8/10 Benchmark Model Answer')}</span>
                       </span>
                       <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}>
-                        <span>{isExpanded ? 'Hide Answer' : 'View Exemplar Answer'}</span>
+                        <span>{isExpanded ? t('common.hide', undefined, 'Hide Answer') : t('common.view', undefined, 'View Exemplar Answer')}</span>
                         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                           <polyline points={isExpanded ? '18 15 12 9 6 15' : '6 9 12 15 18 9'} />
                         </svg>
@@ -192,7 +194,7 @@ export function WeakSpotsCard({
                         </div>
                         {drill.scoring_breakdown && (
                           <div className="drill-scoring-breakdown">
-                            <div className="drill-scoring-title">Why this response achieves an 8/10 score:</div>
+                            <div className="drill-scoring-title">{t('home.rec_why_8_10', undefined, 'Why this response achieves an 8/10 score:')}</div>
                             <FormattedFeedback content={drill.scoring_breakdown} />
                           </div>
                         )}
@@ -211,13 +213,13 @@ export function WeakSpotsCard({
                     }}
                     className="drill-action-btn drill-action-btn--primary"
                   >
-                    ▶ Start Practice →
+                    {t('home.rec_start_btn', undefined, '▶ Start Practice →')}
                   </Link>
                   <Link
                     to={`/questions?search=${encodeURIComponent(drill.question.slice(0, 45))}`}
                     className="drill-action-btn drill-action-btn--secondary"
                   >
-                    View in Bank
+                    {t('home.rec_bank_btn', undefined, 'View in Bank')}
                   </Link>
                 </div>
               </div>

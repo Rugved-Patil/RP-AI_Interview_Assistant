@@ -13,7 +13,7 @@ import './QuestionBankPage.css'
 
 export function QuestionBankPage() {
   const navigate = useNavigate()
-  const { t } = useTranslation()
+  const { t, formatDomain, formatDifficulty, formatCategory } = useTranslation()
   const [stats, setStats] = useState<QuestionBankStats | null>(null)
   const [questions, setQuestions] = useState<QuestionDoc[]>([])
   const [retrievedResults, setRetrievedResults] = useState<RetrievedQuestion[] | null>(null)
@@ -248,7 +248,7 @@ export function QuestionBankPage() {
                   )
                 }
               >
-                {d.domain} ({d.count})
+                {formatDomain(d.domain)} ({d.count})
               </button>
             ))}
           </div>
@@ -267,12 +267,12 @@ export function QuestionBankPage() {
       {error && <div className="qb-empty">{error}</div>}
 
       {/* Loading state */}
-      {loading && <div className="qb-empty">Loading question bank…</div>}
+      {loading && <div className="qb-empty">{t('reports.loading', undefined, 'Loading question bank…')}</div>}
 
       {/* Question List */}
       {!loading && !error && (
         <section className="qb-list">
-          {searching && <div className="qb-empty">Searching questions…</div>}
+          {searching && <div className="qb-empty">{t('settings.verifying_btn', undefined, 'Searching questions…')}</div>}
 
           {/* Search Results */}
           {effectiveRetrievedResults !== null && !searching && (
@@ -284,9 +284,9 @@ export function QuestionBankPage() {
                   <article key={q.id} className="qb-card">
                     <div className="qb-card-top">
                       <div className="qb-card-meta">
-                        <span className="qb-domain-badge">{q.domain}</span>
-                        <span className={`qb-cat-pill ${q.category}`}>{q.category}</span>
-                        <span className="qb-diff-badge">{q.difficulty}</span>
+                        <span className="qb-domain-badge">{formatDomain(q.domain)}</span>
+                        <span className={`qb-cat-pill ${q.category}`}>{formatCategory(q.category)}</span>
+                        <span className="qb-diff-badge">{formatDifficulty(q.difficulty)}</span>
                       </div>
                       <span className="qb-score-badge">
                         {t('qb.match_score', { score: String(Math.round(q.score * 100)) }, `Match: ${Math.round(q.score * 100)}%`)}
@@ -377,9 +377,9 @@ export function QuestionBankPage() {
                   <article key={q.id} className="qb-card">
                     <div className="qb-card-top">
                       <div className="qb-card-meta">
-                        <span className="qb-domain-badge">{q.domain}</span>
-                        <span className={`qb-cat-pill ${q.category}`}>{q.category}</span>
-                        <span className="qb-diff-badge">{q.difficulty}</span>
+                        <span className="qb-domain-badge">{formatDomain(q.domain)}</span>
+                        <span className={`qb-cat-pill ${q.category}`}>{formatCategory(q.category)}</span>
+                        <span className="qb-diff-badge">{formatDifficulty(q.difficulty)}</span>
                       </div>
                     </div>
 

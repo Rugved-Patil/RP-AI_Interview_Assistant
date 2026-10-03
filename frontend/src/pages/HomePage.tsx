@@ -14,7 +14,7 @@ import { useTranslation } from '../i18n/LanguageContext'
 import './HomePage.css'
 
 export function HomePage() {
-  const { t } = useTranslation()
+  const { t, formatDomain, formatDifficulty } = useTranslation()
   const [presetsLoading, setPresetsLoading] = useState(true)
   const [presetsCount, setPresetsCount] = useState<number | null>(null)
   const [analytics, setAnalytics] = useState<AnalyticsDashboardResponse | null>(null)
@@ -305,9 +305,9 @@ export function HomePage() {
           <section className="home__section home__recommended-section" aria-labelledby="recommended-practice-title">
             <div className="home__section-header">
               <div className="home__recommended-badge-row">
-                <span className="home__recommended-pill">Targeted Recommendations</span>
+                <span className="home__recommended-pill">{t('home.rec_badge_pill', undefined, 'Targeted Recommendations')}</span>
                 <span className="home__recommended-threshold-tag">
-                  Personalized · {analytics.summary.total_sessions} Evaluated Sessions Analyzed
+                  {t('home.rec_analyzed_tag', { count: analytics.summary.total_sessions }, `Personalized · ${analytics.summary.total_sessions} Evaluated Sessions Analyzed`)}
                 </span>
               </div>
               <h2 id="recommended-practice-title" className="home__section-title">
@@ -324,7 +324,7 @@ export function HomePage() {
                 <div className="home__weak-spots-pills">
                   {analytics.weak_spots.map((ws) => (
                     <span key={ws.domain} className="home__weak-spot-pill">
-                      <strong>{ws.domain}</strong> (avg {ws.average_score.toFixed(1)}/10)
+                      <strong>{formatDomain(ws.domain)}</strong> ({t('common.avg', undefined, 'avg')} {ws.average_score.toFixed(1)}/10)
                     </span>
                   ))}
                 </div>
@@ -340,9 +340,9 @@ export function HomePage() {
                   <div key={drill.question_id} className="home__recommended-card">
                     <div className="home__rec-card-top">
                       <div className="home__rec-badges">
-                        <span className="home__rec-domain">{drill.domain}</span>
+                        <span className="home__rec-domain">{formatDomain(drill.domain)}</span>
                         <span className={`home__rec-diff home__rec-diff--${drill.difficulty.toLowerCase()}`}>
-                          {drill.difficulty}
+                          {formatDifficulty(drill.difficulty)}
                         </span>
                         {drill.recommended_test_label && (
                           <span className="home__rec-directive">
@@ -378,7 +378,7 @@ export function HomePage() {
                             <span>{t('home.rec_model_btn', undefined, '8/10 Benchmark Model Answer')}</span>
                           </span>
                           <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem' }}>
-                            <span>{isExpanded ? 'Hide' : 'View'}</span>
+                            <span>{isExpanded ? t('common.hide', undefined, 'Hide') : t('common.view', undefined, 'View')}</span>
                             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                               <polyline points={isExpanded ? '18 15 12 9 6 15' : '6 9 12 15 18 9'} />
                             </svg>

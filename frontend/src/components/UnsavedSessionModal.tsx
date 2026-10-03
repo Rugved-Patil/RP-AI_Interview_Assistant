@@ -1,4 +1,5 @@
 import { WarningIcon } from './Icons'
+import { useTranslation } from '../i18n/LanguageContext'
 import './UnsavedSessionModal.css'
 
 interface UnsavedSessionModalProps {
@@ -18,6 +19,7 @@ export function UnsavedSessionModal({
   onDiscardAndProceed,
   onCancel,
 }: UnsavedSessionModalProps) {
+  const { t } = useTranslation()
   if (!isOpen) return null
 
   return (
@@ -27,16 +29,23 @@ export function UnsavedSessionModal({
           <span className="unsaved-modal__icon" aria-hidden="true">
             <WarningIcon width={22} height={22} />
           </span>
-          <h3 className="unsaved-modal__title">Unsaved {sessionTitle}</h3>
+          <h3 className="unsaved-modal__title">
+            {t('modal.unsaved_title', { sessionTitle }, `Unsaved ${sessionTitle}`)}
+          </h3>
         </div>
 
         <div className="unsaved-modal__body">
           <p className="unsaved-modal__lead">
-            You have completed and evaluated this session, but it has not been saved yet.
+            {t('modal.unsaved_lead', undefined, 'You have completed and evaluated this session, but it has not been saved yet.')}
           </p>
           <div className="unsaved-modal__warning-box">
             <p>
-              <strong>Impact on Analytics:</strong> If you exit without saving, this session&apos;s score, feedback, and transcript will be permanently lost and <strong>will not count toward your Progress &amp; Analytics</strong> trajectory or weak-spot discovery.
+              <strong>{t('modal.impact_label', undefined, 'Impact on Analytics:')}</strong>{' '}
+              {t(
+                'modal.impact_desc',
+                undefined,
+                "If you exit without saving, this session's score, feedback, and transcript will be permanently lost and will not count toward your Progress & Analytics trajectory or weak-spot discovery.",
+              )}
             </p>
           </div>
         </div>
@@ -48,7 +57,7 @@ export function UnsavedSessionModal({
             onClick={onSaveAndProceed}
             disabled={isSaving}
           >
-            {isSaving ? 'Saving & Continuing…' : '✓ Save Report & Continue'}
+            {isSaving ? t('modal.saving_continue', undefined, 'Saving & Continuing…') : t('modal.save_continue', undefined, '✓ Save Report & Continue')}
           </button>
           <button
             type="button"
@@ -56,7 +65,7 @@ export function UnsavedSessionModal({
             onClick={onDiscardAndProceed}
             disabled={isSaving}
           >
-            Discard Without Saving
+            {t('modal.discard', undefined, 'Discard Without Saving')}
           </button>
           <button
             type="button"
@@ -64,7 +73,7 @@ export function UnsavedSessionModal({
             onClick={onCancel}
             disabled={isSaving}
           >
-            Cancel (Stay Here)
+            {t('modal.cancel_stay', undefined, 'Cancel (Stay Here)')}
           </button>
         </div>
       </div>

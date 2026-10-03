@@ -7,6 +7,7 @@ import {
 } from '../api/practiceApi'
 import type { PresetIn, PresetSummary } from '../api/practiceApi'
 import { getActivePresetId, setActivePresetId } from '../activePreset'
+import { useTranslation } from '../i18n/LanguageContext'
 import './InterviewPresets.css'
 
 type PresetsState =
@@ -15,6 +16,7 @@ type PresetsState =
   | { name: 'error'; message: string }
 
 export function InterviewPresets() {
+  const { t } = useTranslation()
   const [state, setState] = useState<PresetsState>({ name: 'loading' })
   // Mirrors localStorage in component state so selecting a preset re-renders
   // immediately - activePreset.ts itself has no way to notify React of a
@@ -67,18 +69,21 @@ export function InterviewPresets() {
 
   return (
     <section className="interview-presets">
-      <p className="interview-presets__eyebrow">Interview presets</p>
+      <p className="interview-presets__eyebrow">{t('preset.eyebrow', undefined, 'Interview presets')}</p>
       <p className="interview-presets__lede">
-        Save the role, company, and location you're practicing for. Whichever preset is marked{' '}
-        <strong>Active</strong> is used to build your practice questions, until you change it here.
+        {t(
+          'preset.presets_lede',
+          undefined,
+          "Save the role, company, and location you're practicing for. Whichever preset is marked Active is used to build your practice questions, until you change it here.",
+        )}
       </p>
 
       <NewPresetForm onCreated={handleCreated} />
 
-      {state.name === 'loading' && <p className="interview-presets__meta">Loading…</p>}
+      {state.name === 'loading' && <p className="interview-presets__meta">{t('preset.loading', undefined, 'Loading…')}</p>}
       {state.name === 'error' && <p className="interview-presets__meta">{state.message}</p>}
       {state.name === 'loaded' && state.presets.length === 0 && (
-        <p className="interview-presets__meta">No presets saved yet — add one above.</p>
+        <p className="interview-presets__meta">{t('preset.no_presets_saved', undefined, 'No presets saved yet — add one above.')}</p>
       )}
 
       {state.name === 'loaded' && state.presets.length > 0 && (
@@ -100,6 +105,7 @@ export function InterviewPresets() {
 }
 
 function NewPresetForm({ onCreated }: { onCreated: (preset: PresetSummary) => void }) {
+  const { t } = useTranslation()
   const [role, setRole] = useState('')
   const [company, setCompany] = useState('')
   const [location, setLocation] = useState('')
@@ -132,32 +138,32 @@ function NewPresetForm({ onCreated }: { onCreated: (preset: PresetSummary) => vo
 
   return (
     <div className="preset-form">
-      <p className="preset-form__label">New preset</p>
+      <p className="preset-form__label">{t('preset.new_preset', undefined, 'New preset')}</p>
       <div className="preset-form__fields">
         <input
           className="preset-form__input"
           type="text"
           value={role}
           onChange={(event) => setRole(event.target.value)}
-          placeholder="Role"
+          placeholder={t('preset.role_label', undefined, 'Role')}
         />
         <input
           className="preset-form__input"
           type="text"
           value={company}
           onChange={(event) => setCompany(event.target.value)}
-          placeholder="Company (optional)"
+          placeholder={`${t('preset.company_label', undefined, 'Company')} ${t('preset.optional', undefined, '(optional)')}`}
         />
         <input
           className="preset-form__input"
           type="text"
           value={location}
           onChange={(event) => setLocation(event.target.value)}
-          placeholder="Location (optional)"
+          placeholder={`${t('preset.location_label', undefined, 'Location')} ${t('preset.optional', undefined, '(optional)')}`}
         />
       </div>
       <button className="preset-form__button" onClick={handleSubmit} disabled={!canSubmit}>
-        {submitting ? 'Saving…' : 'Save preset'}
+        {submitting ? t('preset.saving', undefined, 'Saving…') : t('preset.save_preset', undefined, 'Save preset')}
       </button>
       {error && <p className="preset-row__error">{error}</p>}
     </div>
@@ -177,6 +183,7 @@ function PresetRow({
   onUpdated: (preset: PresetSummary) => void
   onDeleted: (id: number) => void
 }) {
+  const { t } = useTranslation()
   const [editing, setEditing] = useState(false)
   const [role, setRole] = useState(preset.role)
   const [company, setCompany] = useState(preset.company ?? '')
@@ -238,29 +245,29 @@ function PresetRow({
             type="text"
             value={role}
             onChange={(event) => setRole(event.target.value)}
-            placeholder="Role"
+            placeholder={t('preset.role_label', undefined, 'Role')}
           />
           <input
             className="preset-form__input"
             type="text"
             value={company}
             onChange={(event) => setCompany(event.target.value)}
-            placeholder="Company (optional)"
+            placeholder={`${t('preset.company_label', undefined, 'Company')} ${t('preset.optional', undefined, '(optional)')}`}
           />
           <input
             className="preset-form__input"
             type="text"
             value={location}
             onChange={(event) => setLocation(event.target.value)}
-            placeholder="Location (optional)"
+            placeholder={`${t('preset.location_label', undefined, 'Location')} ${t('preset.optional', undefined, '(optional)')}`}
           />
         </div>
         <div className="preset-row__actions">
           <button className="preset-row__save" onClick={handleSave} disabled={!canSave}>
-            {saving ? 'Saving…' : 'Save changes'}
+            {saving ? t('preset.saving', undefined, 'Saving…') : t('preset.save_changes', undefined, 'Save changes')}
           </button>
           <button className="preset-row__cancel" onClick={handleCancelEdit} disabled={saving}>
-            Cancel
+            {t('preset.cancel', undefined, 'Cancel')}
           </button>
         </div>
         {rowError && <p className="preset-row__error">{rowError}</p>}
@@ -277,21 +284,21 @@ function PresetRow({
             <span className="preset-row__meta">{[preset.company, preset.location].filter(Boolean).join(' · ')}</span>
           )}
         </div>
-        {isActive && <span className="preset-row__badge">Active</span>}
+        {isActive && <span className="preset-row__badge">{t('preset.active_badge', undefined, 'Active')}</span>}
       </div>
 
       <div className="preset-row__actions">
         {!isActive && (
           <button className="preset-row__select" onClick={() => onSelect(preset.id)}>
-            Use this
+            {t('preset.use_this', undefined, 'Use this')}
           </button>
         )}
         <button className="preset-row__edit" onClick={() => setEditing(true)}>
-          Edit
+          {t('preset.edit', undefined, 'Edit')}
         </button>
         {!confirmingDelete ? (
           <button className="preset-row__delete" onClick={() => setConfirmingDelete(true)}>
-            Delete
+            {t('preset.delete', undefined, 'Delete')}
           </button>
         ) : (
           <span className="preset-row__confirm-group">
@@ -300,10 +307,10 @@ function PresetRow({
               onClick={handleConfirmDelete}
               disabled={isDeleting}
             >
-              {isDeleting ? 'Deleting…' : 'Confirm delete'}
+              {isDeleting ? t('preset.deleting', undefined, 'Deleting…') : t('preset.confirm_delete', undefined, 'Confirm delete')}
             </button>
             <button className="preset-row__cancel" onClick={() => setConfirmingDelete(false)} disabled={isDeleting}>
-              Cancel
+              {t('preset.cancel', undefined, 'Cancel')}
             </button>
           </span>
         )}

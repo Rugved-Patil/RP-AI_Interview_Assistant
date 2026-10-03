@@ -225,14 +225,14 @@ export function PracticeCard() {
         onCancel={() => setPendingExitAction(null)}
       />
 
-      <p className="practice-card__eyebrow">Technical questions</p>
+      <p className="practice-card__eyebrow">{t('practice.technical_eyebrow', undefined, 'Technical questions')}</p>
 
       {stage.name === 'idle' && (
         <div className="practice-card__panel">
           {directQuestion ? (
             <div className="targeted-drill-banner">
               <div className="targeted-drill-header">
-                <span className="targeted-drill-tag">🎯 Targeted Weak-Spot Drill</span>
+                <span className="targeted-drill-tag">{t('practice.targeted_drill_tag', undefined, '🎯 Targeted Weak-Spot Drill')}</span>
                 {navState.domain && <span className="targeted-drill-domain">{navState.domain}</span>}
               </div>
               <p className="targeted-drill-question">&ldquo;{directQuestion}&rdquo;</p>
@@ -245,7 +245,7 @@ export function PracticeCard() {
             onClick={handleStart}
             disabled={activePreset.status !== 'loaded' && !directQuestion}
           >
-            {directQuestion ? 'Start Targeted Drill' : 'Start a practice question'}
+            {directQuestion ? t('practice.start_targeted_drill', undefined, 'Start Targeted Drill') : t('practice.start_tech_btn', undefined, 'Start a technical question')}
           </button>
         </div>
       )}
@@ -259,8 +259,8 @@ export function PracticeCard() {
                 type="button"
                 className={`practice-card__voice-btn ${tts.isSpeaking ? 'practice-card__voice-btn--active' : ''}`}
                 onClick={() => (tts.isSpeaking ? tts.cancel() : tts.speak(stage.question))}
-                title={tts.isSpeaking ? 'Stop audio' : 'Listen to question'}
-                aria-label={tts.isSpeaking ? 'Stop audio' : 'Listen to question'}
+                title={tts.isSpeaking ? t('mock.stop_audio', undefined, 'Stop audio') : t('mock.listen_question', undefined, 'Listen to question')}
+                aria-label={tts.isSpeaking ? t('mock.stop_audio', undefined, 'Stop audio') : t('mock.listen_question', undefined, 'Listen to question')}
               >
                 {tts.isSpeaking ? <StopIcon width={13} height={13} /> : <SpeakerIcon width={15} height={15} />}
               </button>
@@ -301,7 +301,7 @@ export function PracticeCard() {
                 {stt.isListening && (
                   <span className="practice-card__stt-live">
                     <span className="practice-card__pulse-dot" />
-                    <span>Recording…</span>
+                    <span>{t('common.recording', undefined, 'Recording…')}</span>
                   </span>
                 )}
                 {stt.error && (
@@ -309,7 +309,7 @@ export function PracticeCard() {
                 )}
               </div>
               <div className="practice-card__char-counter">
-                {stage.answer.length} / {MAX_ANSWER_LENGTH} chars
+                {stage.answer.length} / {MAX_ANSWER_LENGTH} {t('common.chars', undefined, 'chars')}
               </div>
             </div>
           </div>
@@ -322,7 +322,7 @@ export function PracticeCard() {
               onClick={handleSubmit}
               disabled={stage.submitting || stage.answer.trim().length === 0}
             >
-              {stage.submitting ? t('practice.evaluating', undefined, 'Evaluating Response…') : stage.error ? 'Retry grading' : t('practice.submit_eval', undefined, 'Submit for Evaluation')}
+              {stage.submitting ? t('practice.evaluating', undefined, 'Evaluating Response…') : stage.error ? t('practice.retry_grading', undefined, 'Retry grading') : t('practice.submit_eval', undefined, 'Submit for Evaluation')}
             </button>
             {stage.error && (
               <button
@@ -330,7 +330,7 @@ export function PracticeCard() {
                 onClick={handleStartOver}
                 disabled={stage.submitting}
               >
-                Start over
+                {t('practice.start_over', undefined, 'Start over')}
               </button>
             )}
           </div>
@@ -349,8 +349,8 @@ export function PracticeCard() {
                   type="button"
                   className={`practice-card__voice-btn ${tts.isSpeaking ? 'practice-card__voice-btn--active' : ''}`}
                   onClick={() => (tts.isSpeaking ? tts.cancel() : tts.speak(stage.feedback))}
-                  title={tts.isSpeaking ? 'Stop feedback audio' : 'Listen to feedback'}
-                  aria-label={tts.isSpeaking ? 'Stop feedback audio' : 'Listen to feedback'}
+                  title={tts.isSpeaking ? t('mock.stop_audio', undefined, 'Stop audio') : t('mock.replay_audio', undefined, 'Listen to feedback')}
+                  aria-label={tts.isSpeaking ? t('mock.stop_audio', undefined, 'Stop audio') : t('mock.replay_audio', undefined, 'Listen to feedback')}
                 >
                   {tts.isSpeaking ? <StopIcon width={13} height={13} /> : <SpeakerIcon width={14} height={14} />}
                 </button>
@@ -384,7 +384,7 @@ export function PracticeCard() {
         <div className="practice-card__panel">
           <p className="practice-card__error">{stage.message}</p>
           <button className="practice-card__button" onClick={handleStart}>
-            Try again
+            {t('practice.try_again', undefined, 'Try again')}
           </button>
         </div>
       )}
@@ -393,8 +393,9 @@ export function PracticeCard() {
 }
 
 function ActivePresetBanner({ state }: { state: ActivePresetState }) {
+  const { t } = useTranslation()
   if (state.status === 'loading') {
-    return <p className="practice-card__preset-banner">Loading your interview preset…</p>
+    return <p className="practice-card__preset-banner">{t('preset.loading', undefined, 'Loading your interview preset…')}</p>
   }
 
   if (state.status === 'error') {
@@ -404,9 +405,9 @@ function ActivePresetBanner({ state }: { state: ActivePresetState }) {
   if (state.status === 'none') {
     return (
       <p className="practice-card__preset-banner">
-        <span>No interview preset selected.</span>
+        <span>{t('preset.no_preset', undefined, 'No interview preset selected.')}</span>
         <Link to="/presets" className="practice-card__preset-change">
-          Choose one →
+          {t('preset.choose_one', undefined, 'Choose one →')}
         </Link>
       </p>
     )
@@ -418,11 +419,11 @@ function ActivePresetBanner({ state }: { state: ActivePresetState }) {
   return (
     <p className="practice-card__preset-banner">
       <span>
-        Practicing as <strong>{role}</strong>
+        {t('preset.practicing_as', { role }, `Practicing as ${role}`)}
         {context ? ` — ${context}` : ''}
       </span>
       <Link to="/presets" className="practice-card__preset-change">
-        Change
+        {t('preset.change_link', undefined, 'Change')}
       </Link>
     </p>
   )
