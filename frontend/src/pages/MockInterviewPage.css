@@ -773,13 +773,72 @@
   line-height: 1.4;
 }
 
-@media (max-width: 540px) {
+@media (max-width: 640px) {
   .mock-card {
-    padding: 1rem;
+    padding: 0.85rem;
     border-radius: 8px;
+    width: 100%;
+  }
+
+  .mock-card__panel {
+    padding: 1rem 0.85rem;
   }
 
   .mock-form__options {
     grid-template-columns: 1fr;
+    gap: 0.65rem;
+  }
+
+  .mock-card__preset-banner {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.35rem;
+  }
+
+  .mock-chat__transcript {
+    max-height: 45vh;
+    padding: 0.4rem 0.15rem;
+  }
+
+  .mock-chat__bubble {
+    max-width: 94%;
+    padding: 0.75rem 0.85rem;
+  }
+
+  .mock-chat__actions {
+    width: 100%;
+    justify-content: stretch;
+    gap: 0.5rem;
+  }
+
+  .mock-voice__mic-btn {
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+    border-radius: 8px;
+  }
+
+  .mock-chat__send-btn {
+    flex: 1;
+    height: 44px;
+    min-height: 44px;
+    font-size: 0.82rem;
+  }
+
+  .mock-card__actions {
+    flex-direction: column;
+    width: 100%;
+    gap: 0.65rem;
+  }
+
+  .mock-card__button {
+    width: 100%;
+    min-height: 44px;
+    justify-content: center;
+    padding: 0.65rem 1rem;
+  }
+
+  .mock-dimensions {
+    padding: 1rem 0.85rem;
   }
 }

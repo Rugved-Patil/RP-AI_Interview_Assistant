@@ -753,3 +753,47 @@
   justify-content: flex-end;
   gap: 0.75rem;
 }
+
+/* ==========================================================================
+   Settings Page Mobile Optimization (Screens <= 768px)
+   ========================================================================== */
+@media (max-width: 768px) {
+  .settings-page {
+    padding: 0 0 2rem 0;
+  }
+
+  .settings-section {
+    padding: 1.25rem 1rem;
+    border-radius: 10px;
+  }
+
+  .theme-options-grid {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  .settings-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.65rem;
+  }
+
+  .settings-btn {
+    width: 100%;
+    min-height: 42px;
+    justify-content: center;
+  }
+
+  .settings-modal {
+    padding: 1.25rem 1rem;
+    max-height: 90vh;
+    overflow-y: auto;
+    width: 92vw;
+  }
+
+  .settings-modal__actions {
+    flex-direction: column;
+    width: 100%;
+    gap: 0.5rem;
+  }
+}

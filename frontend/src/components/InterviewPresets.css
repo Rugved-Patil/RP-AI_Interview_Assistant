@@ -239,10 +239,51 @@
   margin: 0.6rem 0 0;
 }
 
-@media (max-width: 480px) {
+/* ==========================================================================
+   Interview Presets Mobile Optimization (Screens <= 640px)
+   ========================================================================== */
+@media (max-width: 640px) {
+  .interview-presets {
+    width: 100%;
+  }
+
+  .preset-form {
+    padding: 1rem 0.85rem;
+  }
+
+  .preset-form__button {
+    width: 100%;
+    min-height: 44px;
+    justify-content: center;
+  }
+
   .preset-row__summary {
     flex-direction: column;
     align-items: flex-start;
-    gap: 0.4rem;
+    gap: 0.5rem;
+    padding: 0.85rem 1rem;
+  }
+
+  .preset-row__details {
+    padding: 1rem 0.85rem;
+  }
+
+  .preset-row__actions {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.5rem;
+  }
+
+  .preset-row__action,
+  .preset-row__save,
+  .preset-row__delete {
+    width: 100%;
+    min-height: 42px;
+    justify-content: center;
+  }
+
+  .preset-row__confirm-group {
+    flex-direction: column;
+    width: 100%;
   }
 }

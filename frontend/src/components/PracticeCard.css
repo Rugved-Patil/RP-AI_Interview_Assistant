@@ -446,9 +446,44 @@
   color: var(--ink-muted);
 }
 
-@media (max-width: 480px) {
+@media (max-width: 640px) {
   .practice-card {
-    padding: 1rem;
+    padding: 0.85rem;
     border-radius: 8px;
+    width: 100%;
+  }
+
+  .practice-card__panel {
+    padding: 1.15rem 0.9rem;
+  }
+
+  .practice-card__lede {
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+  }
+
+  .practice-card__actions {
+    flex-direction: column;
+    width: 100%;
+    gap: 0.65rem;
+  }
+
+  .practice-card__button {
+    width: 100%;
+    min-height: 44px;
+    justify-content: center;
+    padding: 0.65rem 1rem;
+  }
+
+  .practice-card__mic-btn {
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+  }
+
+  .practice-card__voice-btn {
+    width: 38px;
+    height: 38px;
+    min-width: 38px;
   }
 }

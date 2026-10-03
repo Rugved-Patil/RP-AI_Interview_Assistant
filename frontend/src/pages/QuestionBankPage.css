@@ -528,3 +528,72 @@
   border-color: var(--ink);
   color: var(--ink);
 }
+
+/* ==========================================================================
+   Question Bank Mobile Optimization (Screens <= 768px)
+   ========================================================================== */
+@media (max-width: 768px) {
+  .qb-container {
+    gap: 1.25rem;
+  }
+
+  .qb-stats-banner {
+    grid-template-columns: 1fr 1fr;
+    padding: 1rem;
+    gap: 0.75rem;
+  }
+
+  .qb-search-section {
+    padding: 1rem 0.85rem;
+    gap: 0.85rem;
+  }
+
+  .qb-search-row {
+    flex-direction: column;
+    gap: 0.65rem;
+  }
+
+  .qb-tabs-group {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .qb-tab-btn {
+    flex: 1;
+    text-align: center;
+    padding: 0.5rem 0.35rem;
+  }
+
+  .qb-select {
+    width: 100%;
+    height: 42px;
+  }
+
+  .qb-domains-scroll {
+    padding: 0.4rem 0.15rem 0.65rem;
+    gap: 0.45rem;
+  }
+
+  .qb-domain-chip {
+    padding: 0.45rem 0.85rem;
+    min-height: 38px;
+    font-size: 0.75rem;
+  }
+
+  .qb-card {
+    padding: 1.25rem 0.95rem;
+  }
+
+  .qb-card-actions {
+    flex-direction: column;
+    width: 100%;
+    gap: 0.5rem;
+  }
+
+  .qb-practice-btn,
+  .qb-copy-btn {
+    width: 100%;
+    min-height: 42px;
+    justify-content: center;
+  }
+}

@@ -696,11 +696,6 @@
   color: var(--ink);
 }
 
-.home__rec-scoring-box {
-  border-top: 1px dashed var(--rule);
-  padding-top: 0.6rem;
-}
-
 .home__rec-scoring-title {
   font-family: var(--font-mono);
   font-size: 0.72rem;
@@ -708,4 +703,65 @@
   text-transform: uppercase;
   color: var(--olive-deep);
   margin-bottom: 0.3rem;
+}
+
+/* ==========================================================================
+   Home Page Mobile Optimization (Screens <= 768px)
+   ========================================================================== */
+@media (max-width: 768px) {
+  .home {
+    gap: 1.5rem;
+  }
+
+  .home__preset-onboarding {
+    padding: 1.15rem 1rem;
+  }
+
+  .home__preset-onboarding-header {
+    flex-direction: column;
+    gap: 0.65rem;
+  }
+
+  .home__quick-preset-actions {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+  }
+
+  .home__quick-submit-btn {
+    width: 100%;
+    min-height: 44px;
+    justify-content: center;
+    text-align: center;
+  }
+
+  .home__grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .mode-card {
+    padding: 1.25rem 1rem;
+  }
+
+  .mode-card__title {
+    font-size: 1.15rem;
+  }
+
+  .home__rec-card {
+    padding: 1.25rem 1rem;
+  }
+
+  .home__rec-actions {
+    flex-direction: column;
+    width: 100%;
+    gap: 0.65rem;
+  }
+
+  .home__rec-btn {
+    width: 100%;
+    min-height: 44px;
+    justify-content: center;
+    text-align: center;
+  }
 }

@@ -47,6 +47,7 @@ export function CodingSandboxPage() {
   // Execution & Output State
   const [isRunning, setIsRunning] = useState(false)
   const [isGrading, setIsGrading] = useState(false)
+  const [mobileTab, setMobileTab] = useState<'spec' | 'editor' | 'output'>('spec')
   const [activeTab, setActiveTab] = useState<'tests' | 'custom' | 'console' | 'assessment'>('tests')
   const [selectedTestIdx, setSelectedTestIdx] = useState(0)
   const [customInput, setCustomInput] = useState('')
@@ -182,6 +183,7 @@ export function CodingSandboxPage() {
     if (!currentProblem || isRunning) return
     setIsRunning(true)
     setErrorBanner(null)
+    setMobileTab('output')
 
     try {
       const res = await runCodeInSandbox({
@@ -207,6 +209,7 @@ export function CodingSandboxPage() {
     if (!currentProblem || isGrading) return
     setIsGrading(true)
     setErrorBanner(null)
+    setMobileTab('output')
 
     try {
       // First ensure tests are executed
@@ -366,8 +369,39 @@ export function CodingSandboxPage() {
         </div>
       )}
 
-      {/* Main Sandbox Layout: Split View */}
-      <div className="sandbox-body">
+      {/* Mobile Responsive View Mode Selector (Tabs on small screens) */}
+      <div className="sandbox-mobile-tabs" role="tablist" aria-label="Coding Workspace Sections">
+        <button
+          type="button"
+          role="tab"
+          aria-selected={mobileTab === 'spec'}
+          className={`sandbox-mobile-tab-btn ${mobileTab === 'spec' ? 'sandbox-mobile-tab-btn--active' : ''}`}
+          onClick={() => setMobileTab('spec')}
+        >
+          📋 Problem
+        </button>
+        <button
+          type="button"
+          role="tab"
+          aria-selected={mobileTab === 'editor'}
+          className={`sandbox-mobile-tab-btn ${mobileTab === 'editor' ? 'sandbox-mobile-tab-btn--active' : ''}`}
+          onClick={() => setMobileTab('editor')}
+        >
+          💻 Code ({language})
+        </button>
+        <button
+          type="button"
+          role="tab"
+          aria-selected={mobileTab === 'output'}
+          className={`sandbox-mobile-tab-btn ${mobileTab === 'output' ? 'sandbox-mobile-tab-btn--active' : ''}`}
+          onClick={() => setMobileTab('output')}
+        >
+          🧪 Results {runResult ? (runResult.passed_count === runResult.total_count ? '✓' : '✗') : ''}
+        </button>
+      </div>
+
+      {/* Main Sandbox Layout: Split View on Desktop, Tabbed on Mobile */}
+      <div className={`sandbox-body sandbox-body--mobile-${mobileTab}`}>
         {/* Left Pane: Problem Description, Constraints & Examples */}
         <section className="sandbox-spec-pane" aria-label="Problem Description">
           {loadingProblem ? (

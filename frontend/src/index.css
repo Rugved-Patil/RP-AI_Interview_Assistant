@@ -225,6 +225,16 @@ body {
 
 button {
   font: inherit;
+  touch-action: manipulation;
+}
+
+/* Ensure inputs on mobile don't trigger iOS Safari auto-zoom */
+@media (max-width: 768px) {
+  input,
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
 }
 
 /* Visually hides an element while keeping it available to screen readers. */

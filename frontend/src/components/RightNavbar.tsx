@@ -45,6 +45,7 @@ export function RightNavbar() {
       id: 'home',
       to: '/',
       label: t('nav.home', undefined, 'Home'),
+      shortLabel: t('nav.home', undefined, 'Home'),
       icon: HomeIcon,
       exact: true,
     },
@@ -52,36 +53,42 @@ export function RightNavbar() {
       id: 'sandbox',
       to: '/sandbox',
       label: t('nav.sandbox', undefined, 'Coding Sandbox'),
+      shortLabel: t('nav.sandbox_short', undefined, 'Sandbox'),
       icon: CodeIcon,
     },
     {
       id: 'analytics',
       to: '/analytics',
       label: t('nav.analytics', undefined, 'Analytics & Progress'),
+      shortLabel: t('nav.analytics_short', undefined, 'Analytics'),
       icon: AnalyticsIcon,
     },
     {
       id: 'questions',
       to: '/questions',
       label: t('nav.questions', undefined, 'Question Bank'),
+      shortLabel: t('nav.questions_short', undefined, 'Questions'),
       icon: QuestionBankIcon,
     },
     {
       id: 'presets',
       to: '/presets',
       label: t('nav.presets', undefined, 'Interview Presets'),
+      shortLabel: t('nav.presets_short', undefined, 'Presets'),
       icon: PresetsIcon,
     },
     {
       id: 'reports',
       to: '/reports',
       label: t('nav.reports', undefined, 'Saved Reports'),
+      shortLabel: t('nav.reports_short', undefined, 'Reports'),
       icon: SavedReportsIcon,
     },
     {
       id: 'settings',
       to: '/settings',
       label: t('nav.settings', undefined, 'Settings'),
+      shortLabel: t('nav.settings', undefined, 'Settings'),
       icon: SettingsIcon,
     },
   ]
@@ -124,7 +131,8 @@ export function RightNavbar() {
               <span className={`right-nav__link-icon right-nav__link-icon--${item.id}`} aria-hidden="true">
                 <IconComponent width={18} height={18} />
               </span>
-              {!collapsed && <span className="right-nav__link-label">{item.label}</span>}
+              <span className="right-nav__link-label-mobile">{item.shortLabel || item.label}</span>
+              {!collapsed && <span className="right-nav__link-label right-nav__link-label--desktop">{item.label}</span>}
               {collapsed && <span className="right-nav__tooltip">{item.label}</span>}
             </NavLink>
           )

@@ -159,3 +159,61 @@
   margin: 0;
   line-height: 1.45;
 }
+
+/* ==========================================================================
+   Global Mobile & Small Screen Responsiveness (Screens <= 768px)
+   ========================================================================== */
+@media (max-width: 768px) {
+  .page--with-sidebar {
+    padding-right: 0 !important;
+    padding-bottom: calc(64px + env(safe-area-inset-bottom, 12px)) !important;
+  }
+
+  .page__header {
+    padding: 1.15rem 1rem 0.85rem;
+  }
+
+  .page__title {
+    font-size: 0.95rem;
+  }
+
+  .page__main {
+    padding: 1rem 1rem calc(4.5rem + env(safe-area-inset-bottom, 12px)) 1rem;
+    gap: 1.5rem;
+  }
+
+  .page-section {
+    width: 100%;
+  }
+
+  .page-header {
+    margin-bottom: 1.25rem;
+    padding-bottom: 0.85rem;
+  }
+
+  .page-title-row {
+    gap: 0.85rem;
+  }
+
+  .page-title-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 8px;
+  }
+
+  .page-title {
+    font-size: 1.45rem;
+  }
+
+  .page-subtitle {
+    font-size: 0.8rem;
+  }
+
+  .page-back {
+    font-size: 0.82rem;
+    padding: 0.35rem 0;
+    min-height: 38px;
+    display: inline-flex;
+    align-items: center;
+  }
+}

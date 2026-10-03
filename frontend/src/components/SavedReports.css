@@ -595,3 +595,74 @@
   color: var(--ink-red);
   margin: 0;
 }
+
+/* ==========================================================================
+   Saved Reports Mobile Optimization (Screens <= 640px)
+   ========================================================================== */
+@media (max-width: 640px) {
+  .saved-reports__header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+
+  .saved-reports__header-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .saved-reports__export-all-btn {
+    flex: 1;
+    justify-content: center;
+    min-height: 40px;
+  }
+
+  .report-row__summary {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.85rem 1rem;
+  }
+
+  .report-row__prompt {
+    width: 100%;
+    order: 3;
+    font-size: 0.9rem;
+    line-height: 1.4;
+  }
+
+  .report-row__meta {
+    margin-left: auto;
+    font-size: 0.72rem;
+  }
+
+  .report-row__chevron {
+    order: 4;
+    margin-left: auto;
+  }
+
+  .report-row__details {
+    padding: 1rem 0.85rem;
+  }
+
+  .report-row__actions {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.65rem;
+  }
+
+  .report-row__action-group {
+    flex-direction: column;
+    width: 100%;
+    gap: 0.5rem;
+  }
+
+  .report-row__action-btn,
+  .report-row__delete {
+    width: 100%;
+    min-height: 42px;
+    justify-content: center;
+    padding: 0.55rem 1rem;
+  }
+}
