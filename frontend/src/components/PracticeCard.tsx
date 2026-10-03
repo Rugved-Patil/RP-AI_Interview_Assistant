@@ -14,9 +14,10 @@ import { getActivePresetId, setActivePresetId } from '../activePreset'
 import { UnsavedSessionModal } from './UnsavedSessionModal'
 import { useSpeechRecognition } from '../hooks/useSpeechRecognition'
 import { useSpeechSynthesis } from '../hooks/useSpeechSynthesis'
-import { MicIcon, SpeakerIcon, SparklesIcon, StopIcon } from './Icons'
+import { CheckIcon, MicIcon, PdfIcon, ShareIcon, SparklesIcon, SpeakerIcon, StopIcon } from './Icons'
 import { FormattedFeedback } from './FormattedFeedback'
 import { useTranslation } from '../i18n/LanguageContext'
+import { copyShareableSummary, exportSingleReportToPDF } from '../pdfExport'
 import './PracticeCard.css'
 
 /**
@@ -35,6 +36,8 @@ type Stage =
   | {
       name: 'graded'
       sessionId: string
+      question: string
+      answer: string
       score: number
       feedback: string
       saveState: 'unsaved' | 'saving' | 'saved' | 'error'
@@ -143,6 +146,8 @@ export function PracticeCard() {
       setStage({
         name: 'graded',
         sessionId,
+        question: stage.question,
+        answer,
         score: grade.score,
         feedback: grade.feedback,
         saveState: 'unsaved',
@@ -161,6 +166,40 @@ export function PracticeCard() {
       setStage((current) => (current.name === 'graded' ? { ...current, saveState: 'saved' } : current))
     } catch {
       setStage((current) => (current.name === 'graded' ? { ...current, saveState: 'error' } : current))
+    }
+  }
+
+  const [copiedSummary, setCopiedSummary] = useState(false)
+
+  const handleExportPDF = () => {
+    if (stage.name !== 'graded') return
+    const preset = activePreset.status === 'loaded' ? activePreset.preset : null
+    exportSingleReportToPDF({
+      session_id: stage.sessionId,
+      question: stage.question,
+      answer: stage.answer,
+      score: stage.score,
+      feedback: stage.feedback,
+      role: preset?.role || 'Technical Practice Drill',
+      company: preset?.company || null,
+      location: preset?.location || null,
+    })
+  }
+
+  const handleShareSummary = async () => {
+    if (stage.name !== 'graded') return
+    const preset = activePreset.status === 'loaded' ? activePreset.preset : null
+    const ok = await copyShareableSummary({
+      score: stage.score,
+      feedback: stage.feedback,
+      role: preset?.role || 'Technical Practice Drill',
+      company: preset?.company || null,
+      interview_type: 'technical',
+      question: stage.question,
+    })
+    if (ok) {
+      setCopiedSummary(true)
+      setTimeout(() => setCopiedSummary(false), 2200)
     }
   }
 
@@ -377,6 +416,27 @@ export function PracticeCard() {
             >
               {stage.saveState === 'saved' ? t('practice.saved_success', undefined, 'Report Saved!') : t('practice.save_report', undefined, 'Save Report')}
             </button>
+
+            <button
+              type="button"
+              className="practice-card__button practice-card__button--secondary"
+              onClick={handleExportPDF}
+              title={t('reports.export_pdf_tooltip', undefined, 'Download printable assessment PDF')}
+            >
+              <PdfIcon width={14} height={14} />
+              <span>{t('reports.export_pdf', undefined, 'Export PDF')}</span>
+            </button>
+
+            <button
+              type="button"
+              className={`practice-card__button practice-card__button--secondary ${copiedSummary ? 'practice-card__button--copied' : ''}`}
+              onClick={handleShareSummary}
+              title={t('reports.share_summary_tooltip', undefined, 'Copy formatted summary to clipboard')}
+            >
+              {copiedSummary ? <CheckIcon width={14} height={14} /> : <ShareIcon width={14} height={14} />}
+              <span>{copiedSummary ? t('reports.copied_btn', undefined, 'Copied!') : t('reports.share_summary', undefined, 'Share Summary')}</span>
+            </button>
+
             <button
               className="practice-card__button"
               onClick={() => guardedExit(() => {

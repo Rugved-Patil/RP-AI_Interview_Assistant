@@ -15,9 +15,10 @@ import { getActivePresetId, setActivePresetId } from '../activePreset'
 import { UnsavedSessionModal } from '../components/UnsavedSessionModal'
 import { useSpeechRecognition } from '../hooks/useSpeechRecognition'
 import { useSpeechSynthesis } from '../hooks/useSpeechSynthesis'
-import { MicIcon, PlayIcon, SpeakerIcon, SpeakerOffIcon, StopIcon } from '../components/Icons'
+import { CheckIcon, MicIcon, PdfIcon, PlayIcon, ShareIcon, SpeakerIcon, SpeakerOffIcon, StopIcon } from '../components/Icons'
 import { FormattedFeedback } from '../components/FormattedFeedback'
 import { useTranslation } from '../i18n/LanguageContext'
+import { copyShareableSummary, exportMockInterviewReportToPDF } from '../pdfExport'
 import './MockInterviewPage.css'
 
 interface MessageTurn {
@@ -323,6 +324,43 @@ export function MockInterviewPage() {
         saving: false,
         saveError: toMessage(err),
       })
+    }
+  }
+
+  const [copiedSummary, setCopiedSummary] = useState(false)
+
+  const handleExportPDF = () => {
+    if (stage.name !== 'graded') return
+    const preset = activePreset.status === 'loaded' ? activePreset.preset : null
+    exportMockInterviewReportToPDF({
+      score: stage.score,
+      feedback: stage.feedback,
+      transcript: stage.transcript,
+      dimensions: stage.dimensions,
+      role: preset?.role || 'Full Mock Interview',
+      company: preset?.company || null,
+      location: preset?.location || null,
+      experience_level: experienceLevel,
+      interview_type: interviewType,
+      session_id: stage.sessionId,
+    })
+  }
+
+  const handleShareSummary = async () => {
+    if (stage.name !== 'graded') return
+    const preset = activePreset.status === 'loaded' ? activePreset.preset : null
+    const ok = await copyShareableSummary({
+      score: stage.score,
+      feedback: stage.feedback,
+      role: preset?.role || 'Full Mock Interview',
+      company: preset?.company || null,
+      experience_level: experienceLevel,
+      interview_type: interviewType,
+      dimensions: stage.dimensions,
+    })
+    if (ok) {
+      setCopiedSummary(true)
+      setTimeout(() => setCopiedSummary(false), 2200)
     }
   }
 
@@ -717,6 +755,27 @@ export function MockInterviewPage() {
                     ? t('mock.saving_btn', undefined, 'Saving report…')
                     : t('mock.save_report_btn', undefined, 'Save this interview report')}
               </button>
+
+              <button
+                type="button"
+                className="mock-card__button mock-card__button--secondary"
+                onClick={handleExportPDF}
+                title={t('reports.export_pdf_tooltip', undefined, 'Download printable assessment PDF')}
+              >
+                <PdfIcon width={15} height={15} />
+                <span>{t('reports.export_pdf', undefined, 'Export PDF')}</span>
+              </button>
+
+              <button
+                type="button"
+                className={`mock-card__button mock-card__button--secondary ${copiedSummary ? 'mock-card__button--copied' : ''}`}
+                onClick={handleShareSummary}
+                title={t('reports.share_summary_tooltip', undefined, 'Copy formatted summary to clipboard')}
+              >
+                {copiedSummary ? <CheckIcon width={15} height={15} /> : <ShareIcon width={15} height={15} />}
+                <span>{copiedSummary ? t('reports.copied_btn', undefined, 'Copied!') : t('reports.share_summary', undefined, 'Share Summary')}</span>
+              </button>
+
               <button
                 className="mock-card__button mock-card__button--ghost"
                 onClick={() => guardedExit(() => setStage({ name: 'setup' }))}

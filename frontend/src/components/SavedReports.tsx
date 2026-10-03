@@ -6,9 +6,15 @@ import {
   listReports,
 } from '../api/practiceApi'
 import type { ReportSummary, SavedInterviewReportSummary } from '../api/practiceApi'
-import { FilterIcon, SavedReportsIcon } from './Icons'
+import { CheckIcon, FilterIcon, PdfIcon, SavedReportsIcon, ShareIcon } from './Icons'
 import { FormattedFeedback } from './FormattedFeedback'
 import { useTranslation } from '../i18n/LanguageContext'
+import {
+  copyShareableSummary,
+  exportAllReportsToPDF,
+  exportMockInterviewReportToPDF,
+  exportSingleReportToPDF,
+} from '../pdfExport'
 import './SavedReports.css'
 
 export type UnifiedReport =
@@ -198,21 +204,35 @@ export function SavedReports() {
           </div>
         </div>
 
-        <button
-          type="button"
-          className={`saved-reports__filter-btn ${
-            isFilterOpen || activeFilterCount > 0 ? 'saved-reports__filter-btn--active' : ''
-          }`}
-          onClick={() => setIsFilterOpen((prev) => !prev)}
-          aria-expanded={isFilterOpen}
-          aria-label="Toggle Filters"
-          title={isFilterOpen ? 'Close filters' : 'Open filters'}
-        >
-          <FilterIcon width={17} height={17} />
-          {activeFilterCount > 0 && (
-            <span className="saved-reports__filter-badge">{activeFilterCount}</span>
+        <div className="saved-reports__header-actions">
+          {unifiedReports.length > 0 && (
+            <button
+              type="button"
+              className="saved-reports__export-all-btn"
+              onClick={() => exportAllReportsToPDF(state.singleReports, state.mockReports)}
+              title={t('reports.export_all_pdf_tooltip', undefined, 'Download complete portfolio PDF of all saved assessments')}
+            >
+              <PdfIcon width={15} height={15} />
+              <span>{t('settings.export_pdf_btn', undefined, 'Export All (PDF)')}</span>
+            </button>
           )}
-        </button>
+
+          <button
+            type="button"
+            className={`saved-reports__filter-btn ${
+              isFilterOpen || activeFilterCount > 0 ? 'saved-reports__filter-btn--active' : ''
+            }`}
+            onClick={() => setIsFilterOpen((prev) => !prev)}
+            aria-expanded={isFilterOpen}
+            aria-label="Toggle Filters"
+            title={isFilterOpen ? 'Close filters' : 'Open filters'}
+          >
+            <FilterIcon width={17} height={17} />
+            {activeFilterCount > 0 && (
+              <span className="saved-reports__filter-badge">{activeFilterCount}</span>
+            )}
+          </button>
+        </div>
       </div>
 
       {/* Expandable Filter Drawer */}
@@ -347,11 +367,20 @@ function MockReportRow({
   const [confirming, setConfirming] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
   const [deleteError, setDeleteError] = useState<string | null>(null)
+  const [copied, setCopied] = useState(false)
   const context = formatContext({
     role: report.role,
     company: report.company,
     location: report.location,
   })
+
+  async function handleShare() {
+    const success = await copyShareableSummary(report)
+    if (success) {
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2200)
+    }
+  }
 
   async function handleConfirmDelete() {
     setIsDeleting(true)
@@ -427,6 +456,27 @@ function MockReportRow({
           </div>
 
           <div className="report-row__actions">
+            <div className="report-row__action-group">
+              <button
+                type="button"
+                className="report-row__action-btn"
+                onClick={() => exportMockInterviewReportToPDF(report)}
+                title={t('reports.export_pdf_tooltip', undefined, 'Download printable assessment PDF')}
+              >
+                <PdfIcon width={14} height={14} />
+                <span>{t('reports.export_pdf', undefined, 'Export PDF')}</span>
+              </button>
+              <button
+                type="button"
+                className={`report-row__action-btn ${copied ? 'report-row__action-btn--copied' : ''}`}
+                onClick={handleShare}
+                title={t('reports.share_summary_tooltip', undefined, 'Copy formatted summary to clipboard')}
+              >
+                {copied ? <CheckIcon width={14} height={14} /> : <ShareIcon width={14} height={14} />}
+                <span>{copied ? t('reports.copied_btn', undefined, 'Copied!') : t('reports.share_summary', undefined, 'Share Summary')}</span>
+              </button>
+            </div>
+
             {!confirming ? (
               <button
                 type="button"
@@ -475,7 +525,16 @@ function ReportRow({
   const [confirming, setConfirming] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
   const [deleteError, setDeleteError] = useState<string | null>(null)
+  const [copied, setCopied] = useState(false)
   const context = formatContext(report)
+
+  async function handleShare() {
+    const success = await copyShareableSummary(report)
+    if (success) {
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2200)
+    }
+  }
 
   async function handleConfirmDelete() {
     setIsDeleting(true)
@@ -542,7 +601,7 @@ function ReportRow({
                   <FormattedFeedback content={report.question} />
                 </div>
               </div>
-              <div className="report-row__turn report-row__turn--candidate">
+              <div className="report-row__turn--candidate">
                 <div className="report-row__turn-sender">{isCoding ? t('reports.code_submission', { lang: report.location || 'Code' }, `Code Submission (${report.location || 'Code'})`) : t('reports.your_response', undefined, 'Your Response')}</div>
                 <div className="report-row__turn-content">
                   <FormattedFeedback content={report.answer} />
@@ -558,6 +617,27 @@ function ReportRow({
           </div>
 
           <div className="report-row__actions">
+            <div className="report-row__action-group">
+              <button
+                type="button"
+                className="report-row__action-btn"
+                onClick={() => exportSingleReportToPDF(report)}
+                title={t('reports.export_pdf_tooltip', undefined, 'Download printable assessment PDF')}
+              >
+                <PdfIcon width={14} height={14} />
+                <span>{t('reports.export_pdf', undefined, 'Export PDF')}</span>
+              </button>
+              <button
+                type="button"
+                className={`report-row__action-btn ${copied ? 'report-row__action-btn--copied' : ''}`}
+                onClick={handleShare}
+                title={t('reports.share_summary_tooltip', undefined, 'Copy formatted summary to clipboard')}
+              >
+                {copied ? <CheckIcon width={14} height={14} /> : <ShareIcon width={14} height={14} />}
+                <span>{copied ? t('reports.copied_btn', undefined, 'Copied!') : t('reports.share_summary', undefined, 'Share Summary')}</span>
+              </button>
+            </div>
+
             {!confirming ? (
               <button
                 type="button"
