@@ -42,37 +42,44 @@ export function RightNavbar() {
 
   const navItems = [
     {
+      id: 'home',
       to: '/',
       label: t('nav.home', undefined, 'Home'),
       icon: HomeIcon,
       exact: true,
     },
     {
+      id: 'sandbox',
       to: '/sandbox',
       label: t('nav.sandbox', undefined, 'Coding Sandbox'),
       icon: CodeIcon,
     },
     {
+      id: 'analytics',
       to: '/analytics',
       label: t('nav.analytics', undefined, 'Analytics & Progress'),
       icon: AnalyticsIcon,
     },
     {
+      id: 'questions',
       to: '/questions',
       label: t('nav.questions', undefined, 'Question Bank'),
       icon: QuestionBankIcon,
     },
     {
+      id: 'presets',
       to: '/presets',
       label: t('nav.presets', undefined, 'Interview Presets'),
       icon: PresetsIcon,
     },
     {
+      id: 'reports',
       to: '/reports',
       label: t('nav.reports', undefined, 'Saved Reports'),
       icon: SavedReportsIcon,
     },
     {
+      id: 'settings',
       to: '/settings',
       label: t('nav.settings', undefined, 'Settings'),
       icon: SettingsIcon,
@@ -92,7 +99,7 @@ export function RightNavbar() {
           title={collapsed ? t('nav.expand', undefined, 'Expand sidebar') : t('nav.collapse', undefined, 'Collapse sidebar')}
           aria-expanded={!collapsed}
         >
-          <span className="right-nav__toggle-icon" aria-hidden="true">
+          <span className={`right-nav__toggle-icon ${collapsed ? 'right-nav__toggle-icon--collapsed' : 'right-nav__toggle-icon--expanded'}`} aria-hidden="true">
             {collapsed ? <ChevronLeftIcon width={16} height={16} /> : <ChevronRightIcon width={16} height={16} />}
           </span>
           {!collapsed && <span className="right-nav__toggle-text">{t('nav.collapse', undefined, 'Collapse Menu')}</span>}
@@ -111,10 +118,10 @@ export function RightNavbar() {
               key={item.to}
               to={item.to}
               onClick={handleNavClick}
-              className={`right-nav__link ${isActive ? 'right-nav__link--active' : ''}`}
+              className={`right-nav__link right-nav__link--${item.id} ${isActive ? 'right-nav__link--active' : ''}`}
               title={collapsed ? item.label : undefined}
             >
-              <span className="right-nav__link-icon" aria-hidden="true">
+              <span className={`right-nav__link-icon right-nav__link-icon--${item.id}`} aria-hidden="true">
                 <IconComponent width={18} height={18} />
               </span>
               {!collapsed && <span className="right-nav__link-label">{item.label}</span>}

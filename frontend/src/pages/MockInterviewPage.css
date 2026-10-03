@@ -299,6 +299,19 @@
   flex-direction: column;
   gap: 0.35rem;
   max-width: 90%;
+  animation: bubbleSlideIn 0.28s cubic-bezier(0.2, 0.9, 0.2, 1) forwards;
+  will-change: transform, opacity;
+}
+
+@keyframes bubbleSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 .mock-chat__bubble--interviewer {
@@ -340,13 +353,18 @@
   border-radius: 4px;
   cursor: pointer;
   padding: 0;
-  transition: all 150ms ease;
+  transition: all 0.18s cubic-bezier(0.2, 0.9, 0.2, 1);
 }
 
 .mock-voice__replay-btn:hover {
   color: var(--olive-deep);
   border-color: var(--rule);
   background: var(--canvas);
+  transform: scale(1.1);
+}
+
+.mock-voice__replay-btn:active {
+  transform: scale(0.95);
 }
 
 .mock-chat__message {
@@ -354,8 +372,9 @@
   font-size: 0.98rem;
   line-height: 1.55;
   padding: 0.85rem 1.1rem;
-  border-radius: 6px;
+  border-radius: 8px;
   white-space: pre-wrap;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
 }
 
 .mock-chat__bubble--interviewer .mock-chat__message {

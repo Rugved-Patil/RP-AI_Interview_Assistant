@@ -1,6 +1,6 @@
 /* ==========================================================================
    RightNavbar.css - Collapsible / Expandable Right-Side Navigation Rail
-   Warm Linen & Olive Theme with Minimalist SVGs
+   Warm Linen & Olive Theme with Fluid Animated SVGs & Micro-interactions
    ========================================================================== */
 
 .right-nav {
@@ -13,8 +13,11 @@
   display: flex;
   flex-direction: column;
   z-index: 100;
-  transition: width 0.22s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.22s ease;
+  transition: width 0.32s cubic-bezier(0.2, 0.9, 0.2, 1),
+              box-shadow 0.32s cubic-bezier(0.2, 0.9, 0.2, 1),
+              background-color 0.25s ease;
   box-shadow: -2px 0 12px rgba(48, 51, 41, 0.05);
+  will-change: width, box-shadow;
 }
 
 .right-nav--collapsed {
@@ -22,8 +25,8 @@
 }
 
 .right-nav--expanded {
-  width: 220px;
-  box-shadow: -4px 0 24px rgba(48, 51, 41, 0.12);
+  width: 230px;
+  box-shadow: -6px 0 28px rgba(48, 51, 41, 0.14);
 }
 
 .right-nav__header {
@@ -37,10 +40,10 @@
 .right-nav__toggle-btn {
   background: var(--paper-card, #F5F0E5);
   border: 1px solid var(--rule, #B9AC94);
-  border-radius: 6px;
+  border-radius: 8px;
   color: var(--olive-deep, #596044);
   cursor: pointer;
-  padding: 0.45rem 0.6rem;
+  padding: 0.45rem 0.65rem;
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -48,24 +51,47 @@
   font-family: var(--font-mono);
   font-size: 0.8125rem;
   font-weight: 600;
-  transition: all 0.15s ease;
+  transition: all 0.22s cubic-bezier(0.2, 0.9, 0.2, 1);
 }
 
 .right-nav__toggle-btn:hover {
   background-color: var(--paper-card);
   color: var(--ink, #303329);
   border-color: var(--olive-deep, #596044);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(48, 51, 41, 0.08);
+}
+
+.right-nav__toggle-btn:active {
+  transform: translateY(1px) scale(0.98);
 }
 
 .right-nav__toggle-icon {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.right-nav__toggle-btn:hover .right-nav__toggle-icon {
+  transform: scale(1.15);
 }
 
 .right-nav__toggle-text {
   white-space: nowrap;
   overflow: hidden;
+  animation: navTextSlideIn 0.25s cubic-bezier(0.2, 0.9, 0.2, 1) forwards;
+}
+
+@keyframes navTextSlideIn {
+  from {
+    opacity: 0;
+    transform: translateX(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
 .right-nav__menu {
@@ -88,7 +114,10 @@
   font-family: var(--font-mono);
   font-size: 0.82rem;
   font-weight: 500;
-  transition: all 0.15s ease;
+  transition: background-color 0.2s cubic-bezier(0.2, 0.9, 0.2, 1),
+              color 0.2s cubic-bezier(0.2, 0.9, 0.2, 1),
+              transform 0.2s cubic-bezier(0.2, 0.9, 0.2, 1),
+              box-shadow 0.2s cubic-bezier(0.2, 0.9, 0.2, 1);
 }
 
 .right-nav--collapsed .right-nav__link {
@@ -97,15 +126,20 @@
 }
 
 .right-nav__link:hover {
-  background-color: rgba(89, 96, 68, 0.08);
+  background-color: rgba(89, 96, 68, 0.1);
   color: var(--olive-deep, #596044);
+  transform: translateX(-1px);
+}
+
+.right-nav__link:active {
+  transform: scale(0.97);
 }
 
 .right-nav__link--active {
   background-color: var(--paper-card, #F5F0E5);
   color: var(--olive-deep, #596044);
   font-weight: 700;
-  box-shadow: 0 1px 4px rgba(48, 51, 41, 0.08);
+  box-shadow: 0 2px 8px rgba(48, 51, 41, 0.08);
   border: 1px solid var(--rule, #B9AC94);
 }
 
@@ -114,39 +148,106 @@
   align-items: center;
   justify-content: center;
   color: currentColor;
+  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+  will-change: transform;
+}
+
+/* Specific Interactive Animations per Nav Item */
+
+/* 1. Settings Gear Rotation */
+.right-nav__link--settings:hover .right-nav__link-icon--settings {
+  transform: rotate(65deg) scale(1.12);
+}
+
+.right-nav__link--settings:active .right-nav__link-icon--settings {
+  transform: rotate(180deg) scale(0.95);
+  transition-duration: 0.2s;
+}
+
+.right-nav__link--active.right-nav__link--settings .right-nav__link-icon--settings {
+  transform: rotate(30deg);
+}
+
+.right-nav__link--active.right-nav__link--settings:hover .right-nav__link-icon--settings {
+  transform: rotate(120deg) scale(1.15);
+}
+
+/* 2. Home Bounce */
+.right-nav__link--home:hover .right-nav__link-icon--home {
+  transform: translateY(-2px) scale(1.12);
+}
+
+/* 3. Sandbox / Code Bracket Shift */
+.right-nav__link--sandbox:hover .right-nav__link-icon--sandbox {
+  transform: scale(1.12) rotate(-6deg);
+}
+
+/* 4. Analytics Bar Jump */
+.right-nav__link--analytics:hover .right-nav__link-icon--analytics {
+  transform: translateY(-2px) scale(1.12);
+}
+
+/* 5. Question Bank Tilt */
+.right-nav__link--questions:hover .right-nav__link-icon--questions {
+  transform: translateY(-2px) rotate(6deg) scale(1.1);
+}
+
+/* 6. Presets Bookmark Bob */
+.right-nav__link--presets:hover .right-nav__link-icon--presets {
+  transform: translateY(-2px) scale(1.12);
+}
+
+/* 7. Saved Reports Checklist Flip */
+.right-nav__link--reports:hover .right-nav__link-icon--reports {
+  transform: translateY(-2px) scale(1.12);
 }
 
 .right-nav__link-label {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  animation: navLabelSlideIn 0.25s cubic-bezier(0.2, 0.9, 0.2, 1) forwards;
 }
 
-/* Hover Tooltip in collapsed mode */
+@keyframes navLabelSlideIn {
+  from {
+    opacity: 0;
+    transform: translateX(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Smooth Fluid Tooltip in collapsed mode */
 .right-nav__tooltip {
   position: absolute;
-  right: calc(100% + 10px);
+  right: calc(100% + 12px);
   top: 50%;
-  transform: translateY(-50%);
+  transform: translateY(-50%) translateX(4px) scale(0.95);
   background-color: var(--ink, #303329);
   color: var(--text-light, #F5F0E5);
   font-family: var(--font-mono);
   font-size: 0.75rem;
   font-weight: 600;
-  padding: 0.35rem 0.65rem;
-  border-radius: 4px;
+  padding: 0.4rem 0.7rem;
+  border-radius: 6px;
   white-space: nowrap;
   pointer-events: none;
   opacity: 0;
   visibility: hidden;
-  transition: opacity 0.15s ease, visibility 0.15s ease;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+  transition: opacity 0.2s cubic-bezier(0.2, 0.9, 0.2, 1),
+              transform 0.2s cubic-bezier(0.2, 0.9, 0.2, 1),
+              visibility 0.2s cubic-bezier(0.2, 0.9, 0.2, 1);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
   z-index: 1000;
 }
 
 .right-nav--collapsed .right-nav__link:hover .right-nav__tooltip {
   opacity: 1;
   visibility: visible;
+  transform: translateY(-50%) translateX(0) scale(1);
 }
 
 /* Responsive adjustment for small screens */

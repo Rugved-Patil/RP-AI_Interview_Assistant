@@ -73,14 +73,20 @@
   background: var(--ink);
   color: var(--paper-card);
   border: none;
-  border-radius: 4px;
+  border-radius: 6px;
   padding: 0.65rem 1.2rem;
   cursor: pointer;
-  transition: background 150ms ease;
+  transition: all 0.2s cubic-bezier(0.2, 0.9, 0.2, 1);
 }
 
 .preset-form__button:hover:not(:disabled) {
   background: var(--ink-red);
+  transform: translateY(-1px);
+  box-shadow: 0 3px 10px rgba(48, 51, 41, 0.15);
+}
+
+.preset-form__button:active:not(:disabled) {
+  transform: translateY(1px) scale(0.98);
 }
 
 .preset-form__button:disabled {
@@ -94,13 +100,15 @@
   padding: 0;
   background: var(--paper-card);
   border: 1px solid var(--rule);
-  border-radius: 6px;
+  border-radius: 8px;
   overflow: hidden;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
 }
 
 .preset-row {
   border-bottom: 1px solid var(--rule);
   padding: 0.9rem 1.1rem;
+  transition: background-color 0.2s ease;
 }
 
 .preset-row:last-child {

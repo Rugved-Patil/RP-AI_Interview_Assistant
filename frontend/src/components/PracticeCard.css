@@ -211,7 +211,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  transition: all 150ms ease;
+  transition: all 0.2s cubic-bezier(0.2, 0.9, 0.2, 1);
   flex-shrink: 0;
 }
 
@@ -219,13 +219,33 @@
   background: var(--canvas);
   border-color: var(--olive-deep);
   color: var(--olive-deep);
+  transform: translateY(-1px) scale(1.08);
+}
+
+.practice-card__mic-btn:active:not(:disabled) {
+  transform: translateY(1px) scale(0.95);
 }
 
 .practice-card__mic-btn--listening {
   background: var(--ink-red);
   border-color: var(--ink-red);
   color: #ffffff;
-  animation: pulse-mic 1.5s infinite;
+  animation: pulse-mic 1.6s infinite ease-in-out;
+}
+
+@keyframes pulse-mic {
+  0% {
+    box-shadow: 0 0 0 0 rgba(184, 51, 42, 0.65);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 0 0 12px rgba(184, 51, 42, 0);
+    transform: scale(1.08);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(184, 51, 42, 0);
+    transform: scale(1);
+  }
 }
 
 .practice-card__mic-btn--listening:hover:not(:disabled) {
@@ -250,6 +270,17 @@
   animation: mic-pulse 1.2s infinite ease-in-out;
 }
 
+@keyframes mic-pulse {
+  0%, 100% {
+    transform: scale(0.85);
+    opacity: 0.5;
+  }
+  50% {
+    transform: scale(1.4);
+    opacity: 1;
+  }
+}
+
 .practice-card__stt-error {
   color: var(--ink-red);
   font-size: 0.75rem;
@@ -265,14 +296,20 @@
   background: var(--ink);
   color: var(--paper-card);
   border: none;
-  border-radius: 4px;
+  border-radius: 6px;
   padding: 0.75rem 1.35rem;
   cursor: pointer;
-  transition: background 150ms ease;
+  transition: all 0.22s cubic-bezier(0.2, 0.9, 0.2, 1);
 }
 
 .practice-card__button:hover:not(:disabled) {
   background: var(--ink-red);
+  transform: translateY(-1.5px);
+  box-shadow: 0 4px 14px rgba(48, 51, 41, 0.15);
+}
+
+.practice-card__button:active:not(:disabled) {
+  transform: translateY(1px) scale(0.98);
 }
 
 .practice-card__button:focus-visible {

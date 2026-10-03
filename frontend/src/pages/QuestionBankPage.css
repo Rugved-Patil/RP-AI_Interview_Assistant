@@ -232,12 +232,17 @@
   font-size: 0.75rem;
   cursor: pointer;
   white-space: nowrap;
-  transition: all 0.15s ease;
+  transition: all 0.2s cubic-bezier(0.2, 0.9, 0.2, 1);
 }
 
 .qb-domain-chip:hover {
-  border-color: var(--ink);
+  border-color: var(--olive-deep);
   color: var(--ink);
+  transform: translateY(-1.5px);
+}
+
+.qb-domain-chip:active {
+  transform: translateY(0) scale(0.96);
 }
 
 .qb-domain-chip.active {
@@ -245,6 +250,7 @@
   border-color: var(--ink);
   color: var(--paper-card);
   font-weight: 500;
+  box-shadow: 0 2px 8px rgba(48, 51, 41, 0.15);
 }
 
 /* Question List */
@@ -268,18 +274,21 @@
 .qb-card {
   background: var(--paper-card);
   border: 1px solid var(--rule);
-  border-radius: 8px;
+  border-radius: 10px;
   padding: 1.5rem;
   display: flex;
   flex-direction: column;
   gap: 1rem;
   box-shadow: 0 4px 16px -10px rgba(35, 38, 43, 0.35);
-  transition: border-color 0.15s ease, transform 0.15s ease;
+  transition: border-color 0.2s ease,
+              transform 0.25s cubic-bezier(0.2, 0.9, 0.2, 1),
+              box-shadow 0.25s cubic-bezier(0.2, 0.9, 0.2, 1);
 }
 
 .qb-card:hover {
-  border-color: var(--ink);
-  transform: translateY(-1px);
+  border-color: var(--olive-deep);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px -10px rgba(35, 38, 43, 0.4);
 }
 
 .qb-card-top {
