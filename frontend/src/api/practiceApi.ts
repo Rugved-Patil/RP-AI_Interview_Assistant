@@ -408,6 +408,8 @@ export interface AnalyticsSummary {
   mock_average: number | null
   top_strength_domain: string | null
   focus_domain: string | null
+  training_unlocked: boolean
+  sessions_until_unlock: number
 }
 
 export interface ScoreDataPoint {
@@ -464,6 +466,11 @@ export interface RecommendedDrill {
   difficulty: string
   tags: string[]
   reason: string
+  recommended_test_type?: 'single_drill' | 'behavioral_drill' | 'mock_interview'
+  recommended_test_label?: string
+  model_answer?: string
+  scoring_breakdown?: string
+  evaluation_criteria?: string | null
 }
 
 export interface AnalyticsDashboardResponse {

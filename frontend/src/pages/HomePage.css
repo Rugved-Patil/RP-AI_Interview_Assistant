@@ -502,3 +502,166 @@
   background: var(--canvas);
   border-color: var(--ink);
 }
+
+/* Progressive Training Milestone Card */
+.home__training-milestone-card {
+  background: var(--paper-card);
+  border: 1px dashed var(--rule);
+  border-radius: 8px;
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  box-shadow: 0 4px 16px -10px rgba(35, 38, 43, 0.2);
+}
+
+.home__training-milestone-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1.5rem;
+}
+
+.home__training-milestone-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.home__training-milestone-tag {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--olive-deep);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.home__training-milestone-title {
+  font-family: var(--font-serif);
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--ink);
+  margin: 0;
+}
+
+.home__training-milestone-desc {
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  color: var(--ink-muted);
+  line-height: 1.45;
+  margin: 0;
+}
+
+.home__training-milestone-fraction {
+  display: flex;
+  align-items: baseline;
+  background: var(--paper);
+  border: 1px solid var(--rule);
+  padding: 0.4rem 0.75rem;
+  border-radius: 6px;
+}
+
+.home__training-fraction-val {
+  font-family: var(--font-serif);
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--olive-deep);
+}
+
+.home__training-fraction-denom {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--ink-muted);
+  margin-left: 0.2rem;
+}
+
+.home__training-progress-track {
+  width: 100%;
+  height: 6px;
+  background: var(--canvas);
+  border-radius: 999px;
+  overflow: hidden;
+  border: 1px solid var(--rule);
+}
+
+.home__training-progress-bar {
+  height: 100%;
+  background: var(--olive-deep);
+  border-radius: 999px;
+  transition: width 0.3s ease;
+}
+
+.home__rec-directive {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 600;
+  background-color: var(--paper);
+  color: var(--olive-deep);
+  border: 1px solid var(--rule);
+  padding: 0.15rem 0.45rem;
+  border-radius: 4px;
+}
+
+/* Home Model Answer Accordion */
+.home__rec-model-answer-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin-bottom: 1rem;
+}
+
+.home__rec-model-answer-btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--canvas);
+  border: 1px solid var(--rule);
+  border-radius: 5px;
+  padding: 0.45rem 0.75rem;
+  color: var(--olive-deep);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
+  transition: all 0.15s ease;
+}
+
+.home__rec-model-answer-btn:hover {
+  border-color: var(--olive-deep);
+  background: var(--paper);
+}
+
+.home__rec-model-answer-box {
+  background: var(--paper);
+  border: 1px solid var(--rule);
+  border-left: 3px solid var(--olive-deep);
+  border-radius: 0 5px 5px 0;
+  padding: 0.85rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.home__rec-model-answer-text {
+  font-family: var(--font-serif);
+  font-size: 0.86rem;
+  line-height: 1.5;
+  color: var(--ink);
+}
+
+.home__rec-scoring-box {
+  border-top: 1px dashed var(--rule);
+  padding-top: 0.6rem;
+}
+
+.home__rec-scoring-title {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--olive-deep);
+  margin-bottom: 0.3rem;
+}

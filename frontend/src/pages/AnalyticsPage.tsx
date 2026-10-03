@@ -281,6 +281,8 @@ export function AnalyticsPage() {
                 <WeakSpotsCard
                   weakSpots={data.weak_spots}
                   recommendedDrills={data.recommended_drills}
+                  trainingUnlocked={data.summary.training_unlocked}
+                  sessionsUntilUnlock={data.summary.sessions_until_unlock}
                 />
               </section>
             </div>

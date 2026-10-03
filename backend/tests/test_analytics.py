@@ -266,7 +266,7 @@ def test_analytics_filtering_by_timeframe_and_type(test_db: Session):
 
 
 def test_analytics_recommended_drills_generation(test_db: Session):
-    """Test that weak spots generate curated recommendations from the question bank."""
+    """Test that weak spots generate curated recommendations with 8/10 model answers from the question bank."""
     now = datetime.now(timezone.utc)
     # Low score in DevOps
     report_devops = SavedReport(
@@ -284,10 +284,17 @@ def test_analytics_recommended_drills_generation(test_db: Session):
     analytics = compute_analytics(test_db)
     assert len(analytics.weak_spots) >= 1
     assert len(analytics.recommended_drills) > 0
-    # Recommended drill should have question text and id
+    # 1 session completed -> not unlocked yet (needs 2 more)
+    assert analytics.summary.training_unlocked is False
+    assert analytics.summary.sessions_until_unlock == 2
+
+    # Recommended drill should have question text, id, model answer, and scoring breakdown
     first_rec = analytics.recommended_drills[0]
     assert first_rec.question_id is not None
     assert len(first_rec.question) > 10
+    assert len(first_rec.model_answer) > 20
+    assert len(first_rec.scoring_breakdown) > 20
+    assert first_rec.recommended_test_type in ("single_drill", "behavioral_drill", "mock_interview")
 
 
 def test_analytics_api_endpoints(client: TestClient, test_db: Session):

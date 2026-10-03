@@ -25,6 +25,8 @@ class AnalyticsSummary(BaseModel):
     mock_average: float | None = Field(None, description="Average score for mock interviews")
     top_strength_domain: str | None = Field(None, description="Domain with highest average score")
     focus_domain: str | None = Field(None, description="Domain with lowest average score needing practice")
+    training_unlocked: bool = Field(False, description="True if candidate has at least 3 evaluated sessions")
+    sessions_until_unlock: int = Field(3, description="Number of sessions remaining to unlock personalized training")
 
 
 class ScoreDataPoint(BaseModel):
@@ -93,6 +95,11 @@ class RecommendedDrill(BaseModel):
     difficulty: str
     tags: list[str] = Field(default_factory=list)
     reason: str
+    recommended_test_type: str = Field("single_drill", description="single_drill | behavioral_drill | mock_interview")
+    recommended_test_label: str = Field("Technical Practice Drill", description="Display label for recommended test")
+    model_answer: str = Field("", description="8/10 benchmark exemplar model answer in Markdown")
+    scoring_breakdown: str = Field("", description="Scoring criteria breakdown for the 8/10 benchmark")
+    evaluation_criteria: str | None = None
 
 
 class AnalyticsDashboardResponse(BaseModel):

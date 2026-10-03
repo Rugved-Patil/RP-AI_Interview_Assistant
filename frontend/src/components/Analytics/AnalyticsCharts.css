@@ -927,10 +927,130 @@
   border: 1px solid var(--rule, #B9AC94);
 }
 
+.drill-directive-badge {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 600;
+  background-color: var(--paper, #E8DDC8);
+  color: var(--olive-deep, #596044);
+  border: 1px solid var(--rule, #B9AC94);
+  padding: 0.15rem 0.5rem;
+  border-radius: 4px;
+}
+
+.training-active-tag {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 600;
+  background: rgba(89, 96, 68, 0.12);
+  color: var(--olive-deep, #596044);
+  border: 1px solid var(--olive-deep, #596044);
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+}
+
+.training-locked-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: var(--paper-card, #F5F0E5);
+  border: 1px dashed var(--rule, #B9AC94);
+  border-radius: 8px;
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 1.25rem;
+}
+
+.training-locked-icon {
+  font-size: 1.75rem;
+  flex-shrink: 0;
+}
+
+.training-locked-title {
+  font-family: var(--font-serif);
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--ink, #303329);
+  margin: 0 0 0.35rem 0;
+}
+
+.training-locked-desc {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--ink-muted, #596044);
+  line-height: 1.45;
+  margin: 0;
+}
+
+/* 8/10 Exemplar Model Answer Accordion */
+.drill-model-answer-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin-bottom: 1rem;
+}
+
+.drill-model-answer-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--paper-card, #F5F0E5);
+  border: 1px solid var(--rule, #B9AC94);
+  border-radius: 6px;
+  padding: 0.55rem 0.85rem;
+  color: var(--olive-deep, #596044);
+  font-family: var(--font-mono);
+  font-size: 0.76rem;
+  font-weight: 600;
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
+  transition: all 0.15s ease;
+}
+
+.drill-model-answer-toggle:hover {
+  border-color: var(--olive-deep, #596044);
+  background: var(--paper, #E8DDC8);
+}
+
+.drill-model-answer-box {
+  background: var(--paper-card, #F5F0E5);
+  border: 1px solid var(--rule, #B9AC94);
+  border-left: 3px solid var(--olive-deep, #596044);
+  border-radius: 0 6px 6px 0;
+  padding: 1rem 1.15rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  box-shadow: 0 2px 8px -4px rgba(48, 51, 41, 0.15);
+}
+
+.drill-model-answer-content {
+  font-family: var(--font-serif);
+  font-size: 0.88rem;
+  line-height: 1.55;
+  color: var(--ink, #303329);
+}
+
+.drill-scoring-breakdown {
+  border-top: 1px dashed var(--rule, #B9AC94);
+  padding-top: 0.75rem;
+}
+
+.drill-scoring-title {
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--olive-deep, #596044);
+  margin-bottom: 0.4rem;
+}
+
 .drill-actions {
   display: flex;
   gap: 0.5rem;
   align-items: center;
+  margin-top: 0.5rem;
 }
 
 .drill-action-btn {

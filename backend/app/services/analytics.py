@@ -378,6 +378,8 @@ def compute_analytics(
 
     # Recommended Drills from Question Bank
     recommended_drills = _generate_recommended_drills(weak_spots, domains_list)
+    training_unlocked = total_count >= 3
+    sessions_until_unlock = max(0, 3 - total_count)
 
     summary = AnalyticsSummary(
         total_sessions=total_count,
@@ -392,6 +394,8 @@ def compute_analytics(
         mock_average=mock_avg,
         top_strength_domain=top_strength,
         focus_domain=focus_domain,
+        training_unlocked=training_unlocked,
+        sessions_until_unlock=sessions_until_unlock,
     )
 
     return AnalyticsDashboardResponse(
@@ -406,15 +410,31 @@ def compute_analytics(
 
 
 RAG_DOMAIN_MAP: dict[str, str] = {
-    "Machine Learning & AI": "Machine Learning",
-    "Machine Learning": "Machine Learning",
+    "Frontend": "Frontend",
+    "Backend": "Backend",
+    "System Design": "System Design",
+    "DevOps & Cloud": "DevOps & Cloud",
+    "DevOps": "DevOps & Cloud",
+    "Data Engineering": "Data Engineering",
+    "Machine Learning & AI": "Machine Learning & AI",
+    "Machine Learning": "Machine Learning & AI",
+    "Cybersecurity": "Cybersecurity",
+    "Mobile": "Mobile",
+    "Product Management": "Product Management",
+    "Project Management": "Project Management",
+    "UI/UX Design": "UI/UX Design",
+    "Leadership": "Leadership",
+    "Executive Leadership": "Leadership",
+    "Sales & Marketing": "Sales & Marketing",
+    "Finance & Accounting": "Finance & Accounting",
+    "Healthcare": "Healthcare",
+    "Education": "Education",
+    "Hospitality & Operations": "Hospitality & Operations",
+    "Customer Success": "Customer Success",
     "Behavioral & HR": "Behavioral",
     "Behavioral": "Behavioral",
-    "Frontend": "Frontend",
-    "DevOps & Cloud": "DevOps & Cloud",
-    "System Design": "System Design",
-    "Data Structures & Algorithms": "Data Structures & Algorithms",
-    "Software Engineering": "Software Engineering",
+    "Software Engineering": "Backend",
+    "Data Structures & Algorithms": "Backend",
 }
 
 
@@ -422,7 +442,12 @@ def _generate_recommended_drills(
     weak_spots: list[WeakSpotItem],
     all_domains: list[DomainBreakdown],
 ) -> list[RecommendedDrill]:
-    """Retrieves curated drills from the Question Bank targeted to identified gaps."""
+    """Retrieves curated drills from the Question Bank targeted to identified gaps, enriched with 8/10 model answers."""
+    from app.services.model_answers import (
+        generate_8_out_of_10_model_answer,
+        get_recommended_test_directive,
+    )
+
     retriever = get_rag_retriever()
     recommendations: list[RecommendedDrill] = []
     seen_ids: set[str] = set()
@@ -437,13 +462,13 @@ def _generate_recommended_drills(
                 target_domains.append(d.domain)
 
     if not target_domains:
-        target_domains = ["Software Engineering", "Behavioral & HR", "System Design"]
+        target_domains = ["Backend", "System Design", "Behavioral", "Frontend"]
 
     for d_name in target_domains[:4]:
         mapped_domain = RAG_DOMAIN_MAP.get(d_name, d_name)
         results = retriever.retrieve(
             query=d_name,
-            domain=mapped_domain if mapped_domain in ["Software Engineering", "Frontend", "Machine Learning", "System Design", "DevOps & Cloud", "Data Structures & Algorithms", "Behavioral"] else None,
+            domain=mapped_domain if mapped_domain in retriever.vector_store.get_stats().difficulties or True else None,
             top_k=3,
         )
         if not results:
@@ -452,6 +477,15 @@ def _generate_recommended_drills(
         for r in results:
             if r.id not in seen_ids:
                 seen_ids.add(r.id)
+                test_type, test_label = get_recommended_test_directive(r.category, r.domain, r.difficulty)
+                model_ans, scoring_bk = generate_8_out_of_10_model_answer(
+                    question=r.question,
+                    category=r.category,
+                    domain=r.domain,
+                    difficulty=r.difficulty,
+                    evaluation_criteria=r.evaluation_criteria,
+                    tags=r.tags,
+                )
                 recommendations.append(
                     RecommendedDrill(
                         question_id=r.id,
@@ -461,18 +495,32 @@ def _generate_recommended_drills(
                         difficulty=r.difficulty,
                         tags=r.tags,
                         reason=f"Targets {d_name} competency enhancement",
+                        recommended_test_type=test_type,
+                        recommended_test_label=test_label,
+                        model_answer=model_ans,
+                        scoring_breakdown=scoring_bk,
+                        evaluation_criteria=r.evaluation_criteria,
                     )
                 )
 
     # Backfill if fewer than 4 recommendations
     if len(recommendations) < 4:
-        for backup_d in ["System Design", "Software Engineering", "Behavioral"]:
+        for backup_d in ["System Design", "Backend", "Behavioral", "Frontend"]:
             if len(recommendations) >= 6:
                 break
-            results = retriever.retrieve(query=backup_d, domain=backup_d, top_k=2)
+            results = retriever.retrieve(query=backup_d, top_k=2)
             for r in results:
                 if r.id not in seen_ids and len(recommendations) < 6:
                     seen_ids.add(r.id)
+                    test_type, test_label = get_recommended_test_directive(r.category, r.domain, r.difficulty)
+                    model_ans, scoring_bk = generate_8_out_of_10_model_answer(
+                        question=r.question,
+                        category=r.category,
+                        domain=r.domain,
+                        difficulty=r.difficulty,
+                        evaluation_criteria=r.evaluation_criteria,
+                        tags=r.tags,
+                    )
                     recommendations.append(
                         RecommendedDrill(
                             question_id=r.id,
@@ -482,6 +530,11 @@ def _generate_recommended_drills(
                             difficulty=r.difficulty,
                             tags=r.tags,
                             reason=f"Recommended {backup_d} practice",
+                            recommended_test_type=test_type,
+                            recommended_test_label=test_label,
+                            model_answer=model_ans,
+                            scoring_breakdown=scoring_bk,
+                            evaluation_criteria=r.evaluation_criteria,
                         )
                     )
 

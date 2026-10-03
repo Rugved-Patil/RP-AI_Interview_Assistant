@@ -143,7 +143,7 @@ export function QuestionBankPage() {
       {/* Header */}
       <header className="qb-header">
         <div className="qb-title-row">
-          <h1 className="qb-title">Question Bank & RAG Explorer</h1>
+          <h1 className="qb-title">Question Bank</h1>
           {stats && (
             <div className="qb-count-pill">
               {stats.total_questions} Curated Questions • {stats.domains.length} Domains
@@ -151,7 +151,7 @@ export function QuestionBankPage() {
           )}
         </div>
         <p className="qb-subtitle">
-          Search and practice vetted interview exemplars across engineering, management, healthcare, operations, and behavioral disciplines.
+          Explore vetted interview questions frequently asked across diverse industries and roles. Practice with instant feedback or inspect detailed evaluation rubrics.
         </p>
       </header>
 

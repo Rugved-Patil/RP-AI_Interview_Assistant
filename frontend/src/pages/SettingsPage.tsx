@@ -634,7 +634,7 @@ export function SettingsPage() {
           </div>
 
           <div className="settings-form-group">
-            <label className="settings-label">Question Bank &amp; Local RAG Grounding</label>
+            <label className="settings-label">Question Bank &amp; Domain Grounding</label>
             <div className="engine-card">
               <div className="engine-card__header">
                 <span className="engine-card__name">Local Vector Hybrid Index</span>
@@ -642,7 +642,7 @@ export function SettingsPage() {
               </div>
               <p className="engine-card__desc">
                 {serverConfig ? `${serverConfig.rag_questions_count} curated exemplar questions` : 'Curated question bank'}{' '}
-                indexed locally via TF-IDF + BM25 cosine retrieval for grounded technical depth.
+                indexed locally for grounded role depth, realistic question patterns, and diagnostic scoring.
               </p>
             </div>
           </div>
