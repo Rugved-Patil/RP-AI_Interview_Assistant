@@ -196,9 +196,11 @@ Every major enhancement for the next milestone is divided into independent, veri
   - Enriched recommendation engine across all 19 Question Bank domains with actionable test track directives (Technical Drill, Behavioral STAR Drill, or Mock Interview).
   - Enhanced Analytics and Home dashboards with interactive collapsible 8/10 model answer accordions and 1-click drill launcher.
 
-- [ ] **Chunk 4: Multilingual Voice (STT/TTS) & UI Localization (i18n)** — ⏳ **Scheduled (To Be Built)**
-  - Regional and international STT/TTS voice selection via Web Speech API (Hindi, Marathi, German, Spanish, French, etc.).
-  - Client-side zero-dependency UI localization (i18n) dictionary with global language switcher.
+- [x] **Chunk 4: Multilingual Voice (STT/TTS) & UI Localization (i18n)** — ✅ **Completed**
+  - Implemented 12 comprehensive language dictionaries (English, Hindi, Marathi, German, Spanish, French, Japanese, Gujarati, Tamil, Telugu, Bengali, Kannada) with zero runtime dependencies ($0 budget).
+  - Unified language and speech synchronization: 1-click selection in Settings immediately synchronizes Website UI text, natural voice synthesis (TTS), and microphone speech recognition (STT Web Speech API `dictationLang`).
+  - Native sample greeting voice tests in Settings for all 12 languages with automatic natural voice prioritization.
+  - Translated global shell navigation, practice cards, home dashboard, question bank explorer, and settings.
 
 - [ ] **Chunk 5: UI/UX Fluidity, Micro-Animations & Clean Editorial Polish** — ⏳ **Scheduled (To Be Built)**
   - Eliminate backend/internal jargon across all UI copy.

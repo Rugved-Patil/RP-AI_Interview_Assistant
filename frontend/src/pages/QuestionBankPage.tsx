@@ -8,10 +8,12 @@ import {
   type QuestionDoc,
   type RetrievedQuestion,
 } from '../api/practiceApi'
+import { useTranslation } from '../i18n/LanguageContext'
 import './QuestionBankPage.css'
 
 export function QuestionBankPage() {
   const navigate = useNavigate()
+  const { t } = useTranslation()
   const [stats, setStats] = useState<QuestionBankStats | null>(null)
   const [questions, setQuestions] = useState<QuestionDoc[]>([])
   const [retrievedResults, setRetrievedResults] = useState<RetrievedQuestion[] | null>(null)
@@ -137,13 +139,13 @@ export function QuestionBankPage() {
         }}
         style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer' }}
       >
-        ← Back
+        {t('nav.back', undefined, '← Back')}
       </button>
 
       {/* Header */}
       <header className="qb-header">
         <div className="qb-title-row">
-          <h1 className="qb-title">Question Bank</h1>
+          <h1 className="qb-title">{t('qb.title', undefined, 'Question Bank')}</h1>
           {stats && (
             <div className="qb-count-pill">
               {stats.total_questions} Curated Questions • {stats.domains.length} Domains
@@ -151,7 +153,7 @@ export function QuestionBankPage() {
           )}
         </div>
         <p className="qb-subtitle">
-          Explore vetted interview questions frequently asked across diverse industries and roles. Practice with instant feedback or inspect detailed evaluation rubrics.
+          {t('qb.subtitle', undefined, 'Explore vetted interview questions frequently asked across diverse industries and roles. Practice with instant feedback or inspect detailed evaluation rubrics.')}
         </p>
       </header>
 
@@ -177,7 +179,7 @@ export function QuestionBankPage() {
             <input
               type="text"
               className="qb-search-input"
-              placeholder="Search by keyword, concept, or role (e.g., 'React Fiber', 'Kubernetes', 'B-Tree', 'Triage', 'STAR', 'Cash flow')..."
+              placeholder={t('qb.search_placeholder', undefined, "Search by keyword, concept, or role (e.g., 'React Fiber', 'Kubernetes', 'B-Tree', 'Triage', 'STAR', 'Cash flow')...")}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
@@ -196,20 +198,20 @@ export function QuestionBankPage() {
               className={`qb-tab-btn ${selectedCategory === 'all' ? 'active' : ''}`}
               onClick={() => setSelectedCategory('all')}
             >
-              All Categories
+              {t('qb.all_categories', undefined, 'All Categories')}
             </button>
             <button
               className={`qb-tab-btn ${selectedCategory === 'technical' ? 'active' : ''}`}
               onClick={() => setSelectedCategory('technical')}
             >
-              Technical & Domain
+              {t('qb.tech_category', undefined, 'Technical & Domain')}
             </button>
             <button
               className={`qb-tab-btn ${selectedCategory === 'behavioral' ? 'active' : ''}`}
               onClick={() => setSelectedCategory('behavioral')}
             >
-              Behavioral (STAR)
-            </button>
+              {t('qb.behavioral_category', undefined, 'Behavioral (STAR)')
+            }</button>
           </div>
 
           <div className="qb-filter-dropdowns">
@@ -218,11 +220,11 @@ export function QuestionBankPage() {
               value={selectedDifficulty}
               onChange={(e) => setSelectedDifficulty(e.target.value)}
             >
-              <option value="all">All Difficulties</option>
-              <option value="junior">Junior / Entry</option>
-              <option value="mid">Mid-Level</option>
-              <option value="senior">Senior</option>
-              <option value="lead">Lead / Staff</option>
+              <option value="all">{t('qb.all_difficulties', undefined, 'All Difficulties')}</option>
+              <option value="junior">{t('qb.junior', undefined, 'Junior / Entry')}</option>
+              <option value="mid">{t('qb.mid', undefined, 'Mid-Level')}</option>
+              <option value="senior">{t('qb.senior', undefined, 'Senior')}</option>
+              <option value="lead">{t('qb.lead', undefined, 'Lead / Staff')}</option>
             </select>
           </div>
         </div>
@@ -311,9 +313,9 @@ export function QuestionBankPage() {
                           onClick={() => toggleCriteria(q.id)}
                           type="button"
                         >
-                          <span>Evaluation Rubric & Key Concepts</span>
+                          <span>Evaluation Rubric &amp; Key Concepts</span>
                           <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}>
-                            {expandedCriteria[q.id] ? 'Hide Rubric' : 'View Rubric'}
+                            {expandedCriteria[q.id] ? t('qb.hide_rubric', undefined, 'Hide Rubric') : t('qb.view_rubric', undefined, 'View Rubric')}
                             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                               <polyline points={expandedCriteria[q.id] ? "18 15 12 9 6 15" : "6 9 12 15 18 9"} />
                             </svg>
@@ -334,7 +336,7 @@ export function QuestionBankPage() {
                         <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor">
                           <polygon points="5 3 19 12 5 21 5 3" />
                         </svg>
-                        <span>Practice Question</span>
+                        <span>{t('qb.practice_btn', undefined, 'Practice Question')}</span>
                       </button>
                       <button
                         type="button"
@@ -346,7 +348,7 @@ export function QuestionBankPage() {
                             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                               <polyline points="20 6 9 17 4 12" />
                             </svg>
-                            <span>Copied</span>
+                            <span>{t('qb.copied', undefined, 'Copied')}</span>
                           </>
                         ) : (
                           <>
@@ -354,7 +356,7 @@ export function QuestionBankPage() {
                               <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
                               <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
                             </svg>
-                            <span>Copy</span>
+                            <span>{t('qb.copy_btn', undefined, 'Copy')}</span>
                           </>
                         )}
                       </button>
@@ -398,9 +400,9 @@ export function QuestionBankPage() {
                           onClick={() => toggleCriteria(q.id)}
                           type="button"
                         >
-                          <span>Evaluation Rubric & Key Concepts</span>
+                          <span>Evaluation Rubric &amp; Key Concepts</span>
                           <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}>
-                            {expandedCriteria[q.id] ? 'Hide Rubric' : 'View Rubric'}
+                            {expandedCriteria[q.id] ? t('qb.hide_rubric', undefined, 'Hide Rubric') : t('qb.view_rubric', undefined, 'View Rubric')}
                             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                               <polyline points={expandedCriteria[q.id] ? "18 15 12 9 6 15" : "6 9 12 15 18 9"} />
                             </svg>
@@ -421,7 +423,7 @@ export function QuestionBankPage() {
                         <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor">
                           <polygon points="5 3 19 12 5 21 5 3" />
                         </svg>
-                        <span>Practice Question</span>
+                        <span>{t('qb.practice_btn', undefined, 'Practice Question')}</span>
                       </button>
                       <button
                         type="button"
@@ -433,7 +435,7 @@ export function QuestionBankPage() {
                             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                               <polyline points="20 6 9 17 4 12" />
                             </svg>
-                            <span>Copied</span>
+                            <span>{t('qb.copied', undefined, 'Copied')}</span>
                           </>
                         ) : (
                           <>
@@ -441,7 +443,7 @@ export function QuestionBankPage() {
                               <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
                               <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
                             </svg>
-                            <span>Copy</span>
+                            <span>{t('qb.copy_btn', undefined, 'Copy')}</span>
                           </>
                         )}
                       </button>

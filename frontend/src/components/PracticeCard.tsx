@@ -16,6 +16,7 @@ import { useSpeechRecognition } from '../hooks/useSpeechRecognition'
 import { useSpeechSynthesis } from '../hooks/useSpeechSynthesis'
 import { MicIcon, SpeakerIcon, StopIcon } from './Icons'
 import { FormattedFeedback } from './FormattedFeedback'
+import { useTranslation } from '../i18n/LanguageContext'
 import './PracticeCard.css'
 
 /**
@@ -48,6 +49,7 @@ type ActivePresetState =
 
 export function PracticeCard() {
   const location = useLocation()
+  const { t } = useTranslation()
   const navState = (location.state || {}) as {
     directQuestion?: string
     domain?: string
@@ -266,14 +268,14 @@ export function PracticeCard() {
 
           <div className="practice-card__textarea-wrapper">
             <label className="sr-only" htmlFor="answer">
-              Your answer
+              {t('practice.your_answer', undefined, 'Your Response')}
             </label>
             <textarea
               id="answer"
               className="practice-card__textarea"
               value={stage.answer}
               onChange={(event) => setStage({ ...stage, answer: event.target.value })}
-              placeholder="Type or dictate your answer here..."
+              placeholder={t('practice.type_placeholder', undefined, 'Type your answer or use microphone dictation…')}
               rows={8}
               maxLength={MAX_ANSWER_LENGTH}
               disabled={stage.submitting}
@@ -289,8 +291,8 @@ export function PracticeCard() {
                     }`}
                     onClick={stt.toggleListening}
                     disabled={stage.submitting}
-                    title={stt.isListening ? 'Stop dictating' : 'Dictate answer with microphone'}
-                    aria-label={stt.isListening ? 'Stop dictating' : 'Dictate answer with microphone'}
+                    title={stt.isListening ? t('practice.mic_stop', undefined, 'Stop Dictation') : t('practice.mic_start', undefined, 'Start Voice Dictation')}
+                    aria-label={stt.isListening ? t('practice.mic_stop', undefined, 'Stop Dictation') : t('practice.mic_start', undefined, 'Start Voice Dictation')}
                   >
                     <MicIcon width={16} height={16} />
                   </button>
@@ -319,7 +321,7 @@ export function PracticeCard() {
               onClick={handleSubmit}
               disabled={stage.submitting || stage.answer.trim().length === 0}
             >
-              {stage.submitting ? 'Grading…' : stage.error ? 'Retry grading' : 'Submit answer'}
+              {stage.submitting ? t('practice.evaluating', undefined, 'Evaluating Response…') : stage.error ? 'Retry grading' : t('practice.submit_eval', undefined, 'Submit for Evaluation')}
             </button>
             {stage.error && (
               <button
@@ -340,7 +342,7 @@ export function PracticeCard() {
           
           <div className="practice-card__feedback-header">
             <div className="practice-card__feedback-top">
-              <span className="practice-card__feedback-label">Diagnostic Feedback</span>
+              <span className="practice-card__feedback-label">{t('practice.score_title', undefined, 'Diagnostic Performance Assessment')}</span>
               {tts.isSupported && (
                 <button
                   type="button"
@@ -362,7 +364,7 @@ export function PracticeCard() {
               onClick={handleSave}
               disabled={stage.saveState === 'saving' || stage.saveState === 'saved'}
             >
-              {saveButtonLabel(stage.saveState)}
+              {stage.saveState === 'saved' ? t('practice.saved_success', undefined, 'Report Saved!') : t('practice.save_report', undefined, 'Save Report')}
             </button>
             <button
               className="practice-card__button"
@@ -371,7 +373,7 @@ export function PracticeCard() {
                 setStage({ name: 'idle' })
               })}
             >
-              Start another question
+              {t('practice.next_question', undefined, 'Next Practice Question →')}
             </button>
           </div>
         </div>
@@ -423,19 +425,6 @@ function ActivePresetBanner({ state }: { state: ActivePresetState }) {
       </Link>
     </p>
   )
-}
-
-function saveButtonLabel(saveState: 'unsaved' | 'saving' | 'saved' | 'error'): string {
-  switch (saveState) {
-    case 'saving':
-      return 'Saving…'
-    case 'saved':
-      return 'Saved ✓'
-    case 'error':
-      return 'Save failed — retry'
-    default:
-      return 'Save this report'
-  }
 }
 
 function ScoreMark({ score }: { score: number }) {

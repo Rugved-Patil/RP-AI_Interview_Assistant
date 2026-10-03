@@ -51,8 +51,10 @@ export function useSpeechSynthesis() {
   const resolvePreferredVoice = useCallback((availableVoices: SpeechSynthesisVoice[]) => {
     if (!availableVoices || availableVoices.length === 0) return null
     const settings = getSpeechSettings()
+    const targetLang = settings.dictationLang || 'en-US'
+    const langPrefix = targetLang.split('-')[0].toLowerCase()
 
-    // 1. User selected voice URI
+    // 1. User explicitly selected voice URI
     if (settings.voiceURI) {
       const match = availableVoices.find(
         (v) =>
@@ -63,17 +65,30 @@ export function useSpeechSynthesis() {
       if (match) return match
     }
 
-    // 2. Priority list of natural-sounding English voices
+    // 2. Filter voices matching current active language code / prefix (e.g. 'hi', 'mr', 'de', 'es', 'fr', 'ja', 'en')
+    const langVoices = availableVoices.filter(
+      (v) => v.lang.toLowerCase().replace('_', '-').startsWith(langPrefix) || v.lang.toLowerCase() === targetLang.toLowerCase(),
+    )
+
+    if (langVoices.length > 0) {
+      // Prioritize natural / enhanced voices in this language
+      const naturalLangVoice = langVoices.find((v) => isNaturalVoice(v))
+      if (naturalLangVoice) return naturalLangVoice
+
+      // Exact dialect match
+      const exactMatch = langVoices.find((v) => v.lang.toLowerCase().replace('_', '-') === targetLang.toLowerCase())
+      if (exactMatch) return exactMatch
+
+      return langVoices[0]
+    }
+
+    // 3. Fallback to natural English voices if language voices not installed on browser/OS
     const englishVoices = availableVoices.filter((v) => v.lang.startsWith('en'))
     const preferred =
       englishVoices.find((v) => v.name.includes('Google US English')) ||
-      englishVoices.find((v) => v.name.toLowerCase().includes('samantha') && v.name.toLowerCase().includes('enhanced')) ||
       englishVoices.find((v) => v.name.toLowerCase().includes('samantha')) ||
-      englishVoices.find((v) => v.name.toLowerCase().includes('daniel') && v.name.toLowerCase().includes('enhanced')) ||
       englishVoices.find((v) => v.name.toLowerCase().includes('daniel')) ||
-      englishVoices.find((v) => v.name.toLowerCase().includes('alex')) ||
       englishVoices.find((v) => isNaturalVoice(v)) ||
-      englishVoices.find((v) => v.lang === 'en-US') ||
       englishVoices[0] ||
       availableVoices[0] ||
       null

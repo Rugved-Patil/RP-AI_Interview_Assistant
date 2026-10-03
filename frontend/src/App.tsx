@@ -10,6 +10,7 @@ import { SavedReportsPage } from './pages/SavedReportsPage'
 import { SettingsPage } from './pages/SettingsPage'
 import { SituationalPracticePage } from './pages/SituationalPracticePage'
 import { RightNavbar } from './components/RightNavbar'
+import { LanguageProvider, useTranslation } from './i18n/LanguageContext'
 import './App.css'
 
 /**
@@ -18,6 +19,8 @@ import './App.css'
  * swaps in whichever page matches the current URL.
  */
 function Layout() {
+  const { t } = useTranslation()
+
   return (
     <div className="page page--with-sidebar">
       <header className="page__header">
@@ -30,7 +33,7 @@ function Layout() {
             }
           }}
         >
-          RP-AI Interview Assistant
+          {t('nav.brand', undefined, 'RP-AI Interview Assistant')}
         </Link>
       </header>
       <main className="page__main">
@@ -43,23 +46,25 @@ function Layout() {
 
 function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route element={<Layout />}>
-          <Route index element={<HomePage />} />
-          <Route path="analytics" element={<AnalyticsPage />} />
-          <Route path="sandbox" element={<CodingSandboxPage />} />
-          <Route path="sandbox/:problemId" element={<CodingSandboxPage />} />
-          <Route path="practice" element={<SituationalPracticePage />} />
-          <Route path="practice/behavioral" element={<BehavioralPracticePage />} />
-          <Route path="mock-interview" element={<MockInterviewPage />} />
-          <Route path="questions" element={<QuestionBankPage />} />
-          <Route path="presets" element={<PresetsPage />} />
-          <Route path="reports" element={<SavedReportsPage />} />
-          <Route path="settings" element={<SettingsPage />} />
-        </Route>
-      </Routes>
-    </BrowserRouter>
+    <LanguageProvider>
+      <BrowserRouter>
+        <Routes>
+          <Route element={<Layout />}>
+            <Route index element={<HomePage />} />
+            <Route path="analytics" element={<AnalyticsPage />} />
+            <Route path="sandbox" element={<CodingSandboxPage />} />
+            <Route path="sandbox/:problemId" element={<CodingSandboxPage />} />
+            <Route path="practice" element={<SituationalPracticePage />} />
+            <Route path="practice/behavioral" element={<BehavioralPracticePage />} />
+            <Route path="mock-interview" element={<MockInterviewPage />} />
+            <Route path="questions" element={<QuestionBankPage />} />
+            <Route path="presets" element={<PresetsPage />} />
+            <Route path="reports" element={<SavedReportsPage />} />
+            <Route path="settings" element={<SettingsPage />} />
+          </Route>
+        </Routes>
+      </BrowserRouter>
+    </LanguageProvider>
   )
 }
 

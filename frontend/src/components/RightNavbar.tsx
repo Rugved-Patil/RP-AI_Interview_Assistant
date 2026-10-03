@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { NavLink, useLocation } from 'react-router-dom'
 import {
   HomeIcon,
@@ -11,56 +11,12 @@ import {
   ChevronLeftIcon,
   ChevronRightIcon,
 } from './Icons'
+import { useTranslation } from '../i18n/LanguageContext'
 import './RightNavbar.css'
-
-interface NavItem {
-  to: string
-  label: string
-  icon: React.ComponentType<{ width?: number; height?: number; className?: string }>
-  exact?: boolean
-}
-
-const NAV_ITEMS: NavItem[] = [
-  {
-    to: '/',
-    label: 'Home',
-    icon: HomeIcon,
-    exact: true,
-  },
-  {
-    to: '/sandbox',
-    label: 'Coding Sandbox',
-    icon: CodeIcon,
-  },
-  {
-    to: '/analytics',
-    label: 'Analytics & Progress',
-    icon: AnalyticsIcon,
-  },
-  {
-    to: '/questions',
-    label: 'Question Bank',
-    icon: QuestionBankIcon,
-  },
-  {
-    to: '/presets',
-    label: 'Interview Presets',
-    icon: PresetsIcon,
-  },
-  {
-    to: '/reports',
-    label: 'Saved Reports',
-    icon: SavedReportsIcon,
-  },
-  {
-    to: '/settings',
-    label: 'Settings',
-    icon: SettingsIcon,
-  },
-]
 
 export function RightNavbar() {
   const location = useLocation()
+  const { t } = useTranslation()
   const [collapsed, setCollapsed] = useState<boolean>(() => {
     try {
       const saved = localStorage.getItem('rp_ai_nav_collapsed')
@@ -84,6 +40,45 @@ export function RightNavbar() {
     }
   }
 
+  const navItems = [
+    {
+      to: '/',
+      label: t('nav.home', undefined, 'Home'),
+      icon: HomeIcon,
+      exact: true,
+    },
+    {
+      to: '/sandbox',
+      label: t('nav.sandbox', undefined, 'Coding Sandbox'),
+      icon: CodeIcon,
+    },
+    {
+      to: '/analytics',
+      label: t('nav.analytics', undefined, 'Analytics & Progress'),
+      icon: AnalyticsIcon,
+    },
+    {
+      to: '/questions',
+      label: t('nav.questions', undefined, 'Question Bank'),
+      icon: QuestionBankIcon,
+    },
+    {
+      to: '/presets',
+      label: t('nav.presets', undefined, 'Interview Presets'),
+      icon: PresetsIcon,
+    },
+    {
+      to: '/reports',
+      label: t('nav.reports', undefined, 'Saved Reports'),
+      icon: SavedReportsIcon,
+    },
+    {
+      to: '/settings',
+      label: t('nav.settings', undefined, 'Settings'),
+      icon: SettingsIcon,
+    },
+  ]
+
   return (
     <aside
       className={`right-nav ${collapsed ? 'right-nav--collapsed' : 'right-nav--expanded'}`}
@@ -94,18 +89,18 @@ export function RightNavbar() {
           type="button"
           className="right-nav__toggle-btn"
           onClick={() => setCollapsed((prev) => !prev)}
-          title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+          title={collapsed ? t('nav.expand', undefined, 'Expand sidebar') : t('nav.collapse', undefined, 'Collapse sidebar')}
           aria-expanded={!collapsed}
         >
           <span className="right-nav__toggle-icon" aria-hidden="true">
             {collapsed ? <ChevronLeftIcon width={16} height={16} /> : <ChevronRightIcon width={16} height={16} />}
           </span>
-          {!collapsed && <span className="right-nav__toggle-text">Collapse Menu</span>}
+          {!collapsed && <span className="right-nav__toggle-text">{t('nav.collapse', undefined, 'Collapse Menu')}</span>}
         </button>
       </div>
 
       <nav className="right-nav__menu">
-        {NAV_ITEMS.map((item) => {
+        {navItems.map((item) => {
           const IconComponent = item.icon
           const isActive = item.exact
             ? location.pathname === item.to

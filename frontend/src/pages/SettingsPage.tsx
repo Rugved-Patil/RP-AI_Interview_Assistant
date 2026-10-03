@@ -34,10 +34,28 @@ import {
   type SpeechSettings,
 } from '../speechSettings'
 import { applyTheme, getActiveTheme, THEME_OPTIONS, type ThemeId } from '../themeManager'
+import { useTranslation } from '../i18n/LanguageContext'
+import { type LanguageId, SUPPORTED_LANGUAGES } from '../i18n/languages'
 import './SettingsPage.css'
+
+const SAMPLE_GREETINGS: Record<LanguageId, string> = {
+  en: "Welcome to your AI interview assistant. Let's practice and elevate your skills.",
+  hi: 'नमस्ते! एआई साक्षात्कार सहायक में आपका स्वागत है। चलिए अभ्यास शुरू करते हैं।',
+  mr: 'नमस्कार! एआय मुलाखत सहाय्यकामध्ये आपले स्वागत आहे. चला सराव सुरू करूया.',
+  de: 'Willkommen bei Ihrem KI-Interview-Assistenten. Lassen Sie uns üben.',
+  es: 'Bienvenido a su asistente de entrevistas de IA. Practiquemos juntos.',
+  fr: "Bienvenue dans votre assistant d'entretien IA. Entraînons-nous ensemble.",
+  ja: 'AI面接アシスタントへようこそ。一緒に練習を始めましょう。',
+  gu: 'નમસ્તે! એઆઈ ઇન્ટરવ્યુ સહાયકમાં આપનું સ્વાગત છે. ચાલો પ્રેક્ટિસ કરીએ.',
+  ta: 'வணக்கம்! AI நேர்காணல் உதவியாளருக்கு வரவேற்கிறோம். பயிற்சி செய்வோம்.',
+  te: 'నమస్కారం! AI ఇంటర్వ్యూ అసిస్టెంట్‌కి స్వాగతం. సాధన చేద్దాం.',
+  bn: 'নমস্কার! এআই ইন্টারভিউ অ্যাসিস্ট্যান্টে আপনাকে স্বাগতম। চলুন অনুশীলন শুরু করি।',
+  kn: 'ನಮಸ್ಕಾರ! AI ಸಂದರ್ಶನ ಸಹಾಯಕಕ್ಕೆ ಸ್ವಾಗತ. ಅಭ್ಯಾಸ ಪ್ರಾರಂಭಿಸೋಣ.',
+}
 
 export function SettingsPage() {
   const navigate = useNavigate()
+  const { language, languageConfig, setLanguage, t } = useTranslation()
 
   // Theme state
   const [selectedTheme, setSelectedTheme] = useState<ThemeId>(getActiveTheme())
@@ -133,6 +151,19 @@ export function SettingsPage() {
     )
   }, [formSpeech, savedSpeech])
 
+  const handleLanguageSelect = (langId: LanguageId) => {
+    if (isTestingVoice && typeof window !== 'undefined' && 'speechSynthesis' in window) {
+      window.speechSynthesis.cancel()
+      setIsTestingVoice(false)
+    }
+    setLanguage(langId)
+    const updated = getSpeechSettings()
+    setSavedSpeech(updated)
+    setFormSpeech(updated)
+    const target = SUPPORTED_LANGUAGES.find((l) => l.id === langId)
+    showToast(`Switched interface & voice language to ${target?.nativeName || langId} (${target?.label}).`)
+  }
+
   const handleThemeChange = (themeId: ThemeId) => {
     setSelectedTheme(themeId)
     applyTheme(themeId)
@@ -156,7 +187,10 @@ export function SettingsPage() {
       window.speechSynthesis.cancel()
       setIsTestingVoice(false)
     }
-    setFormSpeech(DEFAULT_SPEECH_SETTINGS)
+    setFormSpeech({
+      ...DEFAULT_SPEECH_SETTINGS,
+      dictationLang: languageConfig.speechCode,
+    })
   }
 
   const handleTestVoice = () => {
@@ -181,7 +215,7 @@ export function SettingsPage() {
     // Safety tick before speak using currently committed saved speech settings
     testVoiceTimerRef.current = window.setTimeout(() => {
       try {
-        const text = "Welcome to your AI interview assistant. Let's practice and elevate your skills."
+        const text = SAMPLE_GREETINGS[language] || SAMPLE_GREETINGS.en
         const utterance = new SpeechSynthesisUtterance(text)
 
         if (savedSpeech.voiceURI) {
@@ -192,10 +226,18 @@ export function SettingsPage() {
               `${v.name} (${v.lang})` === savedSpeech.voiceURI,
           )
           if (matched) utterance.voice = matched
+        } else {
+          // Find natural voice matching active language
+          const prefix = languageConfig.speechPrefix.toLowerCase()
+          const matched =
+            availableVoices.find((v) => v.lang.toLowerCase().startsWith(prefix) && isNaturalVoice(v)) ||
+            availableVoices.find((v) => v.lang.toLowerCase().startsWith(prefix))
+          if (matched) utterance.voice = matched
         }
+
         utterance.rate = savedSpeech.rate
         utterance.pitch = savedSpeech.pitch
-        utterance.lang = savedSpeech.dictationLang || 'en-US'
+        utterance.lang = savedSpeech.dictationLang || languageConfig.speechCode
 
         utterance.onstart = () => setIsTestingVoice(true)
         utterance.onend = () => setIsTestingVoice(false)
@@ -343,16 +385,19 @@ export function SettingsPage() {
     }, 4500)
   }
 
-  // Filter ONLY natural & enhanced voices (commenting out standard voices code for now per user request)
-  const naturalVoices = availableVoices.filter((v) => isNaturalVoice(v))
-  const displayVoices =
-    naturalVoices.length > 0
-      ? naturalVoices
-      : availableVoices.filter((v) => v.lang.startsWith('en')).slice(0, 5)
+  // Filter voices prioritizing active language and natural/neural qualities
+  const activePrefix = languageConfig.speechPrefix.toLowerCase()
+  const matchingLangVoices = availableVoices.filter((v) =>
+    v.lang.toLowerCase().startsWith(activePrefix),
+  )
+  const matchingNatural = matchingLangVoices.filter((v) => isNaturalVoice(v))
 
-  /* Standard browser voices commented out for now per request:
-  const standardVoices = availableVoices.filter((v) => !isNaturalVoice(v))
-  */
+  const displayVoices =
+    matchingNatural.length > 0
+      ? matchingNatural
+      : matchingLangVoices.length > 0
+        ? matchingLangVoices
+        : availableVoices.filter((v) => isNaturalVoice(v))
 
   return (
     <div className="settings-page">
@@ -368,7 +413,7 @@ export function SettingsPage() {
         }}
         style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer' }}
       >
-        ← Back
+        {t('nav.back', undefined, '← Back')}
       </button>
 
       <header className="settings-header">
@@ -377,9 +422,9 @@ export function SettingsPage() {
             <SettingsIcon width={28} height={28} />
           </span>
           <div>
-            <h1 className="settings-title">Application Settings</h1>
+            <h1 className="settings-title">{t('settings.title', undefined, 'Application Settings')}</h1>
             <p className="settings-subtitle">
-              Personalize theme palettes, speech synthesis &amp; dictation, engine connectivity, and local data persistence.
+              {t('settings.subtitle', undefined, 'Personalize your language, natural voice synthesis, visual themes, and local offline data.')}
             </p>
           </div>
         </div>
@@ -399,61 +444,53 @@ export function SettingsPage() {
       )}
 
       <div className="settings-grid">
-        {/* Section 1: Theme & Visual Style (8 Themes: 4 on line 1, 4 on line 2) */}
-        <section className="settings-section">
-          <div className="settings-section__header">
-            <h2 className="settings-section__title">
-              <PaletteIcon width={18} height={18} />
-              Theme &amp; Visual Style
-            </h2>
-            <span className="settings-tag settings-tag--active">
-              {THEME_OPTIONS.find((t) => t.id === selectedTheme)?.name}
-            </span>
-          </div>
-
-          <div className="theme-options-grid">
-            {THEME_OPTIONS.map((theme) => {
-              const isSelected = theme.id === selectedTheme
-              return (
-                <button
-                  key={theme.id}
-                  type="button"
-                  className={`theme-card ${isSelected ? 'theme-card--selected' : ''}`}
-                  onClick={() => handleThemeChange(theme.id)}
-                >
-                  <div className="theme-card__swatches" aria-hidden="true">
-                    <span className="theme-swatch" style={{ backgroundColor: theme.previewColors.bg }} />
-                    <span className="theme-swatch" style={{ backgroundColor: theme.previewColors.card }} />
-                    <span className="theme-swatch" style={{ backgroundColor: theme.previewColors.primary }} />
-                    <span className="theme-swatch" style={{ backgroundColor: theme.previewColors.accent }} />
-                  </div>
-                  <span className="theme-card__name">
-                    {theme.name}
-                    {isSelected && <CheckIcon width={14} height={14} style={{ color: 'var(--olive-deep)' }} />}
-                  </span>
-                  <span className="theme-card__desc">{theme.description}</span>
-                </button>
-              )
-            })}
-          </div>
-        </section>
-
-        {/* Section 2: Speech & Voice Settings */}
+        {/* Section 1: Unified Multilingual & Voice Localization */}
         <section className="settings-section">
           <div className="settings-section__header">
             <h2 className="settings-section__title">
               <SpeakerIcon width={18} height={18} />
-              Speech &amp; Audio Input/Output
+              {t('settings.lang_section_title', undefined, 'Unified Language & Speech Localization')}
             </h2>
-            <span className="settings-tag">
-              {hasUnsavedSpeech ? 'Unsaved Changes' : 'Saved'}
+            <span className="settings-tag settings-tag--active">
+              {languageConfig.flag} {languageConfig.nativeName} ({languageConfig.label})
             </span>
           </div>
 
-          <div className="settings-form-row">
+          <p className="settings-hint" style={{ marginBottom: '1rem' }}>
+            {t('settings.lang_section_desc', undefined, 'Selecting a language seamlessly synchronizes the website UI, AI voice synthesis (TTS), and microphone speech-to-text dictation (STT).')}
+          </p>
+
+          <div className="language-options-grid">
+            {SUPPORTED_LANGUAGES.map((lang) => {
+              const isSelected = lang.id === language
+              return (
+                <button
+                  key={lang.id}
+                  type="button"
+                  className={`language-card ${isSelected ? 'language-card--selected' : ''}`}
+                  onClick={() => handleLanguageSelect(lang.id)}
+                >
+                  <div className="language-card__top">
+                    <span className="language-card__flag">{lang.flag}</span>
+                    {isSelected ? (
+                      <CheckIcon width={14} height={14} style={{ color: 'var(--olive-deep)' }} />
+                    ) : (
+                      <span className="language-card__code">{lang.speechCode}</span>
+                    )}
+                  </div>
+                  <span className="language-card__native">{lang.nativeName}</span>
+                  <span className="language-card__label">
+                    {lang.label} · <span style={{ opacity: 0.8 }}>{lang.region}</span>
+                  </span>
+                </button>
+              )
+            })}
+          </div>
+
+          <div className="settings-form-row" style={{ marginTop: '1.25rem' }}>
             <div className="settings-form-group">
               <label htmlFor="voice-select" className="settings-label">
-                Natural Voice Synthesis
+                {t('settings.voice_label', undefined, 'Natural Voice Synthesis')}
               </label>
               <select
                 id="voice-select"
@@ -461,36 +498,32 @@ export function SettingsPage() {
                 value={formSpeech.voiceURI}
                 onChange={(e) => setFormSpeech((prev) => ({ ...prev, voiceURI: e.target.value }))}
               >
-                <option value="">Default Recommended Natural Voice</option>
+                <option value="">Default High-Quality Natural Voice ({languageConfig.nativeName})</option>
                 {displayVoices.map((voice) => (
                   <option key={voice.voiceURI || voice.name} value={voice.voiceURI || voice.name}>
                     ✨ {voice.name} ({voice.lang})
                   </option>
                 ))}
               </select>
-              <p className="settings-hint">Filtered strictly to high-fidelity natural &amp; neural voices for realistic interview simulation.</p>
+              <p className="settings-hint">Prioritizes high-fidelity natural &amp; neural voices for {languageConfig.label}.</p>
             </div>
 
             <div className="settings-form-group">
               <label htmlFor="dictation-select" className="settings-label">
                 <span>
                   <MicIcon width={14} height={14} style={{ verticalAlign: 'middle', marginRight: 4 }} />
-                  Dictation Language
+                  Microphone Dictation Language (STT)
                 </span>
               </label>
-              <select
+              <input
                 id="dictation-select"
-                className="settings-select"
-                value={formSpeech.dictationLang}
-                onChange={(e) => setFormSpeech((prev) => ({ ...prev, dictationLang: e.target.value }))}
-              >
-                <option value="en-US">English (United States)</option>
-                <option value="en-GB">English (United Kingdom)</option>
-                <option value="en-IN">English (India)</option>
-                <option value="en-AU">English (Australia)</option>
-                <option value="en-CA">English (Canada)</option>
-              </select>
-              <p className="settings-hint">Microphone speech recognition language model.</p>
+                type="text"
+                className="settings-input"
+                value={`${languageConfig.speechCode} (${languageConfig.nativeName} - ${languageConfig.label})`}
+                disabled
+                readOnly
+              />
+              <p className="settings-hint">Synchronized with active language selection for native browser STT.</p>
             </div>
           </div>
 
@@ -561,7 +594,7 @@ export function SettingsPage() {
               onClick={handleTestVoice}
             >
               <SpeakerIcon width={16} height={16} />
-              {isTestingVoice ? 'Stop Speaking' : 'Test Active Voice'}
+              {isTestingVoice ? t('settings.stop_voice_btn', undefined, 'Stop Speaking') : t('settings.test_voice_btn', undefined, 'Test Active Voice')}
             </button>
 
             <button
@@ -578,6 +611,45 @@ export function SettingsPage() {
               * You have unsaved voice modifications. Click &quot;Save Audio Settings&quot; to apply them across your mock interviews and audio tests.
             </p>
           )}
+        </section>
+
+        {/* Section 2: Theme & Visual Style (8 Themes) */}
+        <section className="settings-section">
+          <div className="settings-section__header">
+            <h2 className="settings-section__title">
+              <PaletteIcon width={18} height={18} />
+              Theme &amp; Visual Style
+            </h2>
+            <span className="settings-tag settings-tag--active">
+              {THEME_OPTIONS.find((t) => t.id === selectedTheme)?.name}
+            </span>
+          </div>
+
+          <div className="theme-options-grid">
+            {THEME_OPTIONS.map((theme) => {
+              const isSelected = theme.id === selectedTheme
+              return (
+                <button
+                  key={theme.id}
+                  type="button"
+                  className={`theme-card ${isSelected ? 'theme-card--selected' : ''}`}
+                  onClick={() => handleThemeChange(theme.id)}
+                >
+                  <div className="theme-card__swatches" aria-hidden="true">
+                    <span className="theme-swatch" style={{ backgroundColor: theme.previewColors.bg }} />
+                    <span className="theme-swatch" style={{ backgroundColor: theme.previewColors.card }} />
+                    <span className="theme-swatch" style={{ backgroundColor: theme.previewColors.primary }} />
+                    <span className="theme-swatch" style={{ backgroundColor: theme.previewColors.accent }} />
+                  </div>
+                  <span className="theme-card__name">
+                    {theme.name}
+                    {isSelected && <CheckIcon width={14} height={14} style={{ color: 'var(--olive-deep)' }} />}
+                  </span>
+                  <span className="theme-card__desc">{theme.description}</span>
+                </button>
+              )
+            })}
+          </div>
         </section>
 
         {/* Section 3: AI Assessment & Interview Engine */}
