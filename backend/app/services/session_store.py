@@ -35,7 +35,7 @@ class TechnicalSession:
     role/company/location are the personalization context the question was
     generated for (scope doc Section 3.4). category tracks whether this is a
     "technical" or "behavioral" practice attempt so the grader applies the
-    correct rubric.
+    correct rubric. language tracks the candidate's chosen language.
     """
 
     id: str
@@ -44,6 +44,7 @@ class TechnicalSession:
     company: str | None = None
     location: str | None = None
     category: str = "technical"  # "technical" | "behavioral"
+    language: str | None = "en"
     answer: str | None = None
     score: int | None = None
     feedback: str | None = None
@@ -61,6 +62,7 @@ def create_session(
     company: str | None = None,
     location: str | None = None,
     category: str = "technical",
+    language: str | None = "en",
 ) -> TechnicalSession:
     session = TechnicalSession(
         id=str(uuid.uuid4()),
@@ -69,6 +71,7 @@ def create_session(
         company=company,
         location=location,
         category=category,
+        language=language or "en",
     )
     _sessions[session.id] = session
     return session

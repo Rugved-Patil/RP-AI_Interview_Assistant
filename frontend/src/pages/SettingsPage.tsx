@@ -444,7 +444,46 @@ export function SettingsPage() {
       )}
 
       <div className="settings-grid">
-        {/* Section 1: Unified Multilingual & Voice Localization */}
+        {/* Section 1: Theme & Visual Style (8 Themes) */}
+        <section className="settings-section">
+          <div className="settings-section__header">
+            <h2 className="settings-section__title">
+              <PaletteIcon width={18} height={18} />
+              {t('settings.theme_section_title', undefined, 'Theme & Visual Style')}
+            </h2>
+            <span className="settings-tag settings-tag--active">
+              {THEME_OPTIONS.find((t) => t.id === selectedTheme)?.name}
+            </span>
+          </div>
+
+          <div className="theme-options-grid">
+            {THEME_OPTIONS.map((theme) => {
+              const isSelected = theme.id === selectedTheme
+              return (
+                <button
+                  key={theme.id}
+                  type="button"
+                  className={`theme-card ${isSelected ? 'theme-card--selected' : ''}`}
+                  onClick={() => handleThemeChange(theme.id)}
+                >
+                  <div className="theme-card__swatches" aria-hidden="true">
+                    <span className="theme-swatch" style={{ backgroundColor: theme.previewColors.bg }} />
+                    <span className="theme-swatch" style={{ backgroundColor: theme.previewColors.card }} />
+                    <span className="theme-swatch" style={{ backgroundColor: theme.previewColors.primary }} />
+                    <span className="theme-swatch" style={{ backgroundColor: theme.previewColors.accent }} />
+                  </div>
+                  <span className="theme-card__name">
+                    {theme.name}
+                    {isSelected && <CheckIcon width={14} height={14} style={{ color: 'var(--olive-deep)' }} />}
+                  </span>
+                  <span className="theme-card__desc">{theme.description}</span>
+                </button>
+              )
+            })}
+          </div>
+        </section>
+
+        {/* Section 2: Unified Multilingual & Voice Localization */}
         <section className="settings-section">
           <div className="settings-section__header">
             <h2 className="settings-section__title">
@@ -498,21 +537,23 @@ export function SettingsPage() {
                 value={formSpeech.voiceURI}
                 onChange={(e) => setFormSpeech((prev) => ({ ...prev, voiceURI: e.target.value }))}
               >
-                <option value="">Default High-Quality Natural Voice ({languageConfig.nativeName})</option>
+                <option value="">{t('settings.voice_default', undefined, 'Default High-Quality Natural Voice')} ({languageConfig.nativeName})</option>
                 {displayVoices.map((voice) => (
                   <option key={voice.voiceURI || voice.name} value={voice.voiceURI || voice.name}>
                     ✨ {voice.name} ({voice.lang})
                   </option>
                 ))}
               </select>
-              <p className="settings-hint">Prioritizes high-fidelity natural &amp; neural voices for {languageConfig.label}.</p>
+              <p className="settings-hint">
+                {t('settings.voice_hint', { language: languageConfig.label }, `Prioritizes high-fidelity natural & neural voices for ${languageConfig.label}.`)}
+              </p>
             </div>
 
             <div className="settings-form-group">
               <label htmlFor="dictation-select" className="settings-label">
                 <span>
                   <MicIcon width={14} height={14} style={{ verticalAlign: 'middle', marginRight: 4 }} />
-                  Microphone Dictation Language (STT)
+                  {t('settings.dictation_label', undefined, 'Microphone Dictation Language (STT)')}
                 </span>
               </label>
               <input
@@ -523,14 +564,16 @@ export function SettingsPage() {
                 disabled
                 readOnly
               />
-              <p className="settings-hint">Synchronized with active language selection for native browser STT.</p>
+              <p className="settings-hint">
+                {t('settings.dictation_hint', undefined, 'Synchronized with active language selection for native browser STT.')}
+              </p>
             </div>
           </div>
 
           <div className="settings-form-row">
             <div className="settings-form-group">
               <label htmlFor="speed-range" className="settings-label">
-                Speaking Rate
+                {t('settings.rate_label', undefined, 'Speaking Rate')}
                 <span className="settings-label-val">{formSpeech.rate.toFixed(2)}x</span>
               </label>
               <div className="settings-range-wrapper">
@@ -546,15 +589,15 @@ export function SettingsPage() {
                 />
               </div>
               <div className="settings-range-labels">
-                <span>0.5x Slow</span>
-                <span>1.0x Normal</span>
-                <span>1.75x Fast</span>
+                <span>0.5x</span>
+                <span>1.0x</span>
+                <span>1.75x</span>
               </div>
             </div>
 
             <div className="settings-form-group">
               <label htmlFor="pitch-range" className="settings-label">
-                Voice Pitch
+                {t('settings.pitch_label', undefined, 'Voice Pitch')}
                 <span className="settings-label-val">{formSpeech.pitch.toFixed(2)}</span>
               </label>
               <div className="settings-range-wrapper">
@@ -570,9 +613,9 @@ export function SettingsPage() {
                 />
               </div>
               <div className="settings-range-labels">
-                <span>Deeper</span>
-                <span>Standard</span>
-                <span>Higher</span>
+                <span>0.6</span>
+                <span>1.0</span>
+                <span>1.4</span>
               </div>
             </div>
           </div>
@@ -585,7 +628,7 @@ export function SettingsPage() {
               disabled={!hasUnsavedSpeech}
             >
               <CheckIcon width={16} height={16} />
-              Save Audio Settings
+              {t('settings.save_audio_btn', undefined, 'Save Audio Settings')}
             </button>
 
             <button
@@ -603,68 +646,31 @@ export function SettingsPage() {
               onClick={handleResetSpeech}
             >
               <RefreshIcon width={16} height={16} />
-              Reset Audio Form
+              {t('settings.reset_audio_btn', undefined, 'Reset Audio Form')}
             </button>
           </div>
           {hasUnsavedSpeech && (
             <p className="settings-hint" style={{ marginTop: '0.75rem', fontStyle: 'italic' }}>
-              * You have unsaved voice modifications. Click &quot;Save Audio Settings&quot; to apply them across your mock interviews and audio tests.
+              {t('settings.unsaved_audio_hint', undefined, '* You have unsaved voice modifications. Click "Save Audio Settings" to apply them across your mock interviews and audio tests.')}
             </p>
           )}
-        </section>
-
-        {/* Section 2: Theme & Visual Style (8 Themes) */}
-        <section className="settings-section">
-          <div className="settings-section__header">
-            <h2 className="settings-section__title">
-              <PaletteIcon width={18} height={18} />
-              Theme &amp; Visual Style
-            </h2>
-            <span className="settings-tag settings-tag--active">
-              {THEME_OPTIONS.find((t) => t.id === selectedTheme)?.name}
-            </span>
-          </div>
-
-          <div className="theme-options-grid">
-            {THEME_OPTIONS.map((theme) => {
-              const isSelected = theme.id === selectedTheme
-              return (
-                <button
-                  key={theme.id}
-                  type="button"
-                  className={`theme-card ${isSelected ? 'theme-card--selected' : ''}`}
-                  onClick={() => handleThemeChange(theme.id)}
-                >
-                  <div className="theme-card__swatches" aria-hidden="true">
-                    <span className="theme-swatch" style={{ backgroundColor: theme.previewColors.bg }} />
-                    <span className="theme-swatch" style={{ backgroundColor: theme.previewColors.card }} />
-                    <span className="theme-swatch" style={{ backgroundColor: theme.previewColors.primary }} />
-                    <span className="theme-swatch" style={{ backgroundColor: theme.previewColors.accent }} />
-                  </div>
-                  <span className="theme-card__name">
-                    {theme.name}
-                    {isSelected && <CheckIcon width={14} height={14} style={{ color: 'var(--olive-deep)' }} />}
-                  </span>
-                  <span className="theme-card__desc">{theme.description}</span>
-                </button>
-              )
-            })}
-          </div>
         </section>
 
         {/* Section 3: AI Assessment & Interview Engine */}
         <section className="settings-section">
           <div className="settings-section__header">
             <h2 className="settings-section__title">
-              AI Assessment &amp; Interview Engine
+              {t('settings.engine_section_title', undefined, 'AI Assessment & Interview Engine')}
             </h2>
-            <span className="settings-tag settings-tag--active">Operational</span>
+            <span className="settings-tag settings-tag--active">
+              {t('settings.status_operational', undefined, 'Operational')}
+            </span>
           </div>
 
           <div className="engine-status-grid">
             <div className="engine-card">
               <div className="engine-card__header">
-                <span className="engine-card__name">Diagnostic Evaluator Engine</span>
+                <span className="engine-card__name">{t('settings.evaluator_engine_name', undefined, 'Diagnostic Evaluator Engine')}</span>
                 <span
                   className={`engine-card__badge ${
                     serverConfig?.evaluator_configured
@@ -672,20 +678,20 @@ export function SettingsPage() {
                       : 'engine-card__badge--missing'
                   }`}
                 >
-                  {serverConfig?.evaluator_configured ? 'Configured' : 'Missing Key'}
+                  {serverConfig?.evaluator_configured ? t('settings.status_configured', undefined, 'Configured') : t('settings.status_missing', undefined, 'Missing Key')}
                 </span>
               </div>
               <div className="engine-card__key">
                 API Key: {serverConfig?.evaluator_key_preview || 'Not Configured'}
               </div>
               <p className="engine-card__desc">
-                Powers evidence-based scoring across 5 diagnostic dimensions with strict candidate level calibration.
+                {t('settings.evaluator_engine_desc', undefined, 'Powers evidence-based scoring across 5 diagnostic dimensions with strict candidate level calibration.')}
               </p>
             </div>
 
             <div className="engine-card">
               <div className="engine-card__header">
-                <span className="engine-card__name">Interviewer Dialogue Engine</span>
+                <span className="engine-card__name">{t('settings.interviewer_engine_name', undefined, 'Interviewer Dialogue Engine')}</span>
                 <span
                   className={`engine-card__badge ${
                     serverConfig?.interviewer_configured
@@ -693,28 +699,27 @@ export function SettingsPage() {
                       : 'engine-card__badge--missing'
                   }`}
                 >
-                  {serverConfig?.interviewer_configured ? 'Configured' : 'Missing Key'}
+                  {serverConfig?.interviewer_configured ? t('settings.status_configured', undefined, 'Configured') : t('settings.status_missing', undefined, 'Missing Key')}
                 </span>
               </div>
               <div className="engine-card__key">
                 API Key: {serverConfig?.interviewer_key_preview || 'Not Configured'}
               </div>
               <p className="engine-card__desc">
-                Powers realistic multi-turn conversational follow-ups and adaptive interviewer questions.
+                {t('settings.interviewer_engine_desc', undefined, 'Powers realistic multi-turn conversational follow-ups and adaptive interviewer questions.')}
               </p>
             </div>
           </div>
 
           <div className="settings-form-group">
-            <label className="settings-label">Question Bank &amp; Domain Grounding</label>
+            <label className="settings-label">{t('qb.title', undefined, 'Question Bank')}</label>
             <div className="engine-card">
               <div className="engine-card__header">
-                <span className="engine-card__name">Local Vector Hybrid Index</span>
-                <span className="engine-card__badge engine-card__badge--ok">Active</span>
+                <span className="engine-card__name">{t('settings.qb_grounding_name', undefined, 'Local Vector Hybrid Index')}</span>
+                <span className="engine-card__badge engine-card__badge--ok">{t('settings.status_active', undefined, 'Active')}</span>
               </div>
               <p className="engine-card__desc">
-                {serverConfig ? `${serverConfig.rag_questions_count} curated exemplar questions` : 'Curated question bank'}{' '}
-                indexed locally for grounded role depth, realistic question patterns, and diagnostic scoring.
+                {t('settings.qb_grounding_desc', { count: serverConfig ? String(serverConfig.rag_questions_count) : '50+' }, `${serverConfig ? `${serverConfig.rag_questions_count} curated exemplar questions` : 'Curated question bank'} indexed locally for grounded role depth, realistic question patterns, and diagnostic scoring.`)}
               </p>
             </div>
           </div>
@@ -727,7 +732,7 @@ export function SettingsPage() {
               disabled={verifying}
             >
               <RefreshIcon width={16} height={16} />
-              {verifying ? 'Verifying Connections…' : 'Verify Engine Connections'}
+              {verifying ? t('settings.verifying_btn', undefined, 'Verifying Connections…') : t('settings.verify_btn', undefined, 'Verify Engine Connections')}
             </button>
           </div>
 
@@ -772,8 +777,8 @@ export function SettingsPage() {
         {/* Section 4: Data & Storage */}
         <section className="settings-section">
           <div className="settings-section__header">
-            <h2 className="settings-section__title">Storage &amp; Data Management</h2>
-            <span className="settings-tag">Offline SQLite</span>
+            <h2 className="settings-section__title">{t('settings.storage_section_title', undefined, 'Storage & Data Management')}</h2>
+            <span className="settings-tag">{t('settings.storage_tag', undefined, 'Offline SQLite')}</span>
           </div>
 
           <div className="settings-storage-card">
@@ -782,29 +787,29 @@ export function SettingsPage() {
                 <div className="storage-metric__val">
                   {loadingConfig ? '—' : serverConfig?.total_mock_reports ?? 0}
                 </div>
-                <div className="storage-metric__label">Mock Interviews</div>
+                <div className="storage-metric__label">{t('settings.storage_metric_mocks', undefined, 'Mock Interviews')}</div>
               </div>
               <div>
                 <div className="storage-metric__val">
                   {loadingConfig ? '—' : serverConfig?.total_single_reports ?? 0}
                 </div>
-                <div className="storage-metric__label">Single Drills</div>
+                <div className="storage-metric__label">{t('settings.storage_metric_singles', undefined, 'Single Drills')}</div>
               </div>
               <div>
                 <div className="storage-metric__val">
                   {loadingConfig ? '—' : serverConfig?.total_presets ?? 0}
                 </div>
-                <div className="storage-metric__label">Saved Presets</div>
+                <div className="storage-metric__label">{t('settings.storage_metric_presets', undefined, 'Saved Presets')}</div>
               </div>
             </div>
 
             <div className="storage-info-row">
-              <span className="storage-info-label">Database File:</span>
-              <span className="storage-info-val">backend/interview_reports.db (100% Offline SQLite)</span>
+              <span className="storage-info-label">{t('settings.db_file_label', undefined, 'Database File:')}</span>
+              <span className="storage-info-val">{t('settings.db_file_val', undefined, 'backend/interview_reports.db (100% Offline SQLite)')}</span>
             </div>
             <div className="storage-info-row">
-              <span className="storage-info-label">Analytics Grounding:</span>
-              <span className="storage-info-val">Explicitly Saved Single Drills &amp; Mock Sessions</span>
+              <span className="storage-info-label">{t('settings.analytics_grounding_label', undefined, 'Analytics Grounding:')}</span>
+              <span className="storage-info-val">{t('settings.analytics_grounding_val', undefined, 'Explicitly Saved Single Drills & Mock Sessions')}</span>
             </div>
           </div>
 
@@ -816,7 +821,7 @@ export function SettingsPage() {
               disabled={exportingPDF}
             >
               <DownloadIcon width={16} height={16} />
-              {exportingPDF ? 'Preparing PDF…' : 'Export All Reports (PDF)'}
+              {exportingPDF ? 'Preparing PDF…' : t('settings.export_pdf_btn', undefined, 'Export All Reports (PDF)')}
             </button>
 
             <button
@@ -825,7 +830,7 @@ export function SettingsPage() {
               onClick={handleExportJSON}
             >
               <DownloadIcon width={16} height={16} />
-              Export Backup (JSON)
+              {t('settings.export_json_btn', undefined, 'Export Backup (JSON)')}
             </button>
 
             <button
@@ -834,12 +839,12 @@ export function SettingsPage() {
               onClick={handleExportCSV}
             >
               <DownloadIcon width={16} height={16} />
-              Export Reports (CSV)
+              {t('settings.export_csv_btn', undefined, 'Export Reports (CSV)')}
             </button>
 
             <label className="settings-btn settings-btn--ghost" style={{ cursor: 'pointer' }}>
               <UploadIcon width={16} height={16} />
-              Import Backup (JSON)
+              {t('settings.import_json_btn', undefined, 'Import Backup (JSON)')}
               <input
                 ref={fileInputRef}
                 type="file"
@@ -855,7 +860,7 @@ export function SettingsPage() {
               onClick={() => setShowClearModal(true)}
             >
               <TrashIcon width={16} height={16} />
-              Clear Data &amp; Cache
+              {t('settings.clear_data_btn', undefined, 'Clear Data & Cache')}
             </button>
           </div>
         </section>
@@ -867,10 +872,10 @@ export function SettingsPage() {
           <div className="settings-modal" onClick={(e) => e.stopPropagation()}>
             <h3 className="settings-modal__title">
               <WarningIcon width={22} height={22} />
-              Clear Application Data
+              {t('settings.clear_modal_title', undefined, 'Clear Application Data')}
             </h3>
             <p className="settings-modal__desc">
-              Select which records to permanently remove from your offline database. This action cannot be undone unless you have a JSON backup.
+              {t('settings.clear_modal_desc', undefined, 'Select which records to permanently remove from your offline database. This action cannot be undone unless you have a JSON backup.')}
             </p>
 
             <div className="settings-modal__checkboxes">
@@ -880,7 +885,7 @@ export function SettingsPage() {
                   checked={clearOptions.mock}
                   onChange={(e) => setClearOptions((prev) => ({ ...prev, mock: e.target.checked }))}
                 />
-                Saved Mock Interviews ({serverConfig?.total_mock_reports ?? 0})
+                {t('settings.storage_metric_mocks', undefined, 'Saved Mock Interviews')} ({serverConfig?.total_mock_reports ?? 0})
               </label>
 
               <label className="settings-checkbox-label">
@@ -889,7 +894,7 @@ export function SettingsPage() {
                   checked={clearOptions.single}
                   onChange={(e) => setClearOptions((prev) => ({ ...prev, single: e.target.checked }))}
                 />
-                Saved Single Practice Drills ({serverConfig?.total_single_reports ?? 0})
+                {t('settings.storage_metric_singles', undefined, 'Saved Single Practice Drills')} ({serverConfig?.total_single_reports ?? 0})
               </label>
 
               <label className="settings-checkbox-label">
@@ -898,7 +903,7 @@ export function SettingsPage() {
                   checked={clearOptions.presets}
                   onChange={(e) => setClearOptions((prev) => ({ ...prev, presets: e.target.checked }))}
                 />
-                Target Role &amp; Company Presets ({serverConfig?.total_presets ?? 0})
+                {t('settings.storage_metric_presets', undefined, 'Target Role & Company Presets')} ({serverConfig?.total_presets ?? 0})
               </label>
             </div>
 
@@ -909,7 +914,7 @@ export function SettingsPage() {
                 onClick={() => setShowClearModal(false)}
                 disabled={clearing}
               >
-                Cancel
+                {t('settings.clear_modal_cancel', undefined, 'Cancel')}
               </button>
               <button
                 type="button"
@@ -917,7 +922,7 @@ export function SettingsPage() {
                 onClick={handleConfirmClear}
                 disabled={clearing || (!clearOptions.mock && !clearOptions.single && !clearOptions.presets)}
               >
-                {clearing ? 'Clearing…' : 'Confirm & Clear Selected'}
+                {clearing ? t('settings.clear_modal_clearing', undefined, 'Clearing…') : t('settings.clear_modal_confirm', undefined, 'Confirm & Clear Selected')}
               </button>
             </div>
           </div>

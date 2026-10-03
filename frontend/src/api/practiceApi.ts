@@ -29,6 +29,7 @@ export interface StartSessionRequest {
   company?: string
   location?: string
   question?: string
+  language?: string
 }
 
 export interface StartSessionResponse {
@@ -178,6 +179,7 @@ export interface StartInterviewRequest {
   role: string
   company?: string
   location?: string
+  language?: string
 }
 
 export interface StartInterviewResponse {

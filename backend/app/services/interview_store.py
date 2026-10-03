@@ -70,6 +70,7 @@ class InterviewSession:
     system_prompt: str
     company: str | None = None
     location: str | None = None
+    language: str | None = "en"
     status: InterviewStatus = InterviewStatus.IN_PROGRESS
     transcript: list[Turn] = field(default_factory=list)
     score: int | None = None
@@ -88,6 +89,7 @@ def create_interview(
     system_prompt: str,
     company: str | None = None,
     location: str | None = None,
+    language: str | None = "en",
 ) -> InterviewSession:
     session = InterviewSession(
         id=str(uuid.uuid4()),
@@ -97,6 +99,7 @@ def create_interview(
         system_prompt=system_prompt,
         company=company,
         location=location,
+        language=language or "en",
     )
     _interviews[session.id] = session
     return session

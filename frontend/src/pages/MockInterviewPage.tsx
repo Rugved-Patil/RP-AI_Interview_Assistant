@@ -17,6 +17,7 @@ import { useSpeechRecognition } from '../hooks/useSpeechRecognition'
 import { useSpeechSynthesis } from '../hooks/useSpeechSynthesis'
 import { MicIcon, SpeakerIcon, SpeakerOffIcon, StopIcon } from '../components/Icons'
 import { FormattedFeedback } from '../components/FormattedFeedback'
+import { useTranslation } from '../i18n/LanguageContext'
 import './MockInterviewPage.css'
 
 interface MessageTurn {
@@ -67,6 +68,7 @@ type MockStage =
 
 export function MockInterviewPage() {
   const navigate = useNavigate()
+  const { t, currentLanguage } = useTranslation()
   const [searchParams] = useSearchParams()
   const urlType: InterviewType = searchParams.get('type') === 'hr' ? 'hr' : 'technical'
   const [overrideType, setOverrideType] = useState<InterviewType | null>(null)
@@ -156,6 +158,7 @@ export function MockInterviewPage() {
         role,
         company: company ?? undefined,
         location: location ?? undefined,
+        language: currentLanguage,
       })
 
       setStage({
@@ -398,7 +401,7 @@ export function MockInterviewPage() {
         }}
         style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer' }}
       >
-        ← Back
+        {t('nav.back', undefined, '← Back')}
       </button>
 
       <div className="mock-card">

@@ -49,7 +49,7 @@ type ActivePresetState =
 
 export function PracticeCard() {
   const location = useLocation()
-  const { t } = useTranslation()
+  const { t, currentLanguage } = useTranslation()
   const navState = (location.state || {}) as {
     directQuestion?: string
     domain?: string
@@ -113,6 +113,7 @@ export function PracticeCard() {
         company: company ?? undefined,
         location: loc ?? undefined,
         question: directQuestion,
+        language: currentLanguage,
       })
       setStage({
         name: 'question',

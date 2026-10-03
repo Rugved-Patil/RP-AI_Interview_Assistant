@@ -11,6 +11,7 @@ import { saveSpeechSettings } from '../speechSettings'
 
 interface LanguageContextType {
   language: LanguageId
+  currentLanguage: LanguageId
   languageConfig: LanguageConfig
   setLanguage: (lang: LanguageId) => void
   t: (key: string, params?: Record<string, string | number>, fallback?: string) => string
@@ -95,6 +96,7 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const value = useMemo(
     () => ({
       language,
+      currentLanguage: language,
       languageConfig,
       setLanguage,
       t,
@@ -114,6 +116,7 @@ export function useTranslation() {
     const fallbackConfig = getLanguageConfig(DEFAULT_LANGUAGE)
     return {
       language: DEFAULT_LANGUAGE,
+      currentLanguage: DEFAULT_LANGUAGE,
       languageConfig: fallbackConfig,
       setLanguage: () => {},
       t: (key: string, params?: Record<string, string | number>, fallback?: string) => {

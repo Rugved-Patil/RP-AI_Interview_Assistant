@@ -30,6 +30,7 @@ from sqlalchemy.orm import Session
 
 from app.api.routes.grading import GradeParseError, _parse_grade
 from app.core.config import get_settings
+from app.core.languages import build_language_prompt_instruction
 from app.db.base import get_db
 from app.db.models import SavedInterviewReport
 from app.schemas.interview import (
@@ -81,6 +82,7 @@ def _build_mock_interviewer_prompt(
     role: str,
     company: str | None,
     location: str | None,
+    language: str | None = None,
 ) -> str:
     """
     Builds the system prompt for the mock interview interviewer persona.
@@ -160,6 +162,10 @@ def _build_mock_interviewer_prompt(
         if exemplars:
             prompt_body += format_grounding_block(exemplars)
 
+    lang_inst = build_language_prompt_instruction(language, is_evaluator=False)
+    if lang_inst:
+        prompt_body += lang_inst
+
     return prompt_body
 
 
@@ -178,6 +184,7 @@ def _build_mock_grader_prompt(
     role: str,
     company: str | None,
     location: str | None,
+    language: str | None = None,
 ) -> str:
     """
     Builds the system prompt for the holistic mock interview grader persona (Gemini).
@@ -206,7 +213,7 @@ def _build_mock_grader_prompt(
             "- Problem-Solving & Architecture: Assess ability to reason through constraints, practical failure modes, and implementation trade-offs."
         )
 
-    return (
+    prompt = (
         "You are an expert, objective, encouraging, and calibrated interview evaluator assessing a complete mock interview transcript.\n\n"
         f"{context}\n\n"
         f"{domain_guidelines}\n\n"
@@ -262,6 +269,12 @@ def _build_mock_grader_prompt(
         "}\n"
         "```"
     )
+
+    lang_inst = build_language_prompt_instruction(language, is_evaluator=True, is_json=True)
+    if lang_inst:
+        prompt += lang_inst
+
+    return prompt
 
 
 def _format_feedback_dict(data: dict) -> str:
@@ -411,6 +424,7 @@ async def start_interview(body: StartInterviewRequest) -> StartInterviewResponse
         body.role,
         body.company,
         body.location,
+        language=body.language,
     )
 
     try:
@@ -440,6 +454,7 @@ async def start_interview(body: StartInterviewRequest) -> StartInterviewResponse
         system_prompt=system_prompt,
         company=body.company,
         location=body.location,
+        language=body.language,
     )
 
     # Record the opening question in the transcript.
@@ -568,12 +583,14 @@ async def grade_interview(session_id: str) -> InterviewGradeResponse:
         )
 
     provider = get_provider(LLMRole.GRADER)
+    session_lang = getattr(session, "language", "en")
     system_prompt = _build_mock_grader_prompt(
         session.interview_type,
         session.experience_level,
         session.role,
         session.company,
         session.location,
+        language=session_lang,
     )
     transcript_text = _format_transcript_for_grading(session.transcript)
 

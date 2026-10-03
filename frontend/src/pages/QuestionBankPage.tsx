@@ -186,7 +186,7 @@ export function QuestionBankPage() {
           </div>
           {searchQuery && (
             <button className="qb-clear-btn" onClick={() => setSearchQuery('')}>
-              Clear
+              {t('qb.clear_btn', undefined, 'Clear')}
             </button>
           )}
         </div>
@@ -210,8 +210,8 @@ export function QuestionBankPage() {
               className={`qb-tab-btn ${selectedCategory === 'behavioral' ? 'active' : ''}`}
               onClick={() => setSelectedCategory('behavioral')}
             >
-              {t('qb.behavioral_category', undefined, 'Behavioral (STAR)')
-            }</button>
+              {t('qb.behavioral_category', undefined, 'Behavioral (STAR)')}
+            </button>
           </div>
 
           <div className="qb-filter-dropdowns">
@@ -236,7 +236,7 @@ export function QuestionBankPage() {
               className={`qb-domain-chip ${selectedDomain === 'all' ? 'active' : ''}`}
               onClick={() => setSelectedDomain('all')}
             >
-              All Domains ({stats.total_questions})
+              {t('qb.all_domains', undefined, 'All Domains')} ({stats.total_questions})
             </button>
             {stats.domains.map((d) => (
               <button
@@ -258,8 +258,8 @@ export function QuestionBankPage() {
       {/* Results Header Count */}
       <div className="qb-results-header">
         <span className="qb-results-count">
-          Showing <strong>{currentCount}</strong> question{currentCount === 1 ? '' : 's'}
-          {searchQuery.trim() ? ` matching "${searchQuery}"` : ''}
+          {t('qb.showing_count', { count: String(currentCount) }, `Showing ${currentCount} questions`)}
+          {searchQuery.trim() ? ` ${t('qb.matching', undefined, 'matching')} "${searchQuery}"` : ''}
         </span>
       </div>
 
@@ -278,7 +278,7 @@ export function QuestionBankPage() {
           {effectiveRetrievedResults !== null && !searching && (
             <>
               {effectiveRetrievedResults.length === 0 ? (
-                <div className="qb-empty">No matching questions found for your search query.</div>
+                <div className="qb-empty">{t('qb.empty_search', undefined, 'No matching questions found for your search query.')}</div>
               ) : (
                 effectiveRetrievedResults.map((q) => (
                   <article key={q.id} className="qb-card">
@@ -289,7 +289,7 @@ export function QuestionBankPage() {
                         <span className="qb-diff-badge">{q.difficulty}</span>
                       </div>
                       <span className="qb-score-badge">
-                        Match: {Math.round(q.score * 100)}%
+                        {t('qb.match_score', { score: String(Math.round(q.score * 100)) }, `Match: ${Math.round(q.score * 100)}%`)}
                       </span>
                     </div>
 
@@ -313,7 +313,7 @@ export function QuestionBankPage() {
                           onClick={() => toggleCriteria(q.id)}
                           type="button"
                         >
-                          <span>Evaluation Rubric &amp; Key Concepts</span>
+                          <span>{t('qb.rubric_title', undefined, 'Evaluation Rubric & Key Concepts')}</span>
                           <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}>
                             {expandedCriteria[q.id] ? t('qb.hide_rubric', undefined, 'Hide Rubric') : t('qb.view_rubric', undefined, 'View Rubric')}
                             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -371,7 +371,7 @@ export function QuestionBankPage() {
           {effectiveRetrievedResults === null && !searching && (
             <>
               {displayedQuestions.length === 0 ? (
-                <div className="qb-empty">No questions match the selected filters.</div>
+                <div className="qb-empty">{t('qb.empty_filter', undefined, 'No questions match the selected filters.')}</div>
               ) : (
                 displayedQuestions.map((q) => (
                   <article key={q.id} className="qb-card">
@@ -400,7 +400,7 @@ export function QuestionBankPage() {
                           onClick={() => toggleCriteria(q.id)}
                           type="button"
                         >
-                          <span>Evaluation Rubric &amp; Key Concepts</span>
+                          <span>{t('qb.rubric_title', undefined, 'Evaluation Rubric & Key Concepts')}</span>
                           <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}>
                             {expandedCriteria[q.id] ? t('qb.hide_rubric', undefined, 'Hide Rubric') : t('qb.view_rubric', undefined, 'View Rubric')}
                             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

@@ -28,13 +28,14 @@ class StartInterviewRequest(BaseModel):
     role: str
     company: str | None = None
     location: str | None = None
+    language: str | None = None
 
     @field_validator("role")
     @classmethod
     def _role_not_blank(cls, value: str) -> str:
         return require_role(value)
 
-    @field_validator("company", "location")
+    @field_validator("company", "location", "language")
     @classmethod
     def _optional_blank_to_none(cls, value: str | None) -> str | None:
         return blank_optional_becomes_none(value)

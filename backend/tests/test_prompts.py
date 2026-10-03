@@ -215,3 +215,37 @@ def test_mock_interviewer_prompt_calibrates_seniority_pacing():
     )
     assert "SENIORITY CALIBRATION (SENIOR LEVEL)" in senior_prompt
     assert "high-level architecture" in senior_prompt
+
+
+def test_multilingual_prompts_inject_correct_language_directives():
+    from app.api.routes.grading import _build_behavioral_grader_prompt, _build_grader_prompt
+    from app.api.routes.interviews import _build_mock_grader_prompt, _build_mock_interviewer_prompt
+    from app.api.routes.sessions import _build_behavioral_interviewer_prompt, _build_interviewer_prompt
+
+    # Hindi test
+    tech_interviewer = _build_interviewer_prompt("Software Engineer", "Google", "Bangalore", language="hi")
+    assert "Hindi" in tech_interviewer
+    assert "LANGUAGE INSTRUCTION (MANDATORY)" in tech_interviewer
+
+    # Marathi test
+    behav_interviewer = _build_behavioral_interviewer_prompt("Team Lead", "Infosys", "Pune", language="mr")
+    assert "Marathi" in behav_interviewer
+
+    # German mock interviewer test
+    mock_interviewer = _build_mock_interviewer_prompt(
+        InterviewType.TECHNICAL, ExperienceLevel.MID, "Full Stack Developer", "SAP", "Berlin", language="de"
+    )
+    assert "German" in mock_interviewer
+
+    # Single answer grader with Spanish
+    grader_prompt = _build_grader_prompt("QA Engineer", "Meta", "Madrid", language="es")
+    assert "Spanish" in grader_prompt
+    assert "FEEDBACK: <text in Spanish" in grader_prompt
+
+    # Mock grader JSON with French
+    mock_grader = _build_mock_grader_prompt(
+        InterviewType.HR, ExperienceLevel.SENIOR, "Product Manager", "L'Oreal", "Paris", language="fr"
+    )
+    assert "French" in mock_grader
+    assert "overall_impression" in mock_grader
+    assert "MUST be written entirely in French" in mock_grader

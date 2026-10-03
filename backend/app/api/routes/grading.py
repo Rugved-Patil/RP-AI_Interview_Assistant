@@ -16,6 +16,7 @@ import re
 
 from fastapi import APIRouter, HTTPException
 
+from app.core.languages import build_language_prompt_instruction
 from app.schemas.session import GradeResponse
 from app.services.llm import LLMProviderError, LLMRole, Message, Role, get_provider
 from app.services.session_store import get_session
@@ -38,7 +39,12 @@ _SCORE_RE = re.compile(r"SCORE\**\s*:\s*\**\s*(\d+)", re.IGNORECASE)
 _FEEDBACK_RE = re.compile(r"FEEDBACK\**\s*:\s*\**\s*(.+)", re.IGNORECASE | re.DOTALL)
 
 
-def _build_grader_prompt(role: str, company: str | None, location: str | None) -> str:
+def _build_grader_prompt(
+    role: str,
+    company: str | None,
+    location: str | None,
+    language: str | None = None,
+) -> str:
     """
     Builds the grading persona prompt using the same role/company/location
     context the question was generated with.
@@ -52,7 +58,7 @@ def _build_grader_prompt(role: str, company: str | None, location: str | None) -
     if location:
         context += f" (location: {location})"
 
-    return (
+    prompt = (
         f"You are an encouraging, objective, and experienced technical interviewer grading a candidate's answer to a single technical interview question for {context}.\n\n"
         "GRADING CRITERIA & SCORE CALIBRATION:\n"
         "- 9-10: Exceptional / Masterful. Completely accurate, mentions nuances, edge cases, or practical trade-offs.\n"
@@ -67,8 +73,19 @@ def _build_grader_prompt(role: str, company: str | None, location: str | None) -
         "FEEDBACK: <two or three sentences of specific, constructive feedback>"
     )
 
+    lang_inst = build_language_prompt_instruction(language, is_evaluator=True, is_json=False)
+    if lang_inst:
+        prompt += lang_inst
 
-def _build_behavioral_grader_prompt(role: str, company: str | None, location: str | None) -> str:
+    return prompt
+
+
+def _build_behavioral_grader_prompt(
+    role: str,
+    company: str | None,
+    location: str | None,
+    language: str | None = None,
+) -> str:
     """
     Builds the STAR-method grading prompt for behavioral interview questions.
     Evaluates Situation, Task, Action, and Result with constructive, encouraging guidance.
@@ -79,7 +96,7 @@ def _build_behavioral_grader_prompt(role: str, company: str | None, location: st
     if location:
         context += f" (location: {location})"
 
-    return (
+    prompt = (
         f"You are an expert, encouraging behavioral interviewer evaluating a candidate's response to a behavioral interview question for {context}.\n\n"
         "EVALUATION CRITERIA (STAR METHODOLOGY):\n"
         "- Situation & Task: Did the candidate establish clear context and define the challenge?\n"
@@ -98,6 +115,12 @@ def _build_behavioral_grader_prompt(role: str, company: str | None, location: st
         "FEEDBACK: <two to four sentences of constructive feedback explicitly referencing their STAR structure and impact>"
     )
 
+    lang_inst = build_language_prompt_instruction(language, is_evaluator=True, is_json=False)
+    if lang_inst:
+        prompt += lang_inst
+
+    return prompt
+
 
 @router.post("/{session_id}/grade", response_model=GradeResponse)
 async def grade_session(session_id: str) -> GradeResponse:
@@ -108,10 +131,15 @@ async def grade_session(session_id: str) -> GradeResponse:
         raise HTTPException(status_code=400, detail="No answer submitted for this session yet")
 
     provider = get_provider(LLMRole.GRADER)
+    session_lang = getattr(session, "language", "en")
     if getattr(session, "category", "technical") == "behavioral":
-        system_prompt = _build_behavioral_grader_prompt(session.role, session.company, session.location)
+        system_prompt = _build_behavioral_grader_prompt(
+            session.role, session.company, session.location, language=session_lang
+        )
     else:
-        system_prompt = _build_grader_prompt(session.role, session.company, session.location)
+        system_prompt = _build_grader_prompt(
+            session.role, session.company, session.location, language=session_lang
+        )
 
     try:
         response = await provider.generate(

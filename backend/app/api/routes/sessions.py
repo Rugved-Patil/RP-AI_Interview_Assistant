@@ -23,6 +23,7 @@ from __future__ import annotations
 from fastapi import APIRouter, HTTPException
 
 from app.core.config import get_settings
+from app.core.languages import build_language_prompt_instruction
 from app.schemas.session import (
     CreateSessionRequest,
     CreateSessionResponse,
@@ -36,7 +37,12 @@ from app.services.session_store import create_session, get_session
 router = APIRouter(prefix="/sessions", tags=["sessions"])
 
 
-def _build_interviewer_prompt(role: str, company: str | None, location: str | None) -> str:
+def _build_interviewer_prompt(
+    role: str,
+    company: str | None,
+    location: str | None,
+    language: str | None = None,
+) -> str:
     """
     Builds the interviewer persona prompt around whatever context the user
     supplied (scope doc Section 3.4: personalization by role/company/
@@ -81,10 +87,19 @@ def _build_interviewer_prompt(role: str, company: str | None, location: str | No
         if exemplars:
             persona += format_grounding_block(exemplars)
 
+    lang_inst = build_language_prompt_instruction(language, is_evaluator=False)
+    if lang_inst:
+        persona += lang_inst
+
     return persona
 
 
-def _build_behavioral_interviewer_prompt(role: str, company: str | None, location: str | None) -> str:
+def _build_behavioral_interviewer_prompt(
+    role: str,
+    company: str | None,
+    location: str | None,
+    language: str | None = None,
+) -> str:
     """
     Builds the behavioral interviewer persona prompt around role/company/location.
     Generates a single open-ended behavioral question (e.g. STAR prompt).
@@ -122,6 +137,10 @@ def _build_behavioral_interviewer_prompt(role: str, company: str | None, locatio
         if exemplars:
             persona += format_grounding_block(exemplars)
 
+    lang_inst = build_language_prompt_instruction(language, is_evaluator=False)
+    if lang_inst:
+        persona += lang_inst
+
     return persona
 
 
@@ -132,7 +151,7 @@ async def start_situational_session(body: CreateSessionRequest) -> CreateSession
         question = body.question.strip()
     else:
         provider = get_provider(LLMRole.INTERVIEWER)
-        system_prompt = _build_interviewer_prompt(body.role, body.company, body.location)
+        system_prompt = _build_interviewer_prompt(body.role, body.company, body.location, body.language)
 
         try:
             response = await provider.generate(
@@ -164,6 +183,7 @@ async def start_situational_session(body: CreateSessionRequest) -> CreateSession
         company=body.company,
         location=body.location,
         category="technical",
+        language=body.language,
     )
     return CreateSessionResponse(session_id=session.id, question=session.question)
 
@@ -175,7 +195,7 @@ async def start_behavioral_session(body: CreateSessionRequest) -> CreateSessionR
         question = body.question.strip()
     else:
         provider = get_provider(LLMRole.INTERVIEWER)
-        system_prompt = _build_behavioral_interviewer_prompt(body.role, body.company, body.location)
+        system_prompt = _build_behavioral_interviewer_prompt(body.role, body.company, body.location, body.language)
 
         try:
             response = await provider.generate(
@@ -200,6 +220,7 @@ async def start_behavioral_session(body: CreateSessionRequest) -> CreateSessionR
         company=body.company,
         location=body.location,
         category="behavioral",
+        language=body.language,
     )
     return CreateSessionResponse(session_id=session.id, question=session.question)
 
