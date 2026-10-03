@@ -236,7 +236,7 @@ export function HomePage() {
             <span className="mode-card__badge">{t('home.badge_mock', undefined, 'Full Mock Interview')}</span>
             <h3 className="mode-card__title">{t('home.mock_tech_title', undefined, 'Technical Mock Interview')}</h3>
             <p className="mode-card__body">
-              {t('home.mock_tech_desc', undefined, 'Comprehensive technical interview probing deep domain knowledge, system design, and embedded live coding challenges.')}
+              {t('home.mock_tech_desc', undefined, 'A comprehensive technical interview probing deep domain knowledge, system design, and practical experience.')}
             </p>
           </Link>
 

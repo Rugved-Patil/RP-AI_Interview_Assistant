@@ -2723,5 +2723,557 @@
       "Enterprise"
     ],
     "evaluation_criteria": "Identifying irreversible (Type 1) vs reversible (Type 2) decisions, gathering high-signal inputs, evaluating downside risks, and taking timely decisive action."
+  },
+  {
+    "id": "sys-011",
+    "question": "How would you design a distributed unique ID generator (similar to Twitter Snowflake) capable of generating 100,000 IDs/sec with sortability and 99.999% availability?",
+    "category": "technical",
+    "domain": "System Design",
+    "tags": [
+      "distributed-systems",
+      "snowflake",
+      "scalability",
+      "concurrency",
+      "high-availability"
+    ],
+    "difficulty": "senior",
+    "company_archetypes": [
+      "FAANG",
+      "Fintech",
+      "Scaleup"
+    ],
+    "evaluation_criteria": "Understanding 64-bit layout (timestamp, worker ID, sequence number), clock drift mitigation (NTP sync/backward clock movement), single-point-of-failure avoidance, and coordination-free local worker generation."
+  },
+  {
+    "id": "sys-012",
+    "question": "Design a globally distributed Rate Limiting service that enforces per-user request quotas across 5 geographical regions with sub-millisecond latency.",
+    "category": "technical",
+    "domain": "System Design",
+    "tags": [
+      "rate-limiting",
+      "distributed-cache",
+      "redis",
+      "token-bucket",
+      "multi-region"
+    ],
+    "difficulty": "senior",
+    "company_archetypes": [
+      "FAANG",
+      "Cloud Provider",
+      "Fintech"
+    ],
+    "evaluation_criteria": "Comparison of Token Bucket, Leaky Bucket, and Sliding Window Log; local in-memory token caching with asynchronous batch sync; Redis cluster / CRDTs for multi-region consistency vs eventual consistency trade-offs."
+  },
+  {
+    "id": "sys-013",
+    "question": "How would you architect a real-time collaborative document editing engine (like Google Docs or Figma) supporting 50 concurrent editors per document with offline support?",
+    "category": "technical",
+    "domain": "System Design",
+    "tags": [
+      "collaboration",
+      "crdt",
+      "operational-transformation",
+      "websockets",
+      "event-driven"
+    ],
+    "difficulty": "lead",
+    "company_archetypes": [
+      "FAANG",
+      "Product Unicorn"
+    ],
+    "evaluation_criteria": "Deep comparison between Operational Transformation (OT) and Conflict-free Replicated Data Types (CRDTs); WebSocket connection management; vector clocks/logical timestamps; delta compression and snapshotting."
+  },
+  {
+    "id": "sys-014",
+    "question": "Design a resilient payment processing webhook delivery system that guarantees at-least-once delivery with exponential backoff, dead-letter queues, and signature verification.",
+    "category": "technical",
+    "domain": "System Design",
+    "tags": [
+      "webhooks",
+      "message-queues",
+      "rabbitmq",
+      "idempotency",
+      "fintech"
+    ],
+    "difficulty": "mid",
+    "company_archetypes": [
+      "Fintech",
+      "E-commerce",
+      "SaaS Enterprise"
+    ],
+    "evaluation_criteria": "Idempotency keys, transactional outbox pattern, distributed task scheduling with jittered backoff, circuit breaking for unresponsive receiver endpoints, and HMAC-SHA256 payload signing."
+  },
+  {
+    "id": "sys-015",
+    "question": "How do you handle database write contention and hot partitions when designing a live flash-sale ticketing platform like Ticketmaster?",
+    "category": "technical",
+    "domain": "System Design",
+    "tags": [
+      "concurrency",
+      "distributed-locking",
+      "redis",
+      "pessimistic-locking",
+      "high-throughput"
+    ],
+    "difficulty": "senior",
+    "company_archetypes": [
+      "High-Growth Startup",
+      "E-commerce",
+      "FAANG"
+    ],
+    "evaluation_criteria": "Virtual queuing / waiting room mechanisms, distributed locks (Redlock) vs optimistic concurrency control, inventory partitioning across Redis shards, and asynchronous order processing via Kafka."
+  },
+  {
+    "id": "dev-011",
+    "question": "Explain the step-by-step lifecycle of a Kubernetes Pod from kubectl apply to running container, and how Kubernetes handles node failure detection and pod rescheduling.",
+    "category": "technical",
+    "domain": "DevOps & Cloud",
+    "tags": [
+      "kubernetes",
+      "containers",
+      "kubelet",
+      "scheduling",
+      "sre"
+    ],
+    "difficulty": "mid",
+    "company_archetypes": [
+      "Enterprise",
+      "Cloud Provider",
+      "Scaleup"
+    ],
+    "evaluation_criteria": "API server validation, etcd persistence, kube-scheduler filtering/scoring, kubelet CRI/CNI/CSI orchestration, node heartbeat leasing, and eviction timeouts (pod-eviction-timeout)."
+  },
+  {
+    "id": "dev-012",
+    "question": "How do you implement zero-downtime schema migrations (e.g., adding non-null columns or renaming columns on a 500M row PostgreSQL table) in a high-traffic production system?",
+    "category": "technical",
+    "domain": "DevOps & Cloud",
+    "tags": [
+      "postgres",
+      "zero-downtime",
+      "database-migration",
+      "locks",
+      "expand-contract"
+    ],
+    "difficulty": "senior",
+    "company_archetypes": [
+      "FAANG",
+      "Fintech",
+      "Enterprise"
+    ],
+    "evaluation_criteria": "Expand-and-contract pattern, safe DDL locks (lock_timeout, statement_timeout), dual-writing, backfilling in background batches, and blue-green application deployment coordination."
+  },
+  {
+    "id": "dev-013",
+    "question": "Describe how you design a multi-region Disaster Recovery (DR) strategy with an RTO under 5 minutes and RPO under 1 minute for a critical banking service.",
+    "category": "technical",
+    "domain": "DevOps & Cloud",
+    "tags": [
+      "sre",
+      "disaster-recovery",
+      "rto-rpo",
+      "replication",
+      "dns-failover"
+    ],
+    "difficulty": "lead",
+    "company_archetypes": [
+      "Fintech",
+      "Enterprise",
+      "Banking"
+    ],
+    "evaluation_criteria": "Active-active vs active-passive architectures, synchronous vs asynchronous data replication lag, automated DNS health checks with Anycast/Route53 failover, and chaos engineering validation."
+  },
+  {
+    "id": "dev-014",
+    "question": "What is the difference between Prometheus pushgateway and pull-based scraping, and how do you design scalable alerting rules to prevent alert fatigue?",
+    "category": "technical",
+    "domain": "DevOps & Cloud",
+    "tags": [
+      "monitoring",
+      "prometheus",
+      "observability",
+      "alerting",
+      "sre"
+    ],
+    "difficulty": "mid",
+    "company_archetypes": [
+      "Scaleup",
+      "Cloud Provider",
+      "Enterprise"
+    ],
+    "evaluation_criteria": "Pull vs push trade-offs for short-lived batch jobs vs services, symptom-based alerting over cause-based alerting, multi-window multi-burn-rate alerts against SLO error budgets."
+  },
+  {
+    "id": "data-011",
+    "question": "Explain the architectural difference between Change Data Capture (CDC) via database transaction logs (e.g. Debezium) versus batch query polling, and how CDC preserves ordering guarantees.",
+    "category": "technical",
+    "domain": "Data Engineering",
+    "tags": [
+      "cdc",
+      "debezium",
+      "kafka",
+      "event-streaming",
+      "data-pipelines"
+    ],
+    "difficulty": "senior",
+    "company_archetypes": [
+      "Fintech",
+      "FAANG",
+      "Enterprise"
+    ],
+    "evaluation_criteria": "WAL/binlog reading without source database lock overhead, Kafka partition keys preserving primary key order, tombstone events for hard deletes, and exactly-once delivery semantics."
+  },
+  {
+    "id": "data-012",
+    "question": "How do you handle late-arriving out-of-order data and watermarks in streaming engines like Apache Flink or Spark Structured Streaming?",
+    "category": "technical",
+    "domain": "Data Engineering",
+    "tags": [
+      "streaming",
+      "flink",
+      "spark-streaming",
+      "watermarking",
+      "event-time"
+    ],
+    "difficulty": "senior",
+    "company_archetypes": [
+      "Scaleup",
+      "FAANG",
+      "AdTech"
+    ],
+    "evaluation_criteria": "Event-time vs processing-time semantics, bounded out-of-orderness watermarks, allowed lateness accumulation in state stores, and side-output routing for ultra-late records."
+  },
+  {
+    "id": "data-013",
+    "question": "Compare Apache Iceberg and Delta Lake table formats. How do they achieve ACID transactions, time travel, and partition evolution on object storage like S3?",
+    "category": "technical",
+    "domain": "Data Engineering",
+    "tags": [
+      "lakehouse",
+      "iceberg",
+      "delta-lake",
+      "parquet",
+      "storage"
+    ],
+    "difficulty": "lead",
+    "company_archetypes": [
+      "Enterprise",
+      "Cloud Provider",
+      "Big Data Unicorn"
+    ],
+    "evaluation_criteria": "Snapshot trees/manifest lists vs transaction log JSONs, hidden partitioning, atomic metadata commit protocols, copy-on-write vs merge-on-read for upserts."
+  },
+  {
+    "id": "sec-011",
+    "question": "Compare JWT (JSON Web Token) with stateful server-side sessions for a microservices architecture. How do you handle instantaneous token revocation with JWTs?",
+    "category": "technical",
+    "domain": "Cybersecurity",
+    "tags": [
+      "jwt",
+      "authentication",
+      "oauth2",
+      "microservices",
+      "security"
+    ],
+    "difficulty": "mid",
+    "company_archetypes": [
+      "Fintech",
+      "Enterprise",
+      "Startup"
+    ],
+    "evaluation_criteria": "Stateless horizontal scaling vs revocation trade-offs; short-lived access tokens with refresh token rotation; Redis-backed blacklist/bloom filters for revoked JTI tokens."
+  },
+  {
+    "id": "sec-012",
+    "question": "Explain the OAuth 2.0 Authorization Code Flow with PKCE (Proof Key for Code Exchange) and why PKCE is strictly required for Single Page Applications (SPAs) and Mobile apps.",
+    "category": "technical",
+    "domain": "Cybersecurity",
+    "tags": [
+      "oauth2",
+      "pkce",
+      "spa",
+      "security",
+      "authorization"
+    ],
+    "difficulty": "senior",
+    "company_archetypes": [
+      "FAANG",
+      "Fintech",
+      "SaaS Enterprise"
+    ],
+    "evaluation_criteria": "Inability of public clients to safely store client secrets; code_verifier and code_challenge hashing (S256); defense against authorization code interception attacks."
+  },
+  {
+    "id": "sec-013",
+    "question": "How do you protect a public-facing API against Server-Side Request Forgery (SSRF), particularly in cloud environments where metadata endpoints exist?",
+    "category": "technical",
+    "domain": "Cybersecurity",
+    "tags": [
+      "ssrf",
+      "owasp",
+      "cloud-security",
+      "aws-metadata",
+      "api-security"
+    ],
+    "difficulty": "senior",
+    "company_archetypes": [
+      "Cloud Provider",
+      "Fintech",
+      "Enterprise"
+    ],
+    "evaluation_criteria": "Validating and parsing URLs, blocking private IP ranges (RFC 1918, 127.0.0.1, 169.254.169.254 AWS metadata), DNS rebinding mitigations, and IMDSv2 session token requirements."
+  },
+  {
+    "id": "be-013",
+    "question": "How do you implement the Saga Pattern (Choreography vs Orchestration) for distributed transactions across independent microservices with compensating transactions?",
+    "category": "technical",
+    "domain": "Backend",
+    "tags": [
+      "microservices",
+      "saga-pattern",
+      "distributed-transactions",
+      "event-driven",
+      "consistency"
+    ],
+    "difficulty": "lead",
+    "company_archetypes": [
+      "FAANG",
+      "Fintech",
+      "E-commerce"
+    ],
+    "evaluation_criteria": "Eventual consistency vs 2PC (Two-Phase Commit), failure recovery and compensating action idempotency, centralized state machine orchestrators (Temporal / Step Functions) vs decentralized event choreography."
+  },
+  {
+    "id": "ml-011",
+    "question": "What techniques do you use to evaluate and reduce hallucinations in a production Retrieval-Augmented Generation (RAG) system?",
+    "category": "technical",
+    "domain": "Machine Learning",
+    "tags": [
+      "llm",
+      "rag",
+      "hallucination",
+      "evals",
+      "vector-search"
+    ],
+    "difficulty": "senior",
+    "company_archetypes": [
+      "AI Startup",
+      "FAANG",
+      "Enterprise"
+    ],
+    "evaluation_criteria": "Faithfulness and answer relevancy metrics (RAGAS / TruLens), ground truth benchmark datasets, re-ranking retrieved chunks with cross-encoders, strict system prompt grounding, and temperature calibration."
+  },
+  {
+    "id": "ml-012",
+    "question": "Explain the trade-offs between Quantization (e.g. FP16 vs INT8 vs 4-bit AWQ/GGUF) and LoRA/QLoRA fine-tuning for serving large language models with strict latency SLAs.",
+    "category": "technical",
+    "domain": "Machine Learning",
+    "tags": [
+      "llm",
+      "quantization",
+      "lora",
+      "model-serving",
+      "gpu-optimization"
+    ],
+    "difficulty": "lead",
+    "company_archetypes": [
+      "AI Labs",
+      "FAANG",
+      "Scaleup"
+    ],
+    "evaluation_criteria": "Memory bandwidth vs compute bound inference, low-rank matrix decomposition math (W = W0 + B*A), activation outliers in weight quantization, and vLLM / TensorRT-LLM PagedAttention optimizations."
+  },
+  {
+    "id": "ml-013",
+    "question": "How do you detect and mitigate Data Drift and Concept Drift in a real-time fraud detection ML model running in production?",
+    "category": "technical",
+    "domain": "Machine Learning",
+    "tags": [
+      "mlops",
+      "data-drift",
+      "fraud-detection",
+      "monitoring",
+      "model-lifecycle"
+    ],
+    "difficulty": "senior",
+    "company_archetypes": [
+      "Fintech",
+      "Banking",
+      "E-commerce"
+    ],
+    "evaluation_criteria": "Statistical divergence tests (KS-test, PSI - Population Stability Index, Wasserstein distance), delayed ground-truth feedback loop handling, shadow deployments, and automated retraining pipelines."
+  },
+  {
+    "id": "mob-011",
+    "question": "How do you design an offline-first data synchronization engine for a mobile app with local SQLite/Room/Isar storage and background sync?",
+    "category": "technical",
+    "domain": "Mobile",
+    "tags": [
+      "mobile",
+      "offline-first",
+      "sqlite",
+      "sync",
+      "architecture"
+    ],
+    "difficulty": "senior",
+    "company_archetypes": [
+      "Product Unicorn",
+      "Enterprise",
+      "High-Growth Startup"
+    ],
+    "evaluation_criteria": "Optimistic UI mutations, local revision tracking / dirty flags, conflict resolution strategies (last-write-wins vs field-level merges), and OS background execution constraints (WorkManager / BGAppRefresh)."
+  },
+  {
+    "id": "mob-012",
+    "question": "Explain how you diagnose and fix UI jank, frame drops (below 60/120 fps), and memory leaks in Flutter or React Native applications.",
+    "category": "technical",
+    "domain": "Mobile",
+    "tags": [
+      "mobile",
+      "performance",
+      "flutter",
+      "react-native",
+      "memory-management"
+    ],
+    "difficulty": "mid",
+    "company_archetypes": [
+      "Scaleup",
+      "App Agency",
+      "FAANG"
+    ],
+    "evaluation_criteria": "DevTools timeline flame graphs, JS thread vs UI thread bottlenecks, avoiding unnecessary widget rebuilds / memoization, unclosed streams/subscriptions, and image decoding cache optimization."
+  },
+  {
+    "id": "lead-011",
+    "question": "How do you balance technical debt refactoring with urgent business feature requests when negotiating quarterly roadmaps with product managers and executives?",
+    "category": "behavioral",
+    "domain": "Leadership & Management",
+    "tags": [
+      "engineering-leadership",
+      "tech-debt",
+      "product-strategy",
+      "stakeholder-management"
+    ],
+    "difficulty": "lead",
+    "company_archetypes": [
+      "Scaleup",
+      "Enterprise",
+      "FAANG"
+    ],
+    "evaluation_criteria": "Framing tech debt in terms of business impact (developer velocity, incident risk, infrastructure costs), allocating dedicated capacity (e.g. 20% rule), and incremental strangler pattern refactoring."
+  },
+  {
+    "id": "lead-012",
+    "question": "Describe your framework for managing a high-performing engineer whose output is strong but whose communication causes friction with product design and junior teammates.",
+    "category": "behavioral",
+    "domain": "Leadership & Management",
+    "tags": [
+      "people-management",
+      "coaching",
+      "feedback",
+      "team-dynamics"
+    ],
+    "difficulty": "lead",
+    "company_archetypes": [
+      "FAANG",
+      "Scaleup",
+      "Enterprise"
+    ],
+    "evaluation_criteria": "SBI (Situation-Behavior-Impact) feedback model, separating technical brilliance from team expectations, setting actionable interpersonal goals, and aligning incentives with collaboration culture."
+  },
+  {
+    "id": "lead-013",
+    "question": "How do you lead a team through a complex cross-service architectural migration involving 4 different engineering teams with conflicting sprint priorities?",
+    "category": "behavioral",
+    "domain": "Leadership & Management",
+    "tags": [
+      "cross-functional",
+      "architecture",
+      "project-management",
+      "influence"
+    ],
+    "difficulty": "senior",
+    "company_archetypes": [
+      "FAANG",
+      "Enterprise",
+      "High-Growth Startup"
+    ],
+    "evaluation_criteria": "Clear RFC (Request for Comments) alignment, establishing shared milestones and contract tests, transparent dependency mapping, executive sponsorship, and empathy for partner teams' roadmaps."
+  },
+  {
+    "id": "star-015",
+    "question": "Tell me about a time when a critical bug or security vulnerability made it past testing into production. How did you coordinate the incident response and prevent recurrence?",
+    "category": "behavioral",
+    "domain": "Behavioral",
+    "tags": [
+      "incident-response",
+      "blameless-postmortem",
+      "ownership",
+      "production-outage"
+    ],
+    "difficulty": "senior",
+    "company_archetypes": [
+      "FAANG",
+      "Fintech",
+      "Enterprise"
+    ],
+    "evaluation_criteria": "STAR structure: rapid triage, transparent communication with stakeholders, mitigating immediate customer impact, conducting a blameless postmortem, and implementing automated guardrail tests."
+  },
+  {
+    "id": "star-016",
+    "question": "Describe a situation where you fundamentally disagreed with a senior architect or director's technical direction. How did you handle the conflict and what was the outcome?",
+    "category": "behavioral",
+    "domain": "Behavioral",
+    "tags": [
+      "conflict-resolution",
+      "disagree-and-commit",
+      "communication",
+      "technical-evaluation"
+    ],
+    "difficulty": "mid",
+    "company_archetypes": [
+      "FAANG",
+      "Startup",
+      "Enterprise"
+    ],
+    "evaluation_criteria": "Evidence-backed prototypes/benchmarks rather than emotional arguments, understanding opposing business constraints, knowing when to disagree and commit professionally once a decision is finalized."
+  },
+  {
+    "id": "star-017",
+    "question": "Give an example of a project where requirements were highly ambiguous and changed multiple times midway. How did you maintain velocity and deliver value?",
+    "category": "behavioral",
+    "domain": "Behavioral",
+    "tags": [
+      "ambiguity",
+      "adaptability",
+      "agile",
+      "delivery"
+    ],
+    "difficulty": "junior",
+    "company_archetypes": [
+      "Startup",
+      "Scaleup",
+      "Agency"
+    ],
+    "evaluation_criteria": "Proactive questioning to clarify core assumptions, breaking scope into lightweight testable iterations (MVP spikes), frequent stakeholder checkpoints, and flexible modular code design."
+  },
+  {
+    "id": "star-018",
+    "question": "Tell me about a time you mentored a struggling junior or intern engineer to help them level up and succeed independently.",
+    "category": "behavioral",
+    "domain": "Behavioral",
+    "tags": [
+      "mentorship",
+      "empathy",
+      "coaching",
+      "team-growth"
+    ],
+    "difficulty": "mid",
+    "company_archetypes": [
+      "Enterprise",
+      "FAANG",
+      "Scaleup"
+    ],
+    "evaluation_criteria": "Diagnosing root cause (knowledge gap vs confidence vs tooling), pairing without micromanaging, encouraging small incremental wins, and celebrating independent progress."
   }
 ]
