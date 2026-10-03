@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import './FormattedFeedback.css';
 
 interface FormattedFeedbackProps {
@@ -10,7 +10,6 @@ interface FormattedFeedbackProps {
  * Parses inline markdown: **bold**, *italic*, `code`.
  */
 function renderInline(text: string): React.ReactNode[] {
-  // Regex to match **bold**, *italic*, and `code`
   const parts: React.ReactNode[] = [];
   const regex = /(\*\*.*?\*\*|\*.*?\*|`.*?`)/g;
   let lastIdx = 0;
@@ -40,13 +39,53 @@ function renderInline(text: string): React.ReactNode[] {
   return parts.length > 0 ? parts : [text];
 }
 
+/**
+ * Renders a full markdown code block with language badge & copy button.
+ */
+function CodeBlock({ code, language }: { code: string; language: string }) {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(code);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      // Fallback
+    }
+  };
+
+  const displayLang = language ? language.toUpperCase() : 'CODE';
+
+  return (
+    <div className="feedback-codeblock">
+      <div className="feedback-codeblock__header">
+        <span className="feedback-codeblock__lang">{displayLang}</span>
+        <button
+          type="button"
+          className="feedback-codeblock__copy-btn"
+          onClick={handleCopy}
+          title="Copy code to clipboard"
+        >
+          {copied ? '✓ Copied' : 'Copy'}
+        </button>
+      </div>
+      <pre className="feedback-codeblock__pre">
+        <code>{code}</code>
+      </pre>
+    </div>
+  );
+}
+
 export const FormattedFeedback: React.FC<FormattedFeedbackProps> = ({ content, className = '' }) => {
   if (!content) return null;
 
-  // Split lines while trimming whitespace
   const rawLines = content.split('\n');
   const elements: React.ReactNode[] = [];
   let currentList: { type: 'ul' | 'ol'; items: string[] } | null = null;
+  let inCodeBlock = false;
+  let codeBuffer: string[] = [];
+  let codeLanguage = '';
 
   const flushList = () => {
     if (currentList) {
@@ -76,15 +115,44 @@ export const FormattedFeedback: React.FC<FormattedFeedbackProps> = ({ content, c
   };
 
   for (let i = 0; i < rawLines.length; i++) {
-    const line = rawLines[i].trim();
+    const rawLine = rawLines[i];
+    const trimmed = rawLine.trim();
 
-    if (!line) {
+    // Check for start/end of fenced code block ```
+    if (trimmed.startsWith('```')) {
+      flushList();
+      if (!inCodeBlock) {
+        inCodeBlock = true;
+        codeLanguage = trimmed.slice(3).trim();
+        codeBuffer = [];
+      } else {
+        // End of code block
+        inCodeBlock = false;
+        elements.push(
+          <CodeBlock
+            key={`code-${elements.length}`}
+            code={codeBuffer.join('\n')}
+            language={codeLanguage}
+          />
+        );
+        codeBuffer = [];
+        codeLanguage = '';
+      }
+      continue;
+    }
+
+    if (inCodeBlock) {
+      codeBuffer.push(rawLine);
+      continue;
+    }
+
+    if (!trimmed) {
       flushList();
       continue;
     }
 
     // Check for markdown headings (# Heading, ## Heading, ### Heading, #### Heading)
-    const headingMatch = line.match(/^(#{1,6})\s+(.+)$/);
+    const headingMatch = trimmed.match(/^(#{1,6})\s+(.+)$/);
     if (headingMatch) {
       flushList();
       const level = headingMatch[1].length;
@@ -99,7 +167,7 @@ export const FormattedFeedback: React.FC<FormattedFeedbackProps> = ({ content, c
     }
 
     // Check for unordered list item (- item, * item)
-    const bulletMatch = line.match(/^[-*•]\s+(.+)$/);
+    const bulletMatch = trimmed.match(/^[-*•]\s+(.+)$/);
     if (bulletMatch) {
       if (!currentList || currentList.type !== 'ul') {
         flushList();
@@ -110,7 +178,7 @@ export const FormattedFeedback: React.FC<FormattedFeedbackProps> = ({ content, c
     }
 
     // Check for ordered list item (1. item, 2. item)
-    const numberedMatch = line.match(/^\d+\.\s+(.+)$/);
+    const numberedMatch = trimmed.match(/^\d+\.\s+(.+)$/);
     if (numberedMatch) {
       if (!currentList || currentList.type !== 'ol') {
         flushList();
@@ -124,12 +192,23 @@ export const FormattedFeedback: React.FC<FormattedFeedbackProps> = ({ content, c
     flushList();
     elements.push(
       <p key={`p-${elements.length}`} className="formatted-feedback__p">
-        {renderInline(line)}
+        {renderInline(trimmed)}
       </p>
     );
   }
 
   flushList();
+
+  // If unclosed code block at end of message
+  if (inCodeBlock && codeBuffer.length > 0) {
+    elements.push(
+      <CodeBlock
+        key={`code-${elements.length}`}
+        code={codeBuffer.join('\n')}
+        language={codeLanguage}
+      />
+    );
+  }
 
   return <div className={`formatted-feedback ${className}`}>{elements}</div>;
 };

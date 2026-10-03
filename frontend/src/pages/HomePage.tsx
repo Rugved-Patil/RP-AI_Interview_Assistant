@@ -220,14 +220,6 @@ export function HomePage() {
               {t('home.mode_behavioral_desc', undefined, 'Practice open-ended questions assessing communication, leadership, and situational responses.')}
             </p>
           </Link>
-
-          <Link to="/sandbox" className="mode-card">
-            <span className="mode-card__badge">{t('home.badge_sandbox', undefined, 'Live Sandbox')}</span>
-            <h3 className="mode-card__title">{t('home.mode_sandbox_title', undefined, 'Interactive Live Coding')}</h3>
-            <p className="mode-card__body">
-              {t('home.mode_sandbox_desc', undefined, 'Solve algorithmic and system coding problems with real-time test execution and AI diagnostic code reviews.')}
-            </p>
-          </Link>
         </div>
       </section>
 
@@ -244,7 +236,7 @@ export function HomePage() {
             <span className="mode-card__badge">{t('home.badge_mock', undefined, 'Full Mock Interview')}</span>
             <h3 className="mode-card__title">{t('home.mock_tech_title', undefined, 'Technical Mock Interview')}</h3>
             <p className="mode-card__body">
-              {t('home.mock_tech_desc', undefined, 'A comprehensive technical interview probing deep domain knowledge, system design, and practical experience.')}
+              {t('home.mock_tech_desc', undefined, 'Comprehensive technical interview probing deep domain knowledge, system design, and embedded live coding challenges.')}
             </p>
           </Link>
 

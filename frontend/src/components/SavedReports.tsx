@@ -418,7 +418,9 @@ function MockReportRow({
                   <div className="report-row__turn-sender">
                     {tTurn.role === 'interviewer' ? t('reports.ai_interviewer', undefined, 'AI Interviewer') : t('reports.you_candidate', undefined, 'You (Candidate)')}
                   </div>
-                  <div className="report-row__turn-content">{tTurn.content}</div>
+                  <div className="report-row__turn-content">
+                    <FormattedFeedback content={tTurn.content} />
+                  </div>
                 </div>
               ))}
             </div>
@@ -536,15 +538,15 @@ function ReportRow({
             <div className="report-row__transcript">
               <div className="report-row__turn report-row__turn--interviewer">
                 <div className="report-row__turn-sender">{isCoding ? t('reports.coding_problem', undefined, 'Coding Problem') : t('reports.drill_question', undefined, 'Drill Question')}</div>
-                <div className="report-row__turn-content">{report.question}</div>
+                <div className="report-row__turn-content">
+                  <FormattedFeedback content={report.question} />
+                </div>
               </div>
               <div className="report-row__turn report-row__turn--candidate">
                 <div className="report-row__turn-sender">{isCoding ? t('reports.code_submission', { lang: report.location || 'Code' }, `Code Submission (${report.location || 'Code'})`) : t('reports.your_response', undefined, 'Your Response')}</div>
-                {isCoding ? (
-                  <pre className="report-row__code-content"><code>{report.answer}</code></pre>
-                ) : (
-                  <div className="report-row__turn-content">{report.answer}</div>
-                )}
+                <div className="report-row__turn-content">
+                  <FormattedFeedback content={report.answer} />
+                </div>
               </div>
             </div>
           </div>

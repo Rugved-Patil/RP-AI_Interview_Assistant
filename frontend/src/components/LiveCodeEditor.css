@@ -1,0 +1,444 @@
+/* ==========================================================================
+   Live Code Editor Styles & Syntax Token Colors
+   ========================================================================== */
+
+.live-code-editor {
+  display: flex;
+  flex-direction: column;
+  background-color: var(--paper-card);
+  border: 1px solid var(--rule);
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(48, 51, 41, 0.08);
+  transition: all 0.25s ease;
+  width: 100%;
+}
+
+.live-code-editor--embedded {
+  height: 100%;
+  min-height: 480px;
+}
+
+/* Header Bar */
+.live-editor__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.55rem 0.85rem;
+  background-color: var(--canvas);
+  border-bottom: 1px solid var(--rule);
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.live-editor__header-left,
+.live-editor__header-right {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.live-editor__lang-toggle {
+  display: inline-flex;
+  background-color: var(--paper-card);
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+  padding: 2px;
+}
+
+.live-editor__lang-btn {
+  background: none;
+  border: none;
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  padding: 3px 8px;
+  color: var(--ink-muted);
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.15s ease;
+}
+
+.live-editor__lang-btn--active {
+  background-color: var(--olive-deep);
+  color: var(--text-light, #ffffff);
+  font-weight: 600;
+}
+
+.live-editor__badge {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background-color: rgba(92, 107, 74, 0.12);
+  color: var(--olive-deep);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-weight: 600;
+}
+
+.live-editor__font-controls {
+  display: inline-flex;
+  gap: 2px;
+}
+
+.live-editor__tool-btn {
+  background-color: var(--paper-card);
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  padding: 3px 7px;
+  color: var(--ink);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.live-editor__tool-btn:hover {
+  background-color: var(--rule);
+  border-color: var(--ink-muted);
+}
+
+.live-editor__close-btn {
+  background: none;
+  border: none;
+  color: var(--ink-muted);
+  font-size: 0.95rem;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 4px;
+  transition: all 0.15s ease;
+}
+
+.live-editor__close-btn:hover {
+  background-color: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+}
+
+/* Editor Main Body: Gutter + Overlay Canvas */
+.live-editor__body {
+  position: relative;
+  display: flex;
+  flex: 1;
+  min-height: 280px;
+  background-color: var(--paper-card);
+  overflow: hidden;
+  line-height: 1.55;
+  font-family: 'JetBrains Mono', 'Fira Code', Menlo, Monaco, Consolas, monospace;
+}
+
+/* Line Numbers Gutter */
+.live-editor__gutter {
+  width: 44px;
+  flex-shrink: 0;
+  background-color: var(--canvas);
+  border-right: 1px solid var(--rule);
+  padding: 12px 6px 12px 0;
+  text-align: right;
+  color: var(--ink-muted);
+  opacity: 0.65;
+  user-select: none;
+  overflow: hidden;
+}
+
+.live-editor__gutter-num {
+  height: calc(1.55em);
+  font-size: inherit;
+  line-height: 1.55;
+}
+
+/* Canvas Area holding Syntax Overlay & Textarea */
+.live-editor__canvas {
+  position: relative;
+  flex: 1;
+  overflow: hidden;
+}
+
+.live-editor__highlight,
+.live-editor__textarea {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 12px 14px;
+  border: none;
+  box-sizing: border-box;
+  font-family: inherit;
+  font-size: inherit;
+  line-height: 1.55;
+  tab-size: 4;
+  white-space: pre;
+  word-wrap: normal;
+  overflow: auto;
+}
+
+.live-editor__highlight {
+  pointer-events: none;
+  background: transparent;
+  color: var(--ink);
+  z-index: 1;
+}
+
+.live-editor__highlight code {
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+}
+
+.live-editor__textarea {
+  background: transparent;
+  color: transparent;
+  caret-color: var(--olive-deep);
+  resize: none;
+  outline: none;
+  z-index: 2;
+}
+
+.live-editor__textarea::selection {
+  background: rgba(92, 107, 74, 0.28);
+  color: transparent;
+}
+
+/* ==========================================================================
+   Syntax Highlighting Token Colors
+   ========================================================================== */
+
+/* Comments: Clean vibrant green */
+.token-comment {
+  color: #10b981 !important;
+  font-style: italic;
+  opacity: 0.95;
+}
+
+/* Keywords: Royal violet / indigo */
+.token-keyword {
+  color: #7c3aed !important;
+  font-weight: 600;
+}
+
+/* Strings: Amber / Golden warm */
+.token-string {
+  color: #d97706 !important;
+}
+
+/* Builtins, Types & Constants: Cyan / Teal */
+.token-builtin {
+  color: #0284c7 !important;
+  font-weight: 500;
+}
+
+/* Functions: Bright Cobalt Blue */
+.token-function {
+  color: #2563eb !important;
+  font-weight: 600;
+}
+
+/* Numbers: Slate / Orange */
+.token-number {
+  color: #ea580c !important;
+}
+
+/* Dark mode adjustments */
+[data-theme='dark'] .token-comment {
+  color: #34d399 !important;
+}
+[data-theme='dark'] .token-keyword {
+  color: #a78bfa !important;
+}
+[data-theme='dark'] .token-string {
+  color: #fbbf24 !important;
+}
+[data-theme='dark'] .token-builtin {
+  color: #38bdf8 !important;
+}
+[data-theme='dark'] .token-function {
+  color: #60a5fa !important;
+}
+[data-theme='dark'] .token-number {
+  color: #fb923c !important;
+}
+[data-theme='dark'] .live-editor__textarea::selection {
+  background: rgba(167, 139, 250, 0.35);
+}
+
+/* Footer & Controls */
+.live-editor__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.55rem 0.85rem;
+  background-color: var(--canvas);
+  border-top: 1px solid var(--rule);
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.live-editor__footer-left,
+.live-editor__footer-right {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.live-editor__run-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background-color: var(--olive-deep);
+  color: var(--text-light, #ffffff);
+  border: none;
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(48, 51, 41, 0.12);
+  transition: all 0.2s ease;
+}
+
+.live-editor__run-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(48, 51, 41, 0.18);
+  filter: brightness(1.08);
+}
+
+.live-editor__run-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.live-editor__spin {
+  animation: liveSpin 1s linear infinite;
+}
+
+@keyframes liveSpin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.live-editor__insert-btn {
+  display: inline-flex;
+  align-items: center;
+  background-color: var(--paper-card);
+  border: 1px solid var(--rule);
+  color: var(--ink);
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-family: var(--font-mono);
+  font-size: 0.76rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.live-editor__insert-btn:hover {
+  border-color: var(--olive-deep);
+  color: var(--olive-deep);
+  background-color: var(--canvas);
+}
+
+.live-editor__toggle-output-btn {
+  background: none;
+  border: none;
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  color: var(--ink-muted);
+  cursor: pointer;
+  padding: 4px 6px;
+  border-radius: 4px;
+  transition: color 0.15s ease;
+}
+
+.live-editor__toggle-output-btn:hover,
+.live-editor__toggle-output-btn--active {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+/* Console Output Drawer */
+.live-editor__output-drawer {
+  background-color: var(--canvas);
+  border-top: 1px solid var(--rule);
+  padding: 0.75rem 0.9rem;
+  max-height: 180px;
+  overflow-y: auto;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+}
+
+.live-editor__output-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.45rem;
+}
+
+.live-editor__output-title {
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.7rem;
+  letter-spacing: 0.05em;
+  color: var(--ink-muted);
+}
+
+.live-editor__status-badge {
+  font-size: 0.7rem;
+  padding: 1px 6px;
+  border-radius: 3px;
+  font-weight: 600;
+}
+
+.live-editor__status-badge--ok {
+  background-color: rgba(16, 185, 129, 0.15);
+  color: #10b981;
+}
+
+.live-editor__status-badge--err {
+  background-color: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+}
+
+.live-editor__output-content pre {
+  margin: 0.25rem 0;
+  padding: 6px 8px;
+  background-color: var(--paper-card);
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  color: var(--ink);
+  font-family: inherit;
+  font-size: inherit;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.live-editor__console-label {
+  font-size: 0.7rem;
+  color: var(--ink-muted);
+  display: block;
+  margin-top: 0.25rem;
+}
+
+.live-editor__console-err pre {
+  color: #ef4444;
+  background-color: rgba(239, 68, 68, 0.05);
+  border-color: rgba(239, 68, 68, 0.25);
+}
+
+.live-editor__console-empty {
+  color: var(--ink-muted);
+  font-style: italic;
+  padding: 0.5rem 0;
+}
+
+.live-editor__console-empty kbd {
+  background-color: var(--paper-card);
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  padding: 1px 4px;
+  font-size: 0.7rem;
+}

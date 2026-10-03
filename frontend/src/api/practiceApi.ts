@@ -667,7 +667,7 @@ export interface CodingProblem {
 export interface RunCodeRequest {
   code: string
   language: SupportedLanguage
-  test_cases: SandboxTestCase[]
+  test_cases?: SandboxTestCase[]
   custom_input?: string | null
   entry_function?: string | null
 }

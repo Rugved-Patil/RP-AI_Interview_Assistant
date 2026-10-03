@@ -4,7 +4,6 @@ import {
   HomeIcon,
   AnalyticsIcon,
   QuestionBankIcon,
-  CodeIcon,
   PresetsIcon,
   SavedReportsIcon,
   SettingsIcon,
@@ -47,12 +46,6 @@ export function RightNavbar() {
       label: t('nav.home', undefined, 'Home'),
       icon: HomeIcon,
       exact: true,
-    },
-    {
-      id: 'sandbox',
-      to: '/sandbox',
-      label: t('nav.sandbox', undefined, 'Coding Sandbox'),
-      icon: CodeIcon,
     },
     {
       id: 'analytics',

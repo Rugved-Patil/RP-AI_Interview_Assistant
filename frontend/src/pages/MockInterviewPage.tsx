@@ -9,14 +9,17 @@ import {
   saveInterviewReport,
   startInterview,
   submitInterviewAnswer,
+  type InterviewDimensions,
+  type PresetSummary,
+  type SupportedLanguage,
 } from '../api/practiceApi'
-import type { InterviewDimensions, PresetSummary } from '../api/practiceApi'
 import { getActivePresetId, setActivePresetId } from '../activePreset'
 import { UnsavedSessionModal } from '../components/UnsavedSessionModal'
 import { useSpeechRecognition } from '../hooks/useSpeechRecognition'
 import { useSpeechSynthesis } from '../hooks/useSpeechSynthesis'
-import { MicIcon, PlayIcon, SpeakerIcon, SpeakerOffIcon, StopIcon } from '../components/Icons'
+import { CodeIcon, MicIcon, PlayIcon, SpeakerIcon, SpeakerOffIcon, StopIcon } from '../components/Icons'
 import { FormattedFeedback } from '../components/FormattedFeedback'
+import { LiveCodeEditor } from '../components/LiveCodeEditor'
 import { useTranslation } from '../i18n/LanguageContext'
 import './MockInterviewPage.css'
 
@@ -66,6 +69,27 @@ type MockStage =
     }
   | { name: 'error'; message: string }
 
+function isLikelyCodingQuestion(text: string): boolean {
+  if (!text) return false
+  const lower = text.toLowerCase()
+  return (
+    lower.includes('write a function') ||
+    lower.includes('write code') ||
+    lower.includes('implement a function') ||
+    lower.includes('implement an algorithm') ||
+    lower.includes('write a program') ||
+    lower.includes('write a python') ||
+    lower.includes('write a javascript') ||
+    lower.includes('write a method') ||
+    lower.includes('write code to') ||
+    lower.includes('coding challenge') ||
+    lower.includes('test case') ||
+    lower.includes('time complexity') ||
+    lower.includes('space complexity') ||
+    lower.includes('```')
+  )
+}
+
 export function MockInterviewPage() {
   const navigate = useNavigate()
   const { t, currentLanguage, formatDifficulty } = useTranslation()
@@ -77,11 +101,31 @@ export function MockInterviewPage() {
   const [stage, setStage] = useState<MockStage>({ name: 'setup' })
   const [experienceLevel, setExperienceLevel] = useState<ExperienceLevel>('mid')
 
+  // Live Embedded Code Window state
+  const [isCodeEditorOpen, setIsCodeEditorOpen] = useState(false)
+  const [activeCode, setActiveCode] = useState('')
+  const [activeLanguage, setActiveLanguage] = useState<SupportedLanguage>('python')
+  const [hasCodingDetected, setHasCodingDetected] = useState(false)
+
   const [activePreset, setActivePreset] = useState<ActivePresetState>(() =>
     getActivePresetId() === null ? { status: 'none' } : { status: 'loading' },
   )
 
   const transcriptEndRef = useRef<HTMLDivElement>(null)
+
+  // Insert code into text answer box
+  const handleInsertCodeToAnswer = (formattedMarkdown: string) => {
+    setStage((prev) => {
+      if (prev.name !== 'in_progress') return prev
+      const current = prev.currentAnswer
+      const separator = current.length > 0 && !current.endsWith('\n') ? '\n\n' : ''
+      const updated = (current + separator + formattedMarkdown).slice(0, MAX_ANSWER_LENGTH)
+      return {
+        ...prev,
+        currentAnswer: updated,
+      }
+    })
+  }
 
   // Voice Output (TTS)
   const {
@@ -161,6 +205,14 @@ export function MockInterviewPage() {
         language: currentLanguage,
       })
 
+      const isCoding = isLikelyCodingQuestion(response.first_question)
+      if (isCoding) {
+        setIsCodeEditorOpen(true)
+        setHasCodingDetected(true)
+      } else {
+        setHasCodingDetected(false)
+      }
+
       setStage({
         name: 'in_progress',
         sessionId: response.session_id,
@@ -182,8 +234,14 @@ export function MockInterviewPage() {
   async function handleSubmitAnswer() {
     if (stage.name !== 'in_progress') return
     const { sessionId, currentAnswer, transcript } = stage
-    const trimmed = currentAnswer.trim()
-    if (!trimmed) return
+
+    // If code editor is open with code and not already embedded in textarea, bundle it
+    let answerToSend = currentAnswer.trim()
+    if (isCodeEditorOpen && activeCode.trim() && !answerToSend.includes('```')) {
+      answerToSend = `${answerToSend}\n\n\`\`\`${activeLanguage}\n${activeCode.trim()}\n\`\`\``.trim()
+    }
+
+    if (!answerToSend) return
 
     // Stop recording and cancel any speech output before sending
     stopListening()
@@ -191,7 +249,7 @@ export function MockInterviewPage() {
 
     const updatedTranscript: MessageTurn[] = [
       ...transcript,
-      { role: 'candidate', content: trimmed },
+      { role: 'candidate', content: answerToSend },
     ]
 
     setStage({
@@ -202,7 +260,7 @@ export function MockInterviewPage() {
     })
 
     try {
-      const response = await submitInterviewAnswer(sessionId, trimmed)
+      const response = await submitInterviewAnswer(sessionId, answerToSend)
 
       if (response.interview_ended) {
         const finalTranscript: MessageTurn[] = response.interviewer_message
@@ -221,6 +279,12 @@ export function MockInterviewPage() {
           speak(response.interviewer_message)
         }
       } else if (response.interviewer_message) {
+        const isCoding = isLikelyCodingQuestion(response.interviewer_message)
+        if (isCoding) {
+          setIsCodeEditorOpen(true)
+          setHasCodingDetected(true)
+        }
+
         setStage({
           ...stage,
           transcript: [
@@ -404,7 +468,7 @@ export function MockInterviewPage() {
         {t('nav.back', undefined, '← Back')}
       </button>
 
-      <div className="mock-card">
+      <div className={`mock-card ${isCodeEditorOpen && stage.name === 'in_progress' ? 'mock-card--with-code' : ''}`}>
         <header className="page-header" style={{ marginBottom: '1.5rem', borderBottom: 'none', paddingBottom: 0 }}>
           <div className="page-title-row">
             <div className="page-title-icon page-title-icon--mock">
@@ -488,189 +552,240 @@ export function MockInterviewPage() {
         )}
 
         {(stage.name === 'in_progress' || stage.name === 'concluded') && (
-          <div className="mock-card__panel mock-chat__container">
-            <div className="mock-chat__header">
-              <div className="mock-chat__header-left">
-                <span className="mock-chat__badge">
-                  {stage.name === 'in_progress'
-                    ? `${stage.interviewType === 'hr' ? t('mock.focus_hr', undefined, 'HR & Behavioral').toUpperCase() : t('mock.focus_technical', undefined, 'Technical').toUpperCase()} • ${formatDifficulty(stage.experienceLevel).toUpperCase()}`
-                    : t('mock.concluded', undefined, 'CONCLUDED')}
-                </span>
-                {isTtsSupported && (
-                  <button
-                    type="button"
-                    className={`mock-voice__toggle-btn ${
-                      isMuted ? 'mock-voice__toggle-btn--muted' : ''
-                    }`}
-                    onClick={toggleMute}
-                    title={isMuted ? t('mock.unmute', undefined, 'Unmute AI Voice') : t('mock.mute', undefined, 'Mute AI Voice')}
-                    aria-label={isMuted ? t('mock.unmute', undefined, 'Unmute AI Voice') : t('mock.mute', undefined, 'Mute AI Voice')}
-                  >
-                    {isMuted ? <SpeakerOffIcon width={15} height={15} /> : <SpeakerIcon width={15} height={15} />}
-                  </button>
-                )}
-              </div>
-              {stage.name === 'in_progress' && (
-                <button
-                  type="button"
-                  className="mock-chat__end-btn"
-                  onClick={handleEndInterviewEarly}
-                  disabled={stage.submitting}
-                >
-                  {t('mock.end_early_btn', undefined, 'End interview early')}
-                </button>
-              )}
-            </div>
+          <div className={`mock-card__panel ${isCodeEditorOpen && stage.name === 'in_progress' ? 'mock-workspace--split' : ''}`}>
+            <div className="mock-chat__container">
+              <div className="mock-chat__header">
+                <div className="mock-chat__header-left">
+                  <span className="mock-chat__badge">
+                    {stage.name === 'in_progress'
+                      ? `${stage.interviewType === 'hr' ? t('mock.focus_hr', undefined, 'HR & Behavioral').toUpperCase() : t('mock.focus_technical', undefined, 'Technical').toUpperCase()} • ${formatDifficulty(stage.experienceLevel).toUpperCase()}`
+                      : t('mock.concluded', undefined, 'CONCLUDED')}
+                  </span>
 
-            <div className="mock-chat__transcript">
-              {stage.transcript.map((msg, idx) => (
-                <div
-                  key={idx}
-                  className={`mock-chat__bubble mock-chat__bubble--${msg.role}`}
-                >
-                  <div className="mock-chat__sender-line">
-                    <div className="mock-chat__sender">
-                      {msg.role === 'interviewer' ? t('reports.ai_interviewer', undefined, 'AI Interviewer') : t('reports.you_candidate', undefined, 'You')}
-                    </div>
-                    {msg.role === 'interviewer' && isTtsSupported && (
-                      <button
-                        type="button"
-                        className="mock-voice__replay-btn"
-                        onClick={() => speak(msg.content)}
-                        title={t('mock.replay_audio', undefined, 'Replay audio')}
-                        aria-label={t('mock.replay_audio', undefined, 'Replay audio')}
-                      >
-                        <SpeakerIcon width={13} height={13} />
-                      </button>
-                    )}
-                  </div>
-                  <div className="mock-chat__message">{msg.content}</div>
-                </div>
-              ))}
-
-              {stage.name === 'in_progress' && stage.submitting && (
-                <div className="mock-chat__bubble mock-chat__bubble--interviewer">
-                  <div className="mock-chat__sender">{t('reports.ai_interviewer', undefined, 'AI Interviewer')}</div>
-                  <div className="mock-chat__typing">
-                    <span>•</span>
-                    <span>•</span>
-                    <span>•</span>
-                  </div>
-                </div>
-              )}
-
-              <div ref={transcriptEndRef} />
-            </div>
-
-            {stage.name === 'in_progress' && (
-              <div className="mock-chat__input-area">
-                <div className="mock-chat__textarea-wrapper">
-                  <label htmlFor="mock-answer" className="sr-only">
-                    {t('practice.your_answer', undefined, 'Your response')}
-                  </label>
-                  <textarea
-                    id="mock-answer"
-                    className="mock-chat__textarea"
-                    value={stage.currentAnswer}
-                    onChange={(e) =>
-                      setStage({ ...stage, currentAnswer: e.target.value })
-                    }
-                    placeholder={
-                      isListening
-                        ? t('mock.listening_placeholder', undefined, 'Listening… Speak your response')
-                        : t('mock.type_placeholder', undefined, 'Type your response to the interviewer...')
-                    }
-                    rows={4}
-                    maxLength={MAX_ANSWER_LENGTH}
-                    disabled={stage.submitting}
-                  />
-
-                  {isListening && (
-                    <div className="mock-voice__listening-badge">
-                      <span className="mock-voice__pulse-dot" aria-hidden="true" />
-                      <span>{t('common.recording', undefined, 'Recording…')}</span>
-                    </div>
-                  )}
-
-                  {isAiSpeaking && (
-                    <div className="mock-voice__speaking-badge">
-                      <div className="mock-voice__speaking-indicator">
-                        <SpeakerIcon width={13} height={13} />
-                        <span>{t('mock.speaking_badge', undefined, 'Speaking…')}</span>
-                      </div>
-                      <button
-                        type="button"
-                        className="mock-voice__stop-speech-btn"
-                        onClick={cancelSpeech}
-                        title={t('mock.stop_audio', undefined, 'Stop audio')}
-                        aria-label={t('mock.stop_audio', undefined, 'Stop audio')}
-                      >
-                        <StopIcon width={12} height={12} />
-                      </button>
-                    </div>
-                  )}
-                </div>
-
-                {sttError && <p className="mock-card__error">{sttError}</p>}
-                {stage.error && <p className="mock-card__error">{stage.error}</p>}
-
-                <div className="mock-card__actions mock-chat__actions">
-                  {isSttSupported && (
+                  {stage.name === 'in_progress' && (
                     <button
                       type="button"
-                      className={`mock-voice__mic-btn ${
-                        isListening ? 'mock-voice__mic-btn--listening' : ''
-                      }`}
-                      onClick={() => {
-                        cancelSpeech()
-                        toggleListening()
-                      }}
-                      disabled={stage.submitting}
-                      title={isListening ? t('mock.stop_dictation', undefined, 'Stop recording') : t('mock.dictate_response', undefined, 'Dictate response')}
-                      aria-label={isListening ? t('mock.stop_dictation', undefined, 'Stop recording') : t('mock.dictate_response', undefined, 'Dictate response')}
+                      className={`mock-chat__code-toggle-btn ${isCodeEditorOpen ? 'mock-chat__code-toggle-btn--active' : ''}`}
+                      onClick={() => setIsCodeEditorOpen((prev) => !prev)}
+                      title={isCodeEditorOpen ? 'Minimize code window' : 'Open live code window'}
                     >
-                      <MicIcon width={16} height={16} />
+                      <CodeIcon width={14} height={14} />
+                      <span>{isCodeEditorOpen ? 'Hide Code Window' : 'Live Code Window'}</span>
                     </button>
                   )}
 
-                  <button
-                    className="mock-card__button mock-chat__send-btn"
-                    onClick={handleSubmitAnswer}
-                    disabled={stage.submitting || stage.currentAnswer.trim().length === 0}
-                  >
-                    {stage.submitting ? t('mock.sending', undefined, 'Sending…') : t('mock.send_btn', undefined, 'Send response')}
-                  </button>
+                  {isTtsSupported && (
+                    <button
+                      type="button"
+                      className={`mock-voice__toggle-btn ${
+                        isMuted ? 'mock-voice__toggle-btn--muted' : ''
+                      }`}
+                      onClick={toggleMute}
+                      title={isMuted ? t('mock.unmute', undefined, 'Unmute AI Voice') : t('mock.mute', undefined, 'Mute AI Voice')}
+                      aria-label={isMuted ? t('mock.unmute', undefined, 'Unmute AI Voice') : t('mock.mute', undefined, 'Mute AI Voice')}
+                    >
+                      {isMuted ? <SpeakerOffIcon width={15} height={15} /> : <SpeakerIcon width={15} height={15} />}
+                    </button>
+                  )}
                 </div>
+
+                {stage.name === 'in_progress' && (
+                  <button
+                    type="button"
+                    className="mock-chat__end-btn"
+                    onClick={handleEndInterviewEarly}
+                    disabled={stage.submitting}
+                  >
+                    {t('mock.end_early_btn', undefined, 'End interview early')}
+                  </button>
+                )}
               </div>
-            )}
 
-            {stage.name === 'concluded' && (
-              <div className="mock-concluded__panel">
-                <div className="mock-concluded__header">
-                  <h2 className="mock-concluded__title">{t('mock.complete_title', undefined, 'Interview Complete')}</h2>
-                  <p className="mock-concluded__desc">
-                    {t('mock.complete_desc', undefined, 'Ready to evaluate your full conversation across all questions with the diagnostic assessment engine.')}
-                  </p>
-                </div>
-
-                {stage.error && <p className="mock-card__error">{stage.error}</p>}
-
-                <div className="mock-card__actions">
+              {/* Coding Question Indicator Banner */}
+              {hasCodingDetected && isCodeEditorOpen && (
+                <div className="mock-chat__code-banner">
+                  <span>💡 Coding question detected — live code editor open on the right.</span>
                   <button
-                    className="mock-card__button"
-                    onClick={handleGradeInterview}
-                    disabled={stage.grading}
+                    type="button"
+                    onClick={() => setHasCodingDetected(false)}
+                    style={{ border: 'none', background: 'transparent', cursor: 'pointer', color: 'var(--ink)' }}
+                    title="Dismiss alert"
                   >
-                    {stage.grading ? t('mock.generating_diag', undefined, 'Generating diagnostic assessment…') : t('mock.grade_btn', undefined, 'Grade interview transcript')}
-                  </button>
-                  <button
-                    className="mock-card__button mock-card__button--ghost"
-                    onClick={() => setStage({ name: 'setup' })}
-                    disabled={stage.grading}
-                  >
-                    {t('practice.start_over', undefined, 'Start over')}
+                    ✕
                   </button>
                 </div>
+              )}
+
+              <div className="mock-chat__transcript">
+                {stage.transcript.map((msg, idx) => (
+                  <div
+                    key={idx}
+                    className={`mock-chat__bubble mock-chat__bubble--${msg.role}`}
+                  >
+                    <div className="mock-chat__sender-line">
+                      <div className="mock-chat__sender">
+                        {msg.role === 'interviewer' ? t('reports.ai_interviewer', undefined, 'AI Interviewer') : t('reports.you_candidate', undefined, 'You')}
+                      </div>
+                      {msg.role === 'interviewer' && isTtsSupported && (
+                        <button
+                          type="button"
+                          className="mock-voice__replay-btn"
+                          onClick={() => speak(msg.content)}
+                          title={t('mock.replay_audio', undefined, 'Replay audio')}
+                          aria-label={t('mock.replay_audio', undefined, 'Replay audio')}
+                        >
+                          <SpeakerIcon width={13} height={13} />
+                        </button>
+                      )}
+                    </div>
+                    <div className="mock-chat__message">
+                      <FormattedFeedback content={msg.content} />
+                    </div>
+                  </div>
+                ))}
+
+                {stage.name === 'in_progress' && stage.submitting && (
+                  <div className="mock-chat__bubble mock-chat__bubble--interviewer">
+                    <div className="mock-chat__sender">{t('reports.ai_interviewer', undefined, 'AI Interviewer')}</div>
+                    <div className="mock-chat__typing">
+                      <span>•</span>
+                      <span>•</span>
+                      <span>•</span>
+                    </div>
+                  </div>
+                )}
+
+                <div ref={transcriptEndRef} />
+              </div>
+
+              {stage.name === 'in_progress' && (
+                <div className="mock-chat__input-area">
+                  <div className="mock-chat__textarea-wrapper">
+                    <label htmlFor="mock-answer" className="sr-only">
+                      {t('practice.your_answer', undefined, 'Your response')}
+                    </label>
+                    <textarea
+                      id="mock-answer"
+                      className="mock-chat__textarea"
+                      value={stage.currentAnswer}
+                      onChange={(e) =>
+                        setStage({ ...stage, currentAnswer: e.target.value })
+                      }
+                      placeholder={
+                        isListening
+                          ? t('mock.listening_placeholder', undefined, 'Listening… Speak your response')
+                          : isCodeEditorOpen
+                          ? t('mock.type_with_code_placeholder', undefined, 'Type your explanation/notes here or write code in the code window...')
+                          : t('mock.type_placeholder', undefined, 'Type your response to the interviewer...')
+                      }
+                      rows={isCodeEditorOpen ? 3 : 4}
+                      maxLength={MAX_ANSWER_LENGTH}
+                      disabled={stage.submitting}
+                    />
+
+                    {isListening && (
+                      <div className="mock-voice__listening-badge">
+                        <span className="mock-voice__pulse-dot" aria-hidden="true" />
+                        <span>{t('common.recording', undefined, 'Recording…')}</span>
+                      </div>
+                    )}
+
+                    {isAiSpeaking && (
+                      <div className="mock-voice__speaking-badge">
+                        <div className="mock-voice__speaking-indicator">
+                          <SpeakerIcon width={13} height={13} />
+                          <span>{t('mock.speaking_badge', undefined, 'Speaking…')}</span>
+                        </div>
+                        <button
+                          type="button"
+                          className="mock-voice__stop-speech-btn"
+                          onClick={cancelSpeech}
+                          title={t('mock.stop_audio', undefined, 'Stop audio')}
+                          aria-label={t('mock.stop_audio', undefined, 'Stop audio')}
+                        >
+                          <StopIcon width={12} height={12} />
+                        </button>
+                      </div>
+                    )}
+                  </div>
+
+                  {sttError && <p className="mock-card__error">{sttError}</p>}
+                  {stage.error && <p className="mock-card__error">{stage.error}</p>}
+
+                  <div className="mock-card__actions mock-chat__actions">
+                    {isSttSupported && (
+                      <button
+                        type="button"
+                        className={`mock-voice__mic-btn ${
+                          isListening ? 'mock-voice__mic-btn--listening' : ''
+                        }`}
+                        onClick={() => {
+                          cancelSpeech()
+                          toggleListening()
+                        }}
+                        disabled={stage.submitting}
+                        title={isListening ? t('mock.stop_dictation', undefined, 'Stop recording') : t('mock.dictate_response', undefined, 'Dictate response')}
+                        aria-label={isListening ? t('mock.stop_dictation', undefined, 'Stop recording') : t('mock.dictate_response', undefined, 'Dictate response')}
+                      >
+                        <MicIcon width={16} height={16} />
+                      </button>
+                    )}
+
+                    <button
+                      className="mock-card__button mock-chat__send-btn"
+                      onClick={handleSubmitAnswer}
+                      disabled={stage.submitting || (stage.currentAnswer.trim().length === 0 && (!isCodeEditorOpen || activeCode.trim().length === 0))}
+                    >
+                      {stage.submitting ? t('mock.sending', undefined, 'Sending…') : t('mock.send_btn', undefined, 'Send response')}
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {stage.name === 'concluded' && (
+                <div className="mock-concluded__panel">
+                  <div className="mock-concluded__header">
+                    <h2 className="mock-concluded__title">{t('mock.complete_title', undefined, 'Interview Complete')}</h2>
+                    <p className="mock-concluded__desc">
+                      {t('mock.complete_desc', undefined, 'Ready to evaluate your full conversation across all questions with the diagnostic assessment engine.')}
+                    </p>
+                  </div>
+
+                  {stage.error && <p className="mock-card__error">{stage.error}</p>}
+
+                  <div className="mock-card__actions">
+                    <button
+                      className="mock-card__button"
+                      onClick={handleGradeInterview}
+                      disabled={stage.grading}
+                    >
+                      {stage.grading ? t('mock.generating_diag', undefined, 'Generating diagnostic assessment…') : t('mock.grade_btn', undefined, 'Grade interview transcript')}
+                    </button>
+                    <button
+                      className="mock-card__button mock-card__button--ghost"
+                      onClick={() => setStage({ name: 'setup' })}
+                      disabled={stage.grading}
+                    >
+                      {t('practice.start_over', undefined, 'Start over')}
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Embedded Live Code Editor Panel */}
+            {stage.name === 'in_progress' && isCodeEditorOpen && (
+              <div className="mock-code-panel">
+                <LiveCodeEditor
+                  initialLanguage={activeLanguage}
+                  onCodeChange={(c, lang) => {
+                    setActiveCode(c)
+                    setActiveLanguage(lang)
+                  }}
+                  onInsertToAnswer={handleInsertCodeToAnswer}
+                  onClose={() => setIsCodeEditorOpen(false)}
+                  isEmbedded={true}
+                />
               </div>
             )}
           </div>
