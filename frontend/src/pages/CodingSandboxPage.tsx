@@ -16,6 +16,7 @@ import { FormattedFeedback } from '../components/FormattedFeedback'
 import {
   CodeIcon,
   PlayIcon,
+  QuestionBankIcon,
   SavedReportsIcon,
   SparklesIcon,
 } from '../components/Icons'
@@ -378,7 +379,8 @@ export function CodingSandboxPage() {
           className={`sandbox-mobile-tab-btn ${mobileTab === 'spec' ? 'sandbox-mobile-tab-btn--active' : ''}`}
           onClick={() => setMobileTab('spec')}
         >
-          📋 Problem
+          <QuestionBankIcon width={13} height={13} />
+          <span>Problem</span>
         </button>
         <button
           type="button"
@@ -387,7 +389,8 @@ export function CodingSandboxPage() {
           className={`sandbox-mobile-tab-btn ${mobileTab === 'editor' ? 'sandbox-mobile-tab-btn--active' : ''}`}
           onClick={() => setMobileTab('editor')}
         >
-          💻 Code ({language})
+          <CodeIcon width={13} height={13} />
+          <span>Code ({language})</span>
         </button>
         <button
           type="button"
@@ -396,7 +399,8 @@ export function CodingSandboxPage() {
           className={`sandbox-mobile-tab-btn ${mobileTab === 'output' ? 'sandbox-mobile-tab-btn--active' : ''}`}
           onClick={() => setMobileTab('output')}
         >
-          🧪 Results {runResult ? (runResult.passed_count === runResult.total_count ? '✓' : '✗') : ''}
+          <SparklesIcon width={13} height={13} />
+          <span>Results {runResult ? (runResult.passed_count === runResult.total_count ? '✓' : '✗') : ''}</span>
         </button>
       </div>
 

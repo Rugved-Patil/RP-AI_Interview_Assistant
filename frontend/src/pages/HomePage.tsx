@@ -8,7 +8,7 @@ import {
   type RecommendedDrill,
 } from '../api/practiceApi'
 import { setActivePresetId } from '../activePreset'
-import { PresetsIcon } from '../components/Icons'
+import { PresetsIcon, StarIcon } from '../components/Icons'
 import { FormattedFeedback } from '../components/FormattedFeedback'
 import { useTranslation } from '../i18n/LanguageContext'
 import './HomePage.css'
@@ -366,7 +366,7 @@ export function HomePage() {
                           onClick={() => toggleHomeAnswer(drill.question_id)}
                         >
                           <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}>
-                            <span>★</span>
+                            <StarIcon width={13} height={13} />
                             <span>{t('home.rec_model_btn', undefined, '8/10 Benchmark Model Answer')}</span>
                           </span>
                           <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem' }}>

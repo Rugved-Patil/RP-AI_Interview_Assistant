@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import type { RecommendedDrill, WeakSpotItem } from '../../api/practiceApi'
 import { FormattedFeedback } from '../FormattedFeedback'
+import { TargetIcon, StarIcon } from '../Icons'
 import { useTranslation } from '../../i18n/LanguageContext'
 
 interface WeakSpotsCardProps {
@@ -90,7 +91,9 @@ export function WeakSpotsCard({
         </div>
       ) : (
         <div className="weak-spots-well-done">
-          <span className="well-done-icon">★</span>
+          <span className="well-done-icon">
+            <StarIcon width={18} height={18} />
+          </span>
           <div>
             <h4>{t('analytics.strong_perf_title', undefined, 'Strong Performance Consistency')}</h4>
             <p>
@@ -121,7 +124,9 @@ export function WeakSpotsCard({
 
         {!trainingUnlocked && sessionsUntilUnlock > 0 && (
           <div className="training-locked-card">
-            <div className="training-locked-icon">🎯</div>
+            <div className="training-locked-icon" aria-hidden="true">
+              <TargetIcon width={22} height={22} />
+            </div>
             <div>
               <h5 className="training-locked-title">
                 {t('analytics.training_unlock_title', { count: sessionsUntilUnlock }, `Personalized Training Unlocks in ${sessionsUntilUnlock} More Session${sessionsUntilUnlock === 1 ? '' : 's'}`)}
@@ -176,7 +181,7 @@ export function WeakSpotsCard({
                       onClick={() => toggleModelAnswer(drill.question_id)}
                     >
                       <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}>
-                        <span>★</span>
+                        <StarIcon width={13} height={13} />
                         <span>{t('home.rec_model_btn', undefined, '8/10 Benchmark Model Answer')}</span>
                       </span>
                       <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}>

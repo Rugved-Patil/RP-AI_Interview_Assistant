@@ -10,7 +10,7 @@ import { DomainCompetencyChart } from '../components/Analytics/DomainCompetencyC
 import { ScoreDistributionChart } from '../components/Analytics/ScoreDistributionChart'
 import { CommunicationInsightsCard } from '../components/Analytics/CommunicationInsightsCard'
 import { WeakSpotsCard } from '../components/Analytics/WeakSpotsCard'
-import { AnalyticsIcon } from '../components/Icons'
+import { AnalyticsIcon, BarChartIcon } from '../components/Icons'
 import { useTranslation } from '../i18n/LanguageContext'
 import '../components/Analytics/AnalyticsCharts.css'
 import './AnalyticsPage.css'
@@ -178,7 +178,9 @@ export function AnalyticsPage() {
         <>
           {data.summary.total_sessions === 0 ? (
             <div className="analytics-empty-state">
-              <div className="empty-state-icon">📊</div>
+              <div className="empty-state-icon" aria-hidden="true">
+                <BarChartIcon width={28} height={28} />
+              </div>
               <h2 className="empty-state-title">No Saved Reports Yet</h2>
               <p className="empty-state-text">
                 Complete single-question practice drills or full mock interviews and save your evaluated reports to unlock your score progression trajectory, competency radars, and targeted weak-spot diagnostics.
